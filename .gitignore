@@ -1,0 +1,7 @@
+result
+result-*
+.direnv
+.envrc
+*.bak
+secrets.nix
+**/secrets.nix
