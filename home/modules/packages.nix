@@ -4,6 +4,10 @@
 
 {
   home.packages = with pkgs; [
+    ansible
+    stylua
+    shfmt
+    shellcheck
     neovim
     oh-my-posh
     pass
@@ -25,6 +29,7 @@
     poppler_utils
     unzip
     jq
+    python3
     wl-clipboard
     wslu
   ];
