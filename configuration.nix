@@ -5,43 +5,19 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, ... }:
+{ ... }:
 
 {
-  imports = [ ];
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  environment.systemPackages = with pkgs; [
-    git
-    curl
-    wget
-    fd
-    eza
-    htop
-    tree
-    zsh
+  imports = [
+    ./modules/networking.nix
+    ./modules/packages.nix
+    ./modules/security.nix
+    ./modules/time.nix
+    ./modules/users.nix
+    ./modules/wsl.nix
   ];
 
-  programs.zsh.enable = true;
-  programs.ssh.startAgent = false;
-
-  users.users.charlotte = {
-    isNormalUser = true;
-    description = "Charlotte";
-    extraGroups = [ "wheel" ];
-    shell = pkgs.zsh;
-  };
-
-  security.sudo.wheelNeedsPassword = true;
-
-  wsl.enable = true;
-  wsl.defaultUser = "charlotte";
-  wsl.startMenuLaunchers = true;
-  wsl.wslConf.interop.appendWindowsPath = false;
-
-  networking.hostName = "Charlie-Laptop";
-  time.timeZone = "America/Chicago";
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
