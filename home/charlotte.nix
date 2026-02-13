@@ -7,6 +7,7 @@
     ./modules/packages.nix
     ./modules/files.nix
     ./modules/git.nix
+    ./modules/gnupg.nix
     ./modules/atuin.nix
     ./modules/zsh
     ./modules/tmux
