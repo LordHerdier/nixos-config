@@ -31,7 +31,7 @@
     jq
     python3
     wl-clipboard
-   ])
+   ]);
 #  ++ lib.optionals isWsl (with pkgs; [
 #    wslu
 #    win32yank
