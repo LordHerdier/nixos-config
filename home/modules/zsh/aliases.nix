@@ -33,7 +33,7 @@
     path = "realpath";
 
     # Nix
-    nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#Charlie-Laptop";
+    nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)";
     nix-update-dotfiles = "sudo nix flake lock --update-input dotfiles /etc/nixos";
 
     # Tools

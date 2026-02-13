@@ -1,5 +1,7 @@
+# flake.nix
+
 {
-  description = "NixOS-WSL config for Charlie-Laptop";
+  description = "Nix configs for Charlotte's machines (WSL + NixOS)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -16,25 +18,68 @@
   outputs = { self, nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
   let
     system = "x86_64-linux";
+
+    mkHost = { hostName, isWsl ? false, hostPath }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+
+        modules =
+          [
+            # Common system bits
+            ./modules/common/packages.nix
+            ./modules/common/security.nix
+            ./modules/common/time.nix
+            ./modules/common/users.nix
+
+            # Host-specific bits
+            hostPath
+
+            # Home Manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+
+              home-manager.extraSpecialArgs = {
+                inherit dotfiles;
+                inherit hostName isWsl;
+              };
+
+              home-manager.users.charlotte = {
+                imports = [
+                  ./home/charlotte.nix
+                  (./home/hosts + "/${hostName}.nix")
+                ];
+              };
+            }
+          ]
+          ++ nixpkgs.lib.optionals isWsl [
+            nixos-wsl.nixosModules.wsl
+            ./modules/profiles/wsl.nix
+          ];
+
+        specialArgs = { inherit hostName isWsl; };
+      };
   in
   {
-    nixosConfigurations."Charlie-Laptop" = nixpkgs.lib.nixosSystem {
-      inherit system;
+    nixosConfigurations = {
+      "Charlie-Laptop" = mkHost {
+        hostName = "Charlie-Laptop";
+        isWsl = true;
+        hostPath = ./hosts/Charlie-Laptop/default.nix;
+      };
 
-      modules = [
-        nixos-wsl.nixosModules.wsl
-        ./configuration.nix
+      "Nico" = mkHost {
+        hostName = "Nico";
+        isWsl = true;
+        hostPath = ./hosts/Nico/default.nix;
+      };
 
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-
-          home-manager.extraSpecialArgs = { inherit dotfiles; };
-
-          home-manager.users.charlotte = import ./home/charlotte.nix;
-        }
-      ];
+      #"Pine" = mkHost {
+        #hostName = "Pine";
+        #isWsl = false;
+        #hostPath = ./hosts/Pine/default.nix;
+        #};
     };
   };
 }
