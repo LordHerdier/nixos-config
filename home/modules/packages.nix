@@ -17,6 +17,7 @@
     gnused
     gh
     gnupg
+    gcc
     coreutils
     procps
     yazi

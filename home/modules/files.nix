@@ -1,6 +1,6 @@
 # home/modules/files.nix
 
-{ dotfiles, ... }:
+{ config, dotfiles, ... }:
 
 {
   home.file = {
