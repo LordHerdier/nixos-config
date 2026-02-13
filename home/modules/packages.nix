@@ -15,6 +15,7 @@
     ripgrep
     gnugrep
     gnused
+    gh
     coreutils
     procps
     yazi

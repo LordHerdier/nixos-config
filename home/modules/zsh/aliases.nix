@@ -64,8 +64,6 @@
 
     # “bruh”
     npm = "/usr/bin/npm";
-    gpg = "/mnt/c/Program\\ Files\\ \\(x86\\)/GnuPG/bin/gpg.exe";
-    gpgconf = "/mnt/c/Program\\ Files\\ \\(x86\\)/GnuPG/bin/gpgconf.exe";
 
     # Workflow
     nmapc = "nmap -p 1-1000,41794,41795,41796 -Pn -T4";

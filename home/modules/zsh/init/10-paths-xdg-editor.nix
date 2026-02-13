@@ -11,7 +11,6 @@
     path+=(
       "/mnt/c/Windows/System32"
       "/mnt/c/Windows"
-      "/mnt/c/Program Files (x86)/GnuPG/bin"
       "/mnt/c/Program Files/Tailscale"
     )
     export PATH
