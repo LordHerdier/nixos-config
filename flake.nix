@@ -30,6 +30,7 @@
             ./modules/common/security.nix
             ./modules/common/time.nix
             ./modules/common/users.nix
+            ./modules/common/nix.nix
 
             # Host-specific bits
             hostPath
