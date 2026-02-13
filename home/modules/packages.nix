@@ -16,6 +16,8 @@
     gnugrep
     gnused
     gh
+    gnupg
+    pinentry-all
     coreutils
     procps
     yazi
