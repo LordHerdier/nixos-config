@@ -18,6 +18,18 @@
       source = "${dotfiles}/yazi/.config/yazi";
       recursive = true;
     };
+    
+    ".config/nvim" = {
+      source = "${dotfiles}/nvim/.config/nvim";
+      recursive = true;
+    };
+
+    ".config/nvim/lazy-lock.json" = {
+      force = true;
+      # Make it a symlink to the writable lockfile location
+      source = config.lib.file.mkOutOfStoreSymlink
+        "${config.xdg.stateHome}/nvim/lazy/lazy-lock.json";
+    };
+
   };
 }
-
