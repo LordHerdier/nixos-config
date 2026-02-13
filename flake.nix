@@ -15,7 +15,7 @@
     dotfiles.flake = false;
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
+  outputs = {  nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
   let
     system = "x86_64-linux";
 
