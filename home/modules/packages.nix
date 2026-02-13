@@ -31,7 +31,10 @@
     jq
     python3
   ])
-  ++ lib.optionals isWsl [ pkgs.wslu ]
+  ++ lib.optionals isWsl (with pkgs; [
+    wslu
+    win32yank
+  ])
   ++ lib.optionals (!isWsl) [ pkgs.wl-clipboard ];
 }
 
