@@ -7,6 +7,10 @@
     enable = true;
     defaultUser = "charlotte";
     startMenuLaunchers = true;
-    wslConf.interop.appendWindowsPath = false;
+
+    wslConf = {
+      interop.appendWindowsPath = false;
+      network.generateResolvConf = false;
+    };
   };
 }
