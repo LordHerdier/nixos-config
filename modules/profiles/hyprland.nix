@@ -1,6 +1,6 @@
 # modules/profiles/hyprland.nix
 
-{ config,, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   services.xserver = {
