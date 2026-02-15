@@ -8,6 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix
+    ../../modules/profiles/hyprland.nix
   ];
 
   system.stateVersion = "25.05";
@@ -26,9 +27,6 @@
   console = {
     keyMap = "colemak";
   };
-
-  # Enable sound.
-  services.pulseaudio.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
