@@ -76,11 +76,11 @@
         hostPath = ./hosts/Nico/default.nix;
       };
 
-      #"Pine" = mkHost {
-        #hostName = "Pine";
-        #isWsl = false;
-        #hostPath = ./hosts/Pine/default.nix;
-        #};
+      "Pine" = mkHost {
+        hostName = "Pine";
+        isWsl = false;
+        hostPath = ./hosts/Pine/default.nix;
+        };
     };
   };
 }

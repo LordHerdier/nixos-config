@@ -13,4 +13,25 @@
   system.stateVersion = "25.05";
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
+
+  # Boot settings
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub.device = "nodev";
+
+  # Set the timezone
+  time.timeZone = "America/Chicago";
+
+  # Set console language
+  console = {
+    keyMap = "colemak";
+  };
+
+  # Enable sound.
+  services.pulseaudio.enable = true;
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  services.libinput.enable = true;
+
+
 }
