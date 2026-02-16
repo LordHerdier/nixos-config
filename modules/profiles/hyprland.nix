@@ -5,7 +5,6 @@
 {
   services.xserver = {
     enable = true;
-    xwayland.enable = true;
   };
 
   xdg.portal = {
@@ -22,7 +21,7 @@
 
   security.rtkit.enable = true;
 
-  hardware.opengl.enable = true;
+  hardware.graphics.enable = true;
 
   environment.systemPackages = with pkgs; [
   kitty
@@ -36,8 +35,9 @@
   brightnessctl
   ];
 
-  fonts.packages = with pkgs; [
-    nerdfonts
-    noto-fonts
-    noto-fonts-emoji
-  ];
+#  fonts.packages = with pkgs; [
+#    nerdfonts
+#    noto-fonts
+#    noto-fonts-emoji
+#  ];
+}
