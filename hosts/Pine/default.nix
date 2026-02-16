@@ -1,11 +1,12 @@
 # hosts/Pine/default.nix
 
-{ hostName, ... }:
+{ hostName, ambxst, ... }:
 
 {
   networking.hostName = hostName;
 
   imports = [
+    ambxst.nixosModules.default
     ./hardware-configuration.nix
     ./networking.nix
     ./ambxst.nix

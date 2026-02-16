@@ -1,4 +1,4 @@
-# hosts/Pne/ambxst.nix
+# hosts/Pine/ambxst.nix
 
 { lib, ... }:
 
