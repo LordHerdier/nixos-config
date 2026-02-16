@@ -8,6 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix
+    ./ambxst.nix
     ../../modules/profiles/hyprland.nix
   ];
 

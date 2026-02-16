@@ -10,9 +10,13 @@
       "$mod" = "SUPER";
 
       bind = [
-        "$mod, T, exec kitty"
-       " $mod, Q, killactive"
+        "$mod, T, exec, kitty"
+        "$mod, Q, killactive"
         "$mod, E, exec, wofi --show drun"
+      ];
+
+      exec-once = [
+        "ambxst"
       ];
 
       input = {

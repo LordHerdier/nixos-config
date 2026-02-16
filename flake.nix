@@ -13,6 +13,9 @@
 
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
+
+    ambxst.url = "github:Axenide/Ambxst";
+    ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {  nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
@@ -34,6 +37,9 @@
 
             # Host-specific bits
             hostPath
+            
+            # Make an if to load ambxst or not
+            (nixpkgs.lib.mkIf enableAmbxst ambxst.nixosModules.default)
 
             # Home Manager
             home-manager.nixosModules.home-manager
@@ -80,6 +86,7 @@
         hostName = "Pine";
         isWsl = false;
         hostPath = ./hosts/Pine/default.nix;
+        enableAmbxst = true;
         };
     };
   };

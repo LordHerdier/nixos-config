@@ -13,7 +13,11 @@
       recursive = true;
     };
     ".config/sddm" = {
-      source = "{dotfiles}/sddm/.config/sddm";
+      source = "${dotfiles}/sddm/.config/sddm";
+      recursive = true;
+    };
+    ".config/ambxst" = {
+      source = "${dotfiles}/ambxst/.config/ambxst";
       recursive = true;
     };
     
