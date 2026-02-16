@@ -33,5 +33,8 @@
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
 
+  # Enable ssh sservices
+  services.openssh.enable = true;
+
 
 }
