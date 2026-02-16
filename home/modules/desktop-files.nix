@@ -1,6 +1,6 @@
 # home/modules/desktop-files.nix
 
-{ dotfiles, ... }:
+{ dotfiles, ambxst, ... }:
 
 {
   home.file = {
@@ -20,6 +20,5 @@
       source = "${dotfiles}/ambxst/.config/ambxst";
       recursive = true;
     };
-    
   };
 }
