@@ -5,6 +5,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -18,7 +19,7 @@
     ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = {  nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
+  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
   let
     system = "x86_64-linux";
 
@@ -37,9 +38,6 @@
 
             # Host-specific bits
             hostPath
-            
-            # Make an if to load ambxst or not
-            (nixpkgs.lib.mkIf enableAmbxst ambxst.nixosModules.default)
 
             # Home Manager
             home-manager.nixosModules.home-manager
@@ -48,8 +46,7 @@
               home-manager.useUserPackages = true;
 
               home-manager.extraSpecialArgs = {
-                inherit dotfiles;
-                inherit hostName isWsl;
+                inherit dotfiles hostName isWsl;
               };
 
               home-manager.users.charlotte = {
@@ -65,7 +62,7 @@
             ./modules/profiles/wsl.nix
           ];
 
-        specialArgs = { inherit hostName isWsl; };
+        specialArgs = { inherit hostName isWsl ambxst; };
       };
   in
   {
@@ -86,8 +83,7 @@
         hostName = "Pine";
         isWsl = false;
         hostPath = ./hosts/Pine/default.nix;
-        enableAmbxst = true;
-        };
+      };
     };
   };
 }

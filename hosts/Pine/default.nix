@@ -12,7 +12,7 @@
     ../../modules/profiles/hyprland.nix
   ];
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
 
