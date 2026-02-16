@@ -7,10 +7,8 @@
     enable = true;
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-  };
+    xdg.portal.config.common.default = "*";
+
 
   services.pipewire = {
 
