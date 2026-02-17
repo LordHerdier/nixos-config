@@ -5,6 +5,11 @@
 {
   home.packages = (with pkgs; [
     firefox
+    audacity
+    gimp
+    nautilus
+    xfce.thunar
+    tailscale
   ]);
 }
 

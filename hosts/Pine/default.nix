@@ -1,6 +1,6 @@
 # hosts/Pine/default.nix
 
-{ hostName, ambxst, ... }:
+{ hostName, ambxst, pkgs, ... }:
 
 {
   networking.hostName = hostName;
@@ -35,6 +35,31 @@
 
   # Enable ssh sservices
   services.openssh.enable = true;
+
+  # Dbus
+  environment.systemPackages = with pkgs; [
+    (python3.withPackages (ps: with ps; [
+      dbus-python
+    ]))
+    greetd.tuigreet
+    hyprland
+  ];
+
+  services.dbus.enable = true;
+
+  virtualisation.docker.enable = true;
+  services.seatd.enable = true;
+
+  services.greetd = {
+    enable = true;
+
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        user = "greeter";
+      };
+    };
+  };  
 
 
 }

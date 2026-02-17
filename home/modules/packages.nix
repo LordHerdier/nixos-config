@@ -11,6 +11,8 @@
     neovim
     oh-my-posh
     pass
+    binwalk
+    unzip
     sshpass
     stow
     zoxide
@@ -30,6 +32,7 @@
     unzip
     jq
     python3
+    qemu
     wl-clipboard
    ]);
 #  ++ lib.optionals isWsl (with pkgs; [

@@ -5,6 +5,7 @@
 {
   environment.systemPackages = with pkgs; [
     git
+    gnumake
     curl
     wget
     fd
