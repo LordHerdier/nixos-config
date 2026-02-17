@@ -15,11 +15,12 @@
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
 
-    ambxst.url = "github:Axenide/Ambxst";
-    ambxst.inputs.nixpkgs.follows = "nixpkgs";
+    # ambxst.url = "github:Axenide/Ambxst";
+    # ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
+  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
+    #outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
   let
     system = "x86_64-linux";
 
@@ -62,7 +63,8 @@
             ./modules/profiles/wsl.nix
           ];
 
-        specialArgs = { inherit hostName isWsl ambxst; };
+        specialArgs = { inherit hostName isWsl ; };
+          #specialArgs = { inherit hostName isWsl ambxst; };
       };
   in
   {
