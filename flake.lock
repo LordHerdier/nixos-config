@@ -24,11 +24,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1771273368,
-        "narHash": "sha256-S4NC5kInaq7ZpUsf7nTxdGwvcw8rJXbhEHScCI5ajOM=",
+        "lastModified": 1771336928,
+        "narHash": "sha256-n1JyrGM0dkMeW/E9BPC1UWsp5kxrZ0euinUG+SNVgXM=",
         "owner": "LordHerdier",
         "repo": "Dotfiles",
-        "rev": "cdcaa34b54b0e3c6bf340bcedc6ece41a37d7a4b",
+        "rev": "8d52a44c519d05ca7b5dd5f9f056557f7ddf9252",
         "type": "github"
       },
       "original": {
@@ -82,11 +82,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770657009,
-        "narHash": "sha256-v/LA5ZSJ+JQYzMSKB4sySM0wKfsAqddNzzxLLnbsV/E=",
+        "lastModified": 1771243519,
+        "narHash": "sha256-oeHgjE5GpACBjDeXrTczIl6cKmHltLbk7inNSMgGFFQ=",
         "owner": "nix-community",
         "repo": "NixOS-WSL",
-        "rev": "5b50ea1aaa14945d4794c80fcc99c4aa1db84d2d",
+        "rev": "a2cb8eeecfbf4a1ce0083e6a32680b1bec8b045c",
         "type": "github"
       },
       "original": {
