@@ -10,7 +10,7 @@
     #   ambxst.nixosModules.default
     ./hardware-configuration.nix
     ./networking.nix
-    ./ambxst.nix
+    # ./ambxst.nix
     ../../modules/profiles/hyprland.nix
   ];
 
