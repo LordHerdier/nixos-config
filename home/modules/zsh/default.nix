@@ -1,11 +1,12 @@
 # home/modules/zsh/default.nix
 
-{ lib, ... }:
+{ ... }:
 
 {
   imports = [
     ./aliases.nix
     ./profile.nix
+    ./wsl.nix      #gated behind isWsl:true
 
     ./init/00-guard.nix
     ./init/10-paths-xdg-editor.nix

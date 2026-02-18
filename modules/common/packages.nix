@@ -5,6 +5,7 @@
 {
   environment.systemPackages = with pkgs; [
     git
+    gnumake
     curl
     wget
     fd
@@ -12,6 +13,7 @@
     htop
     tree
     zsh
+    psmisc
   ];
 
   programs = {

@@ -1,9 +1,9 @@
 # home/modules/packages.nx
 
-{ pkgs, ... }:
+{ pkgs, lib, isWsl, ... }:
 
 {
-  home.packages = with pkgs; [
+  home.packages = (with pkgs; [
     ansible
     stylua
     shfmt
@@ -11,6 +11,8 @@
     neovim
     oh-my-posh
     pass
+    binwalk
+    unzip
     sshpass
     stow
     zoxide
@@ -30,8 +32,13 @@
     unzip
     jq
     python3
+    qemu
     wl-clipboard
-    wslu
-  ];
+   ]);
+#  ++ lib.optionals isWsl (with pkgs; [
+#    wslu
+#    win32yank
+#  ])
+#  ++ lib.optionals (!isWsl) [ pkgs.wl-clipboard ];
 }
 

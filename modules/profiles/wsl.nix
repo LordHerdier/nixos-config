@@ -1,4 +1,4 @@
-# modules/wsl.nix
+# modules/profiles/wsl.nix
 
 { ... }:
 

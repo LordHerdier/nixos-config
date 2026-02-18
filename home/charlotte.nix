@@ -1,6 +1,6 @@
 # home/charlotte.nix
 
-{ config, pkgs, dotfiles, ... }:
+{ hostName, isWsl, ... }:
 
 {
   imports = [
@@ -13,6 +13,11 @@
     ./modules/zsh
     ./modules/tmux
   ];
+
+  home.sessionVariables = {
+    NIX_HOST = hostName;
+    IS_WSL = if isWsl then "1" else "0";
+  };
 
   home.username = "charlotte";
   home.homeDirectory = "/home/charlotte";

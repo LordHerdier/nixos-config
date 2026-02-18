@@ -1,6 +1,6 @@
 # home/modules/tmux/default.nix
 
-{ lib, pkgs, ... }:
+{  pkgs, ... }:
 
 {
   imports = [
@@ -8,7 +8,6 @@
     ./10-keybinds.nix
     ./20-status-and-titles.nix
     ./30-colors-kanagawa.nix
-    ./40-url-helpers.nix
     ./50-smart-vim.nix
   ];
 

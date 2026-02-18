@@ -8,7 +8,7 @@
       charlotte = {
         isNormalUser = true;
         description = "Charlotte";
-        extraGroups = [ "wheel" ];
+        extraGroups = [ "wheel" "docker" ];
         shell = pkgs.zsh;
       };
     };
