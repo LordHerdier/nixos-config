@@ -11,6 +11,7 @@
     xfce.thunar
     tailscale
     mpvpaper
+    hyprpaper
   ]);
 }
 
