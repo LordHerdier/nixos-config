@@ -12,6 +12,7 @@
     ./networking.nix
     # ./ambxst.nix
     ../../modules/profiles/hyprland.nix
+    ../../modules/common/tailscale.nix
   ];
 
   system.stateVersion = "25.11";
