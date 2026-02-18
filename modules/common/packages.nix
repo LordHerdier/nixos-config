@@ -13,6 +13,7 @@
     htop
     tree
     zsh
+    psmisc
   ];
 
   programs = {
