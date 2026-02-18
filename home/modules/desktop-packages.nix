@@ -10,6 +10,7 @@
     nautilus
     xfce.thunar
     tailscale
+    mpvpaper
   ]);
 }
 
