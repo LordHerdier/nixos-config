@@ -16,6 +16,10 @@
       source = "${dotfiles}/sddm/.config/sddm";
       recursive = true;
     };
+    ".config/kitty" = {
+      source = "${dotfiles}/kitty/.config/kitty";
+      recursive = true;
+    };
     #    ".config/ambxst" = {
     #     source = "${dotfiles}/ambxst/.config/ambxst";
     #     recursive = true;
