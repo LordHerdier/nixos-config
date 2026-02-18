@@ -13,6 +13,7 @@
     mpvpaper
     hyprpaper
     spotify
+    discord
   ]);
 }
 
