@@ -12,6 +12,7 @@
     tailscale
     mpvpaper
     hyprpaper
+    spotify
   ]);
 }
 
