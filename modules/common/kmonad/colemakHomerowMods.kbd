@@ -1,0 +1,51 @@
+(defcfg
+    input (device-file "/dev/input/by-path/platform-i8042-serio-0-event-kbd")
+    output (uinput-sink "KMonad output")
+    fallthrough true
+)
+
+(defsrc
+    esc   f1    f2    f3    f4    f6    f7    f8    f9    f10   f11   f12   home    end   delete
+    grv   1     2     3     4     5     6     7     8     9     0     -     =       bspc
+    tab   q     w     e     r     t     y     u     i     o     p     [     ]       \
+    caps  a     s     d     f     g     h     j     k     l     ;     '     ret
+    lsft  z     x     c     v     b     n     m     ,     .     /     rsft
+    lctl  fn    lmet  lalt       space              ralt  rctl  pgup  up    pgdn
+                                                                left  down  right
+)
+
+(defalias
+    met_a (tap-hold 200  a lmet)
+    alt_s (tap-hold 200 s lalt)
+    sft_d (tap-hold 200 d lsft)
+    ctl_f (tap-hold 200 f lctl)
+
+    nav_g (tap-hold 200 g (layer-toggle nav))
+    nav_h (tap-hold 200 h (layer-toggle nav))
+
+    ctl_j (tap-hold 200 j lctl)
+
+    sft_k (tap-hold 200 k lsft)
+    alt_l (tap-hold 200 l lalt)
+    met_; (tap-hold 200 ; lmet)
+)
+
+(deflayer default
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _     _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h @ctl_j  @sft_k  @alt_l  @met_;  _       _
+    _     _       _       _     _     _     _     _     _     _     _     _
+    _     _       _       _          _                  _     _     _     _     _
+                                                                _     _     _
+)
+
+(deflayer nav
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _     _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       up      _       _       _       _       up      _       _       _       _       _
+    _     _       left    down    right   _       _       left    down    right   _       _       _
+    _     _       _       _     _     _     _     _     _     _     _     _
+    _     _       _       _          _                  _     _     _     _     _
+                                                                _     _     _
+)
