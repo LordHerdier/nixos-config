@@ -1,9 +1,9 @@
-# home/modules/kmonad.nix
+# modules/common/kmonad.nix
 
 { Dotfiles, pkgs, ... }:
 
 {
-  home.packages = [ pkgs.kmonad ];
+  environment.systemPackages = [ pkgs.kmonad ];
 
   services.kmonad = {
     enable = true;
