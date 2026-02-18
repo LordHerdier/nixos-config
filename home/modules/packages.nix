@@ -34,7 +34,7 @@
     python3
     qemu
     wl-clipboard
-    nerd-fonts-caskaydia-cove
+    nerd-fonts.caskaydia-cove
    ]);
 #  ++ lib.optionals isWsl (with pkgs; [
 #    wslu
