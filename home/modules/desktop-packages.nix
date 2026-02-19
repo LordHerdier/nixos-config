@@ -14,6 +14,8 @@
     hyprpaper
     spotify
     discord
+    remmina
+    moonlight-qt
   ]);
 }
 
