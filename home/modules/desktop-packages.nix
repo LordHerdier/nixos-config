@@ -16,6 +16,7 @@
     discord
     remmina
     moonlight-qt
+    steam
   ]);
 }
 
