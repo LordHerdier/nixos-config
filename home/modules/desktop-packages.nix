@@ -12,6 +12,11 @@
     tailscale
     mpvpaper
     hyprpaper
+    spotify
+    discord
+    remmina
+    moonlight-qt
+    steam
   ]);
 }
 
