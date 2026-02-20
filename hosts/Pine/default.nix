@@ -37,6 +37,9 @@
   # Enable ssh sservices
   services.openssh.enable = true;
 
+  # Bluetooth
+  hardware.bluetooth.enable = true;
+
   # Dbus
   environment.systemPackages = with pkgs; [
     (python3.withPackages (ps: with ps; [
