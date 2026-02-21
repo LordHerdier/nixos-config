@@ -15,11 +15,13 @@
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
 
+    nixvim.url = "github:nix-community/nixvim";
+
     # ambxst.url = "github:Axenide/Ambxst";
     # ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ... }:
+  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, nixvim, ... }:
     #outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
   let
     system = "x86_64-linux";
