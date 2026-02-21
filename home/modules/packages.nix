@@ -28,7 +28,7 @@
     procps
     yazi
     ffmpegthumbnailer
-    poppler_utils
+    poppler-utils
     unzip
     jq
     python3

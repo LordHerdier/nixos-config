@@ -9,7 +9,6 @@
     pyright                # Python LSP
     nodePackages.bash-language-server
     nodePackages.yaml-language-server
-    ansible-language-server
     nodePackages.svelte-language-server
     vtsls     # TS/JS LSP (vtsls)
 
