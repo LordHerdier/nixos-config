@@ -66,6 +66,24 @@
         echo "No theme selected, nothing changed."
       fi
     }
+
+    dumpfiles() {
+      local ext
+      ext="$1"
+      if [[ -z "$ext" ]]; then
+        echo "Usage: dumpfiles <extension>"
+        return 1
+      fi
+
+      ext="''${ext#.}"
+
+      find . -type f -name "*.''${ext}" -print0 \
+        | sort -z \
+        | while IFS= read -r -d $'\0' f; do 
+            echo "==== $f ===="
+            cat -- "$f"
+            echo
+          done
+    }
   '';
 }
-
