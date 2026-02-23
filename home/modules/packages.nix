@@ -35,6 +35,7 @@
     qemu
     wl-clipboard
     nerd-fonts.caskaydia-cove
+    nmap
    ]);
 #  ++ lib.optionals isWsl (with pkgs; [
 #    wslu

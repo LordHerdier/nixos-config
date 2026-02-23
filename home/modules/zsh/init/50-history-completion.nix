@@ -13,6 +13,9 @@
 
     # Completion matcher
     zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+    # Emacs-style history binds
+    bindkey '^P' up-history
+    bindkey '^N' down-history
   '';
 }
-
