@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../modules/hyprland/default.nix
+    #../modules/hyprland/default.nix
     ../modules/desktop-files.nix
     ../modules/desktop-packages.nix
     ../modules/kitty.nix
@@ -10,4 +10,5 @@
   ];
 
   my.kitty.enable = true;
+  nixos95.enable = true;
 }

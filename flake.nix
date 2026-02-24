@@ -17,21 +17,38 @@
 
     nixvim.url = "github:nix-community/nixvim";
 
+    nixos95.url = "github:Peritia-System/NixOS-95/Dev";
+    nixos95.inputs.nixpkgs.follows = "nixpkgs";
+    nixos95.inputs.home-manager.follows = "home-manager";
+
     # ambxst.url = "github:Axenide/Ambxst";
     # ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, nixvim, ... }:
+  outputs =
+    {
+      nixpkgs,
+      home-manager,
+      nixos-wsl,
+      dotfiles,
+      nixvim,
+      nixos95,
+      ...
+    }:
     #outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
-  let
-    system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
 
-    mkHost = { hostName, isWsl ? false, hostPath }:
-      nixpkgs.lib.nixosSystem {
-        inherit system;
+      mkHost =
+        {
+          hostName,
+          isWsl ? false,
+          hostPath,
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
 
-        modules =
-          [
+          modules = [
             # Common system bits
             ./modules/common/packages.nix
             ./modules/common/security.nix
@@ -54,6 +71,7 @@
 
               home-manager.users.charlotte = {
                 imports = [
+                  nixos95.nixosModules.default
                   ./home/charlotte.nix
                   (./home/hosts + "/${hostName}.nix")
                 ];
@@ -65,29 +83,29 @@
             ./modules/profiles/wsl.nix
           ];
 
-        specialArgs = { inherit hostName isWsl ; };
+          specialArgs = { inherit hostName isWsl; };
           #specialArgs = { inherit hostName isWsl ambxst; };
-      };
-  in
-  {
-    nixosConfigurations = {
-      "Charlie-Laptop" = mkHost {
-        hostName = "Charlie-Laptop";
-        isWsl = true;
-        hostPath = ./hosts/Charlie-Laptop/default.nix;
-      };
+        };
+    in
+    {
+      nixosConfigurations = {
+        "Charlie-Laptop" = mkHost {
+          hostName = "Charlie-Laptop";
+          isWsl = true;
+          hostPath = ./hosts/Charlie-Laptop/default.nix;
+        };
 
-      "Nico" = mkHost {
-        hostName = "Nico";
-        isWsl = true;
-        hostPath = ./hosts/Nico/default.nix;
-      };
+        "Nico" = mkHost {
+          hostName = "Nico";
+          isWsl = true;
+          hostPath = ./hosts/Nico/default.nix;
+        };
 
-      "Pine" = mkHost {
-        hostName = "Pine";
-        isWsl = false;
-        hostPath = ./hosts/Pine/default.nix;
+        "Pine" = mkHost {
+          hostName = "Pine";
+          isWsl = false;
+          hostPath = ./hosts/Pine/default.nix;
+        };
       };
     };
-  };
 }
