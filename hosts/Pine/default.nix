@@ -14,6 +14,7 @@
     ../../modules/profiles/hyprland.nix
     ../../modules/common/tailscale.nix
     ../../modules/common/kmonad/kmonad.nix
+    ../../modules/common/steam.nix
   ];
 
   system.stateVersion = "25.11";
