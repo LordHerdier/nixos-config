@@ -1,20 +1,19 @@
 # hosts/Pine/default.nix
 
-{ hostName, pkgs, ... }:
-#{ hostName, ambxst, pkgs, ... }:
+{ hostName, ... }:
 
 {
   networking.hostName = hostName;
 
   imports = [
-    #   ambxst.nixosModules.default
     ./hardware-configuration.nix
     ./networking.nix
-    # ./ambxst.nix
-    ../../modules/profiles/hyprland.nix
-    ../../modules/common/tailscale.nix
+    ../../modules/profiles/laptop.nix
+    ../../modules/profiles/dev-docker.nix
+    ../../modules/profiles/desktop-hyprland.nix
     ../../modules/common/kmonad/kmonad.nix
-    ../../modules/common/steam.nix
+    ../../modules/features/steam.nix
+    ../../modules/features/tailscale.nix
   ];
 
   system.stateVersion = "25.11";
@@ -34,39 +33,7 @@
     keyMap = "colemak";
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.libinput.enable = true;
-
   # Enable ssh sservices
   services.openssh.enable = true;
-
-  # Bluetooth
-  hardware.bluetooth.enable = true;
-
-  # Dbus
-  environment.systemPackages = with pkgs; [
-    (python3.withPackages (ps: with ps; [
-      dbus-python
-    ]))
-    greetd.tuigreet
-    hyprland
-  ];
-
-  services.dbus.enable = true;
-
-  virtualisation.docker.enable = true;
-  services.seatd.enable = true;
-
-  services.greetd = {
-    enable = true;
-
-    settings = {
-      default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-        user = "greeter";
-      };
-    };
-  };  
-
 
 }

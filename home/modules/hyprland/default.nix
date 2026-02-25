@@ -1,6 +1,6 @@
 # home/modules/hyprland/default.nix
 
-{ pkgs, ... }:
+{ ... }:
 
 {
   wayland.windowManager.hyprland = {

@@ -1,3 +1,5 @@
 # home/hosts/Charlie-Laptop.nix
-{ ... }: { imports = [ ./_wsl.nix ]; }
-
+{ ... }:
+{
+  imports = [ ../profiles/wsl.nix ];
+}

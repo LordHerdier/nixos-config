@@ -2,12 +2,6 @@
 
 {
   imports = [
-    ../modules/hyprland/default.nix
-    ../modules/desktop-files.nix
-    ../modules/desktop-packages.nix
-    ../modules/kitty.nix
-    #    ../../modules/common/kmonad.nix
+    ../profiles/desktop-hyprland.nix
   ];
-
-  my.kitty.enable = true;
 }

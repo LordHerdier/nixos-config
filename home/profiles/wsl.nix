@@ -1,4 +1,4 @@
-# home/hosts/_wsl.nix
+# home/profiles/wsl.nix
 { lib, isWsl, ... }:
 
 {
@@ -18,4 +18,3 @@
     '';
   };
 }
-

@@ -1,22 +1,24 @@
 # home/modules/desktop-packages.nix
 
-{ pkgs, lib, isWsl, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = (with pkgs; [
-    firefox
-    audacity
-    gimp
-    nautilus
-    xfce.thunar
-    tailscale
-    mpvpaper
-    hyprpaper
-    spotify
-    discord
-    remmina
-    moonlight-qt
-    steam
-  ]);
+  home.packages = (
+    with pkgs;
+    [
+      firefox
+      audacity
+      gimp
+      nautilus
+      xfce.thunar
+      tailscale
+      mpvpaper
+      hyprpaper
+      spotify
+      discord
+      remmina
+      moonlight-qt
+      steam
+    ]
+  );
 }
-

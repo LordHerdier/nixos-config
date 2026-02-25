@@ -1,3 +1,5 @@
 # home/hosts/Nico.nix
-{ ... }: { imports = [ ./_wsl.nix ]; }
-
+{ ... }:
+{
+  imports = [ ../profiles/wsl.nix ];
+}

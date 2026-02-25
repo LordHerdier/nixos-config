@@ -41,10 +41,6 @@
     la = "eza -lgha --group-directories-first";
     ll = "eza -lg --group-directories-first";
 
-    # WSL helpers
-    ts = "tailscale.exe";
-    files = "explorer.exe .";
-
     # Python venv
     venvc = "python3 -m venv venv";
     venva = "source venv/bin/activate";
@@ -69,4 +65,3 @@
     nmapc = "nmap -p 1-1000,41794,41795,41796 -Pn -T4";
   };
 }
-

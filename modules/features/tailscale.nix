@@ -1,4 +1,4 @@
-# modules/common/tailscale.nix
+# modules/features/tailscale.nix
 
 { pkgs, ... }:
 
@@ -8,6 +8,5 @@
   services.tailscale = {
     enable = true;
   };
-  
-}
 
+}

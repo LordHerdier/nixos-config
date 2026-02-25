@@ -69,11 +69,6 @@
 
     mkcd() { mkdir -p -- "$1" && cd -P -- "$1"; }
 
-    copypath() {
-      [[ -z "$1" ]] && return 1
-      realpath "$1" | clip.exe
-    }
-
     themes() {
       local selection
       local -a files names
