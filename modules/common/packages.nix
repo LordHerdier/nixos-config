@@ -5,6 +5,7 @@
 {
   environment.systemPackages = with pkgs; [
     git
+    at
     gnumake
     curl
     wget
@@ -15,6 +16,8 @@
     zsh
     psmisc
   ];
+
+  services.atd.enable = true;
 
   programs = {
     zsh.enable = true;

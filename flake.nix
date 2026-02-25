@@ -21,17 +21,29 @@
     # ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, nixvim, ... }:
+  outputs =
+    {
+      nixpkgs,
+      home-manager,
+      nixos-wsl,
+      dotfiles,
+      nixvim,
+      ...
+    }:
     #outputs = { nixpkgs, home-manager, nixos-wsl, dotfiles, ambxst, ... }:
-  let
-    system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
 
-    mkHost = { hostName, isWsl ? false, hostPath }:
-      nixpkgs.lib.nixosSystem {
-        inherit system;
+      mkHost =
+        {
+          hostName,
+          isWsl ? false,
+          hostPath,
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
 
-        modules =
-          [
+          modules = [
             # Common system bits
             ./modules/common/packages.nix
             ./modules/common/security.nix
@@ -65,29 +77,29 @@
             ./modules/profiles/wsl.nix
           ];
 
-        specialArgs = { inherit hostName isWsl ; };
+          specialArgs = { inherit hostName isWsl; };
           #specialArgs = { inherit hostName isWsl ambxst; };
-      };
-  in
-  {
-    nixosConfigurations = {
-      "Charlie-Laptop" = mkHost {
-        hostName = "Charlie-Laptop";
-        isWsl = true;
-        hostPath = ./hosts/Charlie-Laptop/default.nix;
-      };
+        };
+    in
+    {
+      nixosConfigurations = {
+        "Charlie-Laptop" = mkHost {
+          hostName = "Charlie-Laptop";
+          isWsl = true;
+          hostPath = ./hosts/Charlie-Laptop/default.nix;
+        };
 
-      "Nico" = mkHost {
-        hostName = "Nico";
-        isWsl = true;
-        hostPath = ./hosts/Nico/default.nix;
-      };
+        "Nico" = mkHost {
+          hostName = "Nico";
+          isWsl = true;
+          hostPath = ./hosts/Nico/default.nix;
+        };
 
-      "Pine" = mkHost {
-        hostName = "Pine";
-        isWsl = false;
-        hostPath = ./hosts/Pine/default.nix;
+        "Pine" = mkHost {
+          hostName = "Pine";
+          isWsl = false;
+          hostPath = ./hosts/Pine/default.nix;
+        };
       };
     };
-  };
 }
