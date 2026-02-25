@@ -16,7 +16,7 @@
   nix.optimise.dates = [ "03:45" ];
   nix.settings.auto-optimise-store = true;
 
-  nic.gc = {
+  nix.gc = {
     automatic = true;
     interval = {
       Weekday = 0;
