@@ -3,13 +3,12 @@
 {
   programs.git = {
     enable = true;
-    userName = "Charlotte Whittleman";
-    userEmail = "brennwh@siue.edu";
-    extraConfig = {
+    settings = {
+      user.email = "brennwh@siue.edu";
+      user.name = "Charlotte Whittleman";
       init.defaultBranch = "main";
       pull.rebase = false;
       push.autoSetupRemote = true;
     };
   };
 }
-
