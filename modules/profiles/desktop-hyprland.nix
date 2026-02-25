@@ -13,7 +13,6 @@
     swappy
     networkmanagerapplet
     brightnessctl
-    tuigreet
     hyprland
     (python3.withPackages (
       ps: with ps; [
@@ -46,9 +45,10 @@
     greetd = {
       enable = true;
 
-      default_sessions = {
-        user = "greeter";
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+      settings = {
+        default_session = {
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        };
       };
     };
   };
