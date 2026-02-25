@@ -1,3 +1,5 @@
+# flake.nix
+
 {
   description = "Nix configs for Charlotte's machines (WSL + NixOS)";
 
@@ -43,6 +45,7 @@
       flake =
         let
           system = "x86_64-linux";
+          hostDefs = import ./flake/hosts.nix;
 
           mkHost =
             {
@@ -91,25 +94,7 @@
             };
         in
         {
-          nixosConfigurations = {
-            "Charlie-Laptop" = mkHost {
-              hostName = "Charlie-Laptop";
-              isWsl = true;
-              hostPath = ./hosts/Charlie-Laptop/default.nix;
-            };
-
-            "Nico" = mkHost {
-              hostName = "Nico";
-              isWsl = true;
-              hostPath = ./hosts/Nico/default.nix;
-            };
-
-            "Pine" = mkHost {
-              hostName = "Pine";
-              isWsl = false;
-              hostPath = ./hosts/Pine/default.nix;
-            };
-          };
+          nixosConfigurations = nixpkgs.lib.mapAttrs (_name: cfg: mkHost cfg) hostDefs;
         };
     };
 }
