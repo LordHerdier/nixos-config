@@ -39,6 +39,34 @@
       echo "OMP theme switched to ''${newtheme} ($(basename "$config"))."
     }
 
+    randomtheme() {
+      local -a files names
+      
+      # Grab all json/yaml theme files, silently failing if none exist (N flag)
+      files=(~/.oh-my-posh/themes/*.omp.(json|yaml)(N))
+      
+      if [[ ''${#files[@]} -eq 0 ]]; then
+        echo "No themes found in ~/.oh-my-posh/themes/"
+        return 1
+      fi
+
+      # Extract base names
+      names=()
+      for f in $files; do
+        names+=("''${f:t}")
+      done
+
+      # Strip extensions
+      names=(''${names[@]%.omp.json})
+      names=(''${names[@]%.omp.yaml})
+
+      # Select a random theme (ZSH arrays are 1-indexed)
+      local random_theme="''${names[$((RANDOM % ''${#names[@]} + 1))]}"
+      
+      # Pass the selected theme to your existing theme switcher
+      theme "$random_theme"
+    }
+
     mkcd() { mkdir -p -- "$1" && cd -P -- "$1"; }
 
     copypath() {
