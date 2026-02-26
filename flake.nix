@@ -15,6 +15,8 @@
 
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
+
+    self.submodules = true;
   };
 
   outputs =
@@ -54,6 +56,13 @@
               inherit system;
 
               modules = [
+                (
+                  { ... }:
+                  {
+                    nixpkgs.overlays = [ (import ./pkgs/overlay.nix) ];
+                  }
+                )
+
                 # Common system bits
                 ./modules/common/packages.nix
                 ./modules/common/security.nix

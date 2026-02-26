@@ -1,0 +1,3 @@
+[submodule "pkgs/efficient-src"]
+	path = pkgs/efficient-src
+	url = ssh://git@git.isg.siue.edu/its-labs-and-classrooms/efficient-cli.git
