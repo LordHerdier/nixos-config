@@ -21,7 +21,7 @@
 
     # Mouse + vi keys
     set -g mouse on
-    set -g allow-passthrough on
+    set -g allow-passthrough off
     set-window-option -g mode-keys vi
     set -g status-keys vi
 
@@ -41,6 +41,10 @@
     # Renumber windows
     set -g renumber-windows on
 
+    # Disable auto-renaming
+    set -g allow-rename off
+    setw -g automatic-rename off
+
     ##### Plugin settings #####
     # tmux-resurrect
     set -g @resurrect-strategy-vim 'session'
@@ -52,4 +56,3 @@
     set -g @continuum-restore 'on'
   '';
 }
-
