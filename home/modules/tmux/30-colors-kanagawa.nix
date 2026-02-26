@@ -16,6 +16,9 @@
     kanagawa_green="#98bb6c"
     kanagawa_red="#C34043"
 
+    # session dots plugin color
+    set -g @session-dots-color "$kanagawa_light_blue"
+
     set -g window-style "fg=default,bg=default"
     set -g window-active-style "fg=default,bg=default"
 
@@ -47,4 +50,3 @@
     set -g clock-mode-colour "$kanagawa_light_blue"
   '';
 }
-
