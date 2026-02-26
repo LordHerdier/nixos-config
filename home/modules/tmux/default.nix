@@ -31,7 +31,6 @@ in
     terminal = "tmux-256color";
 
     plugins = with pkgs.tmuxPlugins; [
-      vim-tmux-navigator
       resurrect
       continuum
       tmux-session-dots
