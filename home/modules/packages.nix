@@ -16,6 +16,7 @@
       neovim
       oh-my-posh
       pass
+      inetutils
       binwalk
       unzip
       sshpass
