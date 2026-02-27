@@ -14,16 +14,12 @@
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
     ../../modules/features/tailscale.nix
+    ../../modules/features/systemd-boot-silent/default.nix
   ];
 
   system.stateVersion = "25.11";
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
-
-  # Boot settings
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.grub.device = "nodev";
 
   # Set the timezone
   time.timeZone = "America/Chicago";
