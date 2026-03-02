@@ -10,7 +10,7 @@
       audacity
       gimp
       nautilus
-      xfce.thunar
+      thunar
       tailscale
       mpvpaper
       hyprpaper

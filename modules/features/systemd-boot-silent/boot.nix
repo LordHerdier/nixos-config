@@ -13,6 +13,4 @@
   boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
   boot.initrd.systemd.enable = true;
-  systemd.watchdog.rebootTime = "0";
-
 }
