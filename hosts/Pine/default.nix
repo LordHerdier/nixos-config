@@ -15,6 +15,7 @@
     ../../modules/features/steam.nix
     ../../modules/features/tailscale.nix
     ../../modules/features/systemd-boot-silent/default.nix
+    ../../modules/common/ssh.nix
   ];
 
   system.stateVersion = "25.11";
@@ -28,8 +29,5 @@
   console = {
     keyMap = "colemak";
   };
-
-  # Enable ssh sservices
-  services.openssh.enable = true;
 
 }
