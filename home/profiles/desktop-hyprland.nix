@@ -8,6 +8,7 @@
     ../modules/desktop-files.nix
     ../modules/desktop-packages.nix
     ../modules/kitty.nix
+    ../modules/steam.nix
   ];
 
   my.kitty.enable = true;

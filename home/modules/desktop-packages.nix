@@ -6,19 +6,20 @@
   home.packages = (
     with pkgs;
     [
-      firefox
       audacity
-      gimp
-      nautilus
-      thunar
-      tailscale
-      mpvpaper
-      hyprpaper
-      spotify
       discord
-      remmina
+      firefox
+      gamescope
+      gimp
+      hyprpaper
       moonlight-qt
-      steam
+      mpvpaper
+      nautilus
+      remmina
+      spotify
+      tailscale
+      thunar
+      tsukimi
     ]
   );
 }

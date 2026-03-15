@@ -27,6 +27,8 @@
     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
   };
 
+  programs.dconf.enable = true;
+
   services = {
     pipewire = {
       enable = true;
