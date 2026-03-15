@@ -33,7 +33,7 @@
           options = {
             transparent    = true,
             terminal_colors = false,
-            dim_inactive   = true,
+            -- dim_inactive   = true,
           },
         })
         vim.cmd("colorscheme nightfox")
