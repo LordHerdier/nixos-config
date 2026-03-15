@@ -6,34 +6,15 @@ let
   nvfConfig = inputs.nvf.lib.neovimConfiguration {
     inherit pkgs;
     modules = [
-      {
-        config.vim = {
-          viAlias = false;
-          vimAlias = false;
-
-          # Basic quality-of-life to start
-          options = {
-            number = true;
-            relativenumber = true;
-            tabstop = 2;
-            shiftwidth = 2;
-            expandtab = true;
-            wrap = false;
-          };
-
-          theme = {
-            enable = true;
-            name = "catppuccin";
-            style = "mocha";
-          };
-        };
-      }
+      ./00-options.nix
+      ./10-theme.nix
+      ./20-lsp.nix
+      ./30-keymaps.nix
     ];
   };
 in
 {
   home.packages = [
-    # Install as 'nvf' so it doesn't shadow existing 'nvim'
     (pkgs.writeShellScriptBin "nvf" ''
       exec ${nvfConfig.neovim}/bin/nvim "$@"
     '')
