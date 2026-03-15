@@ -10,7 +10,7 @@ let
       ./10-theme.nix
       ./20-lsp.nix
       ./30-keymaps.nix
-      ./40-plugins.nix
+      ./40-plugins.nix # handles importing individual plugin files
     ];
   };
 in
