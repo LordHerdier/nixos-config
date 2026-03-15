@@ -91,7 +91,7 @@
                 ./modules/profiles/wsl.nix
               ];
 
-              specialArgs = { inherit hostName isWsl; };
+              specialArgs = { inherit hostName isWsl inputs; };
             };
         in
         {
