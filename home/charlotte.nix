@@ -8,6 +8,7 @@
     ./modules/files.nix
     ./modules/git.nix
     ./modules/nvim.nix
+    ./modules/nvf.nix
     ./modules/gnupg.nix
     ./modules/atuin.nix
     ./modules/zsh
@@ -25,4 +26,3 @@
 
   programs.home-manager.enable = true;
 }
-

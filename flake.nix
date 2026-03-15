@@ -13,6 +13,9 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
+    nvf.url = "github:notashelf/nvf";
+    nvf.inputs.nixpkgs.follows = "nixpkgs";
+
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
   };
@@ -23,6 +26,7 @@
       nixpkgs,
       home-manager,
       nixos-wsl,
+      nvf,
       dotfiles,
       ...
     }:
