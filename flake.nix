@@ -75,7 +75,12 @@
                   home-manager.useUserPackages = true;
 
                   home-manager.extraSpecialArgs = {
-                    inherit dotfiles hostName isWsl;
+                    inherit
+                      dotfiles
+                      hostName
+                      isWsl
+                      inputs
+                      ;
                   };
 
                   home-manager.users.charlotte = {
@@ -91,7 +96,7 @@
                 ./modules/profiles/wsl.nix
               ];
 
-              specialArgs = { inherit hostName isWsl inputs; };
+              specialArgs = { inherit hostName isWsl; };
             };
         in
         {
