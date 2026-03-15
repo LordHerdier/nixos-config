@@ -8,7 +8,7 @@
     ./modules/files.nix
     ./modules/git.nix
     ./modules/nvim.nix
-    ./modules/nvf.nix
+    ./modules/nvf
     ./modules/gnupg.nix
     ./modules/atuin.nix
     ./modules/zsh

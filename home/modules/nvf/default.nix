@@ -1,4 +1,4 @@
-# home/modules/nvf.nix
+# home/modules/nvf/default.nix
 
 { pkgs, inputs, ... }:
 
