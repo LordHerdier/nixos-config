@@ -14,6 +14,7 @@
     networkmanagerapplet
     brightnessctl
     hyprland
+    hyprpaper
     (python3.withPackages (
       ps: with ps; [
         dbus-python
@@ -26,6 +27,8 @@
     config.common.default = "*";
     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
   };
+
+  programs.dconf.enable = true;
 
   services = {
     pipewire = {
