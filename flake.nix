@@ -13,47 +13,51 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
+    nvf.url = "github:notashelf/nvf";
+    nvf.inputs.nixpkgs.follows = "nixpkgs";
+
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
   };
 
-  outputs =
-    inputs@{
-      flake-parts,
-      nixpkgs,
-      home-manager,
-      nixos-wsl,
-      dotfiles,
-      ...
-    }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs @ {
+    flake-parts,
+    nixpkgs,
+    home-manager,
+    nixos-wsl,
+    nvf,
+    dotfiles,
+    ...
+  }:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       # Systems used by perSystem (even if you don't use much yet)
-      systems = [ "x86_64-linux" ];
+      systems = ["x86_64-linux"];
 
       # Optional but nice: expose imports later as you grow
-      imports = [ ];
+      imports = [];
 
       # perSystem is where devShells/packages/checks/formatter can go later
-      perSystem =
-        { pkgs, system, ... }:
-        {
-          formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
-        };
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
+      };
 
-      flake =
-        let
-          system = "x86_64-linux";
+      flake = let
+        system = "x86_64-linux";
 
-          mkHost =
-            {
-              hostName,
-              isWsl ? false,
-              hostPath,
-            }:
-            nixpkgs.lib.nixosSystem {
-              inherit system;
+        mkHost = {
+          hostName,
+          isWsl ? false,
+          hostPath,
+        }:
+          nixpkgs.lib.nixosSystem {
+            inherit system;
 
-              modules = [
+            modules =
+              [
                 # Common system bits
                 ./modules/common/packages.nix
                 ./modules/common/security.nix
@@ -71,7 +75,12 @@
                   home-manager.useUserPackages = true;
 
                   home-manager.extraSpecialArgs = {
-                    inherit dotfiles hostName isWsl;
+                    inherit
+                      dotfiles
+                      hostName
+                      isWsl
+                      inputs
+                      ;
                   };
 
                   home-manager.users.charlotte = {
@@ -87,29 +96,28 @@
                 ./modules/profiles/wsl.nix
               ];
 
-              specialArgs = { inherit hostName isWsl; };
-            };
-        in
-        {
-          nixosConfigurations = {
-            "Charlie-Laptop" = mkHost {
-              hostName = "Charlie-Laptop";
-              isWsl = true;
-              hostPath = ./hosts/Charlie-Laptop/default.nix;
-            };
+            specialArgs = {inherit hostName isWsl;};
+          };
+      in {
+        nixosConfigurations = {
+          "Charlie-Laptop" = mkHost {
+            hostName = "Charlie-Laptop";
+            isWsl = true;
+            hostPath = ./hosts/Charlie-Laptop/default.nix;
+          };
 
-            "Nico" = mkHost {
-              hostName = "Nico";
-              isWsl = true;
-              hostPath = ./hosts/Nico/default.nix;
-            };
+          "Nico" = mkHost {
+            hostName = "Nico";
+            isWsl = true;
+            hostPath = ./hosts/Nico/default.nix;
+          };
 
-            "Pine" = mkHost {
-              hostName = "Pine";
-              isWsl = false;
-              hostPath = ./hosts/Pine/default.nix;
-            };
+          "Pine" = mkHost {
+            hostName = "Pine";
+            isWsl = false;
+            hostPath = ./hosts/Pine/default.nix;
           };
         };
+      };
     };
 }

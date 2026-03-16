@@ -13,7 +13,6 @@
       stylua
       shfmt
       shellcheck
-      neovim
       oh-my-posh
       pass
       inetutils
