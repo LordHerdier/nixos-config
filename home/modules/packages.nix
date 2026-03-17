@@ -10,6 +10,7 @@
     with pkgs;
     [
       ansible
+      claude-code
       stylua
       shfmt
       shellcheck
