@@ -18,8 +18,8 @@
 
     # New window/pane in current directory
     bind c new-window -c "#{pane_current_path}"
-    bind v split-window -v -c "#{pane_current_path}"
-    bind h split-window -h -c "#{pane_current_path}"
+    bind h split-window -v -c "#{pane_current_path}"
+    bind v split-window -h -c "#{pane_current_path}"
 
     # zoom
     bind-key z resize-pane -Z
