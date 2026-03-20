@@ -20,44 +20,48 @@
     dotfiles.flake = false;
   };
 
-  outputs = inputs @ {
-    flake-parts,
-    nixpkgs,
-    home-manager,
-    nixos-wsl,
-    nvf,
-    dotfiles,
-    ...
-  }:
-    flake-parts.lib.mkFlake {inherit inputs;} {
+  outputs =
+    inputs@{
+      flake-parts,
+      nixpkgs,
+      home-manager,
+      nixos-wsl,
+      nvf,
+      dotfiles,
+      ...
+    }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       # Systems used by perSystem (even if you don't use much yet)
-      systems = ["x86_64-linux"];
+      systems = [ "x86_64-linux" ];
 
       # Optional but nice: expose imports later as you grow
-      imports = [];
+      imports = [ ];
 
       # perSystem is where devShells/packages/checks/formatter can go later
-      perSystem = {
-        pkgs,
-        system,
-        ...
-      }: {
-        formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
-      };
-
-      flake = let
-        system = "x86_64-linux";
-
-        mkHost = {
-          hostName,
-          isWsl ? false,
-          hostPath,
+      perSystem =
+        {
+          pkgs,
+          system,
+          ...
         }:
-          nixpkgs.lib.nixosSystem {
-            inherit system;
+        {
+          formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
+        };
 
-            modules =
-              [
+      flake =
+        let
+          system = "x86_64-linux";
+
+          mkHost =
+            {
+              hostName,
+              isWsl ? false,
+              hostPath,
+            }:
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+
+              modules = [
                 # Common system bits
                 ./modules/common/packages.nix
                 ./modules/common/security.nix
@@ -96,28 +100,29 @@
                 ./modules/profiles/wsl.nix
               ];
 
-            specialArgs = {inherit hostName isWsl;};
-          };
-      in {
-        nixosConfigurations = {
-          "Charlie-Laptop" = mkHost {
-            hostName = "Charlie-Laptop";
-            isWsl = true;
-            hostPath = ./hosts/Charlie-Laptop/default.nix;
-          };
+              specialArgs = { inherit hostName isWsl; };
+            };
+        in
+        {
+          nixosConfigurations = {
+            "Charlie-Laptop" = mkHost {
+              hostName = "Charlie-Laptop";
+              isWsl = true;
+              hostPath = ./hosts/Charlie-Laptop/default.nix;
+            };
 
-          "Nico" = mkHost {
-            hostName = "Nico";
-            isWsl = true;
-            hostPath = ./hosts/Nico/default.nix;
-          };
+            "Nico" = mkHost {
+              hostName = "Nico";
+              isWsl = true;
+              hostPath = ./hosts/Nico/default.nix;
+            };
 
-          "Pine" = mkHost {
-            hostName = "Pine";
-            isWsl = false;
-            hostPath = ./hosts/Pine/default.nix;
+            "Pine" = mkHost {
+              hostName = "Pine";
+              isWsl = false;
+              hostPath = ./hosts/Pine/default.nix;
+            };
           };
         };
-      };
     };
 }

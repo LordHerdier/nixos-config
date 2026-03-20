@@ -14,6 +14,7 @@
     ./init/40-ssh-agent.nix
     ./init/50-history-completion.nix
     ./init/60-functions.nix
+    ./init/61-manpager.nix
     ./init/99-private-extras.nix
   ];
 
