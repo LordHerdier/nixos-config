@@ -1,4 +1,4 @@
-# home/hosts/index.nix
+# home/hosts/Index.nix
 
 {
   imports = [

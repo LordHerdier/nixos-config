@@ -1,4 +1,4 @@
-# hosts/index/default.nix
+# hosts/Index/default.nix
 
 { hostName, ... }:
 

@@ -123,10 +123,10 @@
               hostPath = ./hosts/Pine/default.nix;
             };
 
-            "index" = mkHost {
-              hostName = "index";
+            "Index" = mkHost {
+              hostName = "Index";
               isWsl = false;
-              hostPath = ./hosts/index/default.nix;
+              hostPath = ./hosts/Index/default.nix;
             };
           };
         };
