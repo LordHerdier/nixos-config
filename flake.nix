@@ -122,6 +122,12 @@
               isWsl = false;
               hostPath = ./hosts/Pine/default.nix;
             };
+
+            "index" = mkHost {
+              hostName = "index";
+              isWsl = false;
+              hostPath = ./hosts/index/default.nix;
+            };
           };
         };
     };
