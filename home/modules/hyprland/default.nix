@@ -17,6 +17,7 @@
 
       exec-once = [
         "ambxst"
+        "gnome-keyring-daemon --start --components=secrets,pkcs11"
       ];
 
       input = {

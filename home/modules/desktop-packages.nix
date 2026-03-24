@@ -10,6 +10,7 @@
       discord
       firefox
       gimp
+      gnome-keyring
       moonlight-qt
       nautilus
       mpvpaper

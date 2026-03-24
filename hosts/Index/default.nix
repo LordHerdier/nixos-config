@@ -16,6 +16,7 @@
     ../../modules/features/tailscale.nix
     ../../modules/features/systemd-boot-silent/default.nix
     ../../modules/common/ssh.nix
+    ../../modules/features/fingerprint-reader.nix
   ];
 
   system.stateVersion = "25.11";

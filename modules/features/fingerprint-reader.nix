@@ -1,0 +1,34 @@
+# modules/features/fingerprint-reader.nix
+
+{ pkgs, ... }:
+
+{
+  environment.systemPackages = [ pkgs.fprintd ];
+
+  services.fprintd = {
+    enable = true;
+    tod.enable = true;
+    tod.driver = pkgs.libfprint-2-tod1-goodix;
+  };
+
+  services.udev.packages = [ pkgs.libfprint-2-tod1-goodix ];
+
+  services.udev.extraRules = ''
+    # Disable USB autosuspend for Goodix fingerprint reader (27c6:609c)
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="27c6", ATTR{idProduct}=="609c", ATTR{power/autosuspend}="-1", ATTR{power/persist}="0"
+  '';
+
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if ((action.id == "net.reactivated.fprint.device.enroll" ||
+           action.id == "net.reactivated.fprint.device.setusername" ||
+           action.id == "net.reactivated.fprint.device.verify") &&
+          subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
+
+  security.pam.services.sudo.fprintAuth = true;
+  security.pam.services.login.fprintAuth = true;
+}

@@ -13,6 +13,8 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
     nvf.url = "github:notashelf/nvf";
     nvf.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -26,6 +28,7 @@
       nixpkgs,
       home-manager,
       nixos-wsl,
+      nixos-hardware,
       nvf,
       dotfiles,
       ...
@@ -57,6 +60,7 @@
               hostName,
               isWsl ? false,
               hostPath,
+              extraModules ? [ ],
             }:
             nixpkgs.lib.nixosSystem {
               inherit system;
@@ -98,7 +102,8 @@
               ++ nixpkgs.lib.optionals isWsl [
                 nixos-wsl.nixosModules.wsl
                 ./modules/profiles/wsl.nix
-              ];
+              ]
+              ++ extraModules;
 
               specialArgs = { inherit hostName isWsl; };
             };
@@ -127,6 +132,9 @@
               hostName = "Index";
               isWsl = false;
               hostPath = ./hosts/Index/default.nix;
+              extraModules = [
+                nixos-hardware.nixosModules.framework-amd-ai-300-series
+              ];
             };
           };
         };
