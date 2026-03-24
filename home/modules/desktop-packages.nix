@@ -7,6 +7,7 @@
     with pkgs;
     [
       audacity
+      bitwarden-desktop
       discord
       firefox
       hyprcursor
