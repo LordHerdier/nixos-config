@@ -4,10 +4,6 @@
 
 {
   home.file = {
-    ".config/hypr" = {
-      source = "${dotfiles}/hypr/.config/hypr";
-      recursive = true;
-    };
     ".config/eww" = {
       source = "${dotfiles}/eww/.config/eww";
       recursive = true;

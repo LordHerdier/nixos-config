@@ -3,33 +3,21 @@
 { ... }:
 
 {
+  imports = [
+    ./20-monitors.nix
+    ./30-input.nix
+    ./40-design.nix
+    ./50-binds.nix
+    ./hypridle.nix
+    ./hyprlock.nix
+  ];
+
   wayland.windowManager.hyprland = {
     enable = true;
 
-    settings = {
-      "$mod" = "SUPER";
-
-      bind = [
-        "$mod, T, exec, kitty"
-        "$mod, Q, killactive"
-        "$mod, E, exec, wofi --show drun"
-      ];
-
-      exec-once = [
-        "ambxst"
-        "gnome-keyring-daemon --start --components=secrets,pkcs11"
-      ];
-
-      input = {
-        kb_layout = "colemak";
-        follow_mouse = 1;
-      };
-
-      general = {
-        gaps_in = 5;
-        gaps_out = 10;
-        border_size = 2;
-      };
-    };
+    settings.exec-once = [
+      "ambxst"
+      "gnome-keyring-daemon --start --components=secrets,pkcs11"
+    ];
   };
 }

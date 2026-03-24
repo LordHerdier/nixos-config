@@ -9,6 +9,7 @@
       audacity
       discord
       firefox
+      hyprcursor
       gimp
       gnome-keyring
       moonlight-qt
