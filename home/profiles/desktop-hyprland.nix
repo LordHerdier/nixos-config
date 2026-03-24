@@ -9,6 +9,7 @@
     ../modules/desktop-packages.nix
     ../modules/kitty.nix
     ../modules/steam.nix
+    ../modules/games.nix
   ];
 
   my.kitty.enable = true;
