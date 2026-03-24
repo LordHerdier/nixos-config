@@ -61,4 +61,5 @@
 
   hardware.graphics.enable = true;
 
+  programs.ambxst.enable = true;
 }

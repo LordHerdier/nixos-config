@@ -20,6 +20,9 @@
 
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
+
+    ambxst.url = "github:Axenide/Ambxst";
+    ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -31,6 +34,7 @@
       nixos-hardware,
       nvf,
       dotfiles,
+      ambxst,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -126,6 +130,10 @@
               hostName = "Pine";
               isWsl = false;
               hostPath = ./hosts/Pine/default.nix;
+              extraModules = [
+                ambxst.nixosModules.default
+                { programs.ambxst.enable = nixpkgs.lib.mkDefault false; }
+              ];
             };
 
             "Index" = mkHost {
@@ -134,6 +142,8 @@
               hostPath = ./hosts/Index/default.nix;
               extraModules = [
                 nixos-hardware.nixosModules.framework-amd-ai-300-series
+                ambxst.nixosModules.default
+                { programs.ambxst.enable = nixpkgs.lib.mkDefault false; }
               ];
             };
           };
