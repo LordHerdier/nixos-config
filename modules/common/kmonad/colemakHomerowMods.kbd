@@ -28,6 +28,8 @@
     sft_k (tap-hold 200 k lsft)
     alt_l (tap-hold 200 l lalt)
     met_; (tap-hold 200 ; lmet)
+
+    rctl-mod (tap-hold 200 rctl (layer-toggle rctl-layer))
 )
 
 (deflayer default
@@ -36,7 +38,7 @@
     _     _       _       _       _       _       _       _       _       _       _       _       _       _
     _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h @ctl_j  @sft_k  @alt_l  @met_;  _       _
     _     _       _       _     _     _     _     _     _     _     _     _
-    _     _       _       _          _                  _     _     _     _     _
+    _     _       _       _          _                  _     @rctl-mod   _     _     _
                                                                 _     _     _
 )
 
@@ -47,5 +49,25 @@
     _     _       left    down    right   _       _       left    down    right   _       _       _
     _     _       _       _     _     _     _     _     _     _     _     _
     _     _       _       _          _                  _     _     _     _     _
+                                                                _     _     _
+)
+
+(deflayer rctl-layer
+    _     _                    _                    _     _     _     _     _     _     _     _     _     _     _     _
+    _     (layer-switch default) (layer-switch nomod) _   _     _     _     _     _     _     _     _     _     _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _     _     _     _     _     _     _     _     _
+    _     _       _       _          _                  _     _     _     _     _
+                                                                _     _     _
+)
+
+(deflayer nomod
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _     _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _     _     _     _     _     _     _     _     _
+    _     _       _       _          _                  _     @rctl-mod   _     _     _
                                                                 _     _     _
 )
