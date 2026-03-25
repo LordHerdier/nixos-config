@@ -8,4 +8,6 @@
   };
 
   users.users.charlotte.extraGroups = [ "docker" ];
+
+  environment.sessionVariables.DOCKER_HOST = "unix:///var/run/docker.sock";
 }
