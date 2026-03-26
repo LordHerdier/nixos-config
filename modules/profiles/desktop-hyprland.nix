@@ -3,6 +3,8 @@
 { pkgs, ... }:
 
 {
+  programs.hyprland.enable = true;
+
   environment.systemPackages = with pkgs; [
     kitty
     waybar
@@ -13,7 +15,6 @@
     swappy
     networkmanagerapplet
     brightnessctl
-    hyprland
     hyprpaper
     (python3.withPackages (
       ps: with ps; [
@@ -45,15 +46,27 @@
       enable = true;
     };
 
-    greetd = {
-      enable = true;
+    xserver = {
+      xkb.layout = "us";
+      xkb.variant = "colemak";
+    };
 
-      settings = {
-        default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
-        };
+    displayManager = {
+      sddm = {
+        enable = true;
+        wayland.enable = true;
       };
     };
+
+    # greetd = {
+    #   enable = true;
+    #
+    #   settings = {
+    #     default_session = {
+    #       command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
+    #     };
+    #   };
+    # };
   };
 
   security.rtkit.enable = true;

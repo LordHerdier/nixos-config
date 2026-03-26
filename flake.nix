@@ -21,6 +21,8 @@
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
 
+    qylock.url = "git+file:/home/charlotte/Downloads/qylock-nix/";
+
     ambxst.url = "github:Axenide/Ambxst";
     ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -35,6 +37,7 @@
       nvf,
       dotfiles,
       ambxst,
+      qylock,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -144,6 +147,9 @@
                 nixos-hardware.nixosModules.framework-amd-ai-300-series
                 ambxst.nixosModules.default
                 { programs.ambxst.enable = nixpkgs.lib.mkDefault false; }
+                qylock.nixosModules.default
+                ./modules/features/qylock.nix
+
               ];
             };
           };
