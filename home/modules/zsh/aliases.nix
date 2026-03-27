@@ -33,8 +33,13 @@
     path = "realpath";
 
     # Nix
+    n = "nix";
+    nf = "nix flake";
+    nd = "nix develop";
+    ns = "nix shell";
     nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)";
     nix-update-dotfiles = "sudo nix flake lock --update-input dotfiles /etc/nixos";
+    nrb = "nix-rebuild";
 
     # Tools
     ls = "eza -gh --group-directories-first";
