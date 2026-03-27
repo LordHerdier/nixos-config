@@ -7,6 +7,7 @@
       "flakes"
     ];
     warn-dirty = false;
+    download-buffer-size = 524288000; # 500 MiB
   };
   nixpkgs.config = {
     allowUnfree = true;
