@@ -16,12 +16,18 @@
     networkmanagerapplet
     brightnessctl
     hyprpaper
+    phinger-cursors
     (python3.withPackages (
       ps: with ps; [
         dbus-python
       ]
     ))
   ];
+
+  environment.variables = {
+    XCURSOR_THEME = "phinger-cursors-light";
+    XCURSOR_SIZE = "24";
+  };
 
   xdg.portal = {
     enable = true;
@@ -55,6 +61,11 @@
       sddm = {
         enable = true;
         wayland.enable = true;
+
+        settings.Theme = {
+          CursorTheme = "phinger-cursors-light";
+          CursorSize = 24;
+        };
       };
     };
 

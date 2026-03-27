@@ -309,11 +309,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1774467024,
-        "narHash": "sha256-CG2s5rLwdaHH4z8U6PQA/jTh3pEWbaI6H3Myl9UFeWI=",
+        "lastModified": 1774541164,
+        "narHash": "sha256-Ix3GmtVwfOafnpwPLlFR2Kt2Geo1yWBKsVJx70Mg+pY=",
         "ref": "refs/heads/main",
-        "rev": "19be539faefb5985ac3ef1336df4a3ad1ee4a92f",
-        "revCount": 53,
+        "rev": "ec3aeb6039e174b14b30a156dc11319dc1287808",
+        "revCount": 55,
         "type": "git",
         "url": "file:/home/charlotte/Downloads/qylock-nix/"
       },
