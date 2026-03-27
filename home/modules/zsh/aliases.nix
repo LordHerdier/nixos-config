@@ -45,6 +45,24 @@
     venvc = "python3 -m venv venv";
     venva = "source venv/bin/activate";
 
+    # git
+    g = "git";
+    ga = "git add";
+    gad = "git add .";
+    gc = "git commit";
+    gcl = "git clone";
+    gf = "git fetch";
+    gl = "git log";
+    gcm = "git commit -m";
+    gco = "git checkout";
+    gcob = "git checkout -b";
+    gd = "git diff";
+    gp = "git pull";
+    gpu = "git push";
+    gs = "git status";
+    gsw = "git switch";
+    gswm = "git switch main";
+
     # Docker compose
     dc = "docker compose";
     dcu = "docker compose up";
