@@ -35,6 +35,7 @@
     # Nix
     n = "nix";
     nf = "nix flake";
+    nfu = "nix flake update";
     nd = "nix develop";
     ns = "nix shell";
     nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)";

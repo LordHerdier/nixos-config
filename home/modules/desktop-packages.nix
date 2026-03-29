@@ -15,6 +15,7 @@
       gnome-keyring
       moonlight-qt
       nautilus
+      mpv
       mpvpaper
       remmina
       spotify

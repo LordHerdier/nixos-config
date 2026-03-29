@@ -23,7 +23,8 @@
 
     qylock.url = "git+file:/home/charlotte/Downloads/qylock-nix/";
 
-    ambxst.url = "github:Axenide/Ambxst";
+    # ambxst.url = "github:Axenide/Ambxst";
+    ambxst.url = "github:LordHerdier/Ambxst/feat/fprintd";
     ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 
