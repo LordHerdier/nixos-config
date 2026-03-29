@@ -8,7 +8,7 @@
 
     # Variables
     "$colorpicker" = "hyprpicker -qaf rgb";
-    "$lock" = "hyprlock";
+    "$lock" = "ambxst lock";
     "$logout" = "hyprctl dispatch exit";
     "$micMute" = "pactl set-source-mute @DEFAULT_SOURCE@ toggle";
     "$screenshot" = "hyprshot --mode region --output-folder /tmp";
