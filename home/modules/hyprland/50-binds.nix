@@ -6,9 +6,6 @@
   wayland.windowManager.hyprland.settings = {
     "$mainMod" = "SUPER";
 
-    # Ax / Fabric
-    "$fabricSend" = "fabric-cli exec ax-shell";
-
     # Variables
     "$colorpicker" = "hyprpicker -qaf rgb";
     "$lock" = "hyprlock";
@@ -53,27 +50,6 @@
       "$mainMod, C, exec, code"
       "$mainMod, B, exec, zen-beta"
       "$mainMod, M, exec, spotify"
-
-      # Ax-Shell / Notch
-      "$mainMod, W, exec, $axMessage"
-      "$mainMod, D, exec, $fabricSend 'notch.open_notch(\"dashboard\")'"
-      "$mainMod SHIFT, N, exec, $fabricSend 'notch.open_notch(\"kanban\")'"
-      "$mainMod, A, exec, $fabricSend 'notch.open_notch(\"launcher\")'"
-      "$mainMod, V, exec, $fabricSend 'notch.open_notch(\"cliphist\")'"
-      "$mainMod, TAB, exec, $fabricSend 'notch.open_notch(\"overview\")'"
-      "$mainMod, COMMA, exec, $fabricSend 'notch.open_notch(\"wallpapers\")'"
-      "$mainMod, PERIOD, exec, $fabricSend 'notch.open_notch(\"emoji\")'"
-      "$mainMod, ESCAPE, exec, $fabricSend 'notch.open_notch(\"power\")'"
-      "$mainMod SHIFT, Q, exec, $fabricSend 'notch.open_notch(\"pins\")'"
-      "$mainMod SHIFT, M, exec, $fabricSend 'notch.open_notch(\"mixer\")'"
-      "$mainMod SHIFT, S, exec, $fabricSend 'notch.open_notch(\"tools\")'"
-      "$mainMod SHIFT, COMMA, exec, $fabricSend 'notch.dashboard.wallpapers.set_random_wallpaper(None, external=True)'"
-      "$mainMod SHIFT, T, exec, $fabricSend 'notch.open_notch(\"tmux\")'"
-      "$mainMod SHIFT, M, exec, $fabricSend 'notch.dashboard.widgets.buttons.caffeine_button.toggle_inhibit(external=True)'"
-      "$mainMod CTRL, B, exec, $fabricSend 'from utils.global_keybinds import get_global_keybind_handler; get_global_keybind_handler().toggle_bar()'"
-      "$mainMod SHIFT, B, exec, $fabricSend 'app.set_css()'"
-      "$mainMod ALT, B, exec, killall ax-shell; uwsm-app $(python /home/charlotte/.config/Ax-Shell/main.py)"
-      "$mainMod CTRL ALT, B, exec, killall ax-shell; uwsm-app $(GTK_DEBUG=interactive python /home/charlotte/.config/Ax-Shell/main.py)"
 
       # Window management
       "$mainMod, F, fullscreen"
