@@ -15,8 +15,12 @@
   wayland.windowManager.hyprland = {
     enable = true;
 
+    extraConfig = ''
+      source = ~/.local/share/ambxst/hyprland.conf
+    '';
+
     settings.exec-once = [
-      "ambxst"
+      "axctl"
       "gnome-keyring-daemon --start --components=secrets,pkcs11"
     ];
   };
