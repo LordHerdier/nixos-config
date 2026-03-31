@@ -10,6 +10,7 @@
       bitwarden-desktop
       discord
       firefox
+      fladder
       hyprcursor
       gimp
       gnome-keyring
