@@ -5,20 +5,18 @@
         "axctl": "axctl",
         "nixpkgs": [
           "nixpkgs"
-        ],
-        "quickshell": "quickshell"
+        ]
       },
       "locked": {
-        "lastModified": 1774719300,
-        "narHash": "sha256-f4p62JS180LBzCGB0Q1y5lGFyIkLMnZa/9vwRL3arfI=",
-        "owner": "LordHerdier",
+        "lastModified": 1775093757,
+        "narHash": "sha256-osK5dWf8wMnJs+OmBMo7ND5Q9MU5HaMKcq8SosBpzmQ=",
+        "owner": "Axenide",
         "repo": "Ambxst",
-        "rev": "58af1c4544bd69cb2ba104b55047fe25e72a9bf5",
+        "rev": "844cb9d3fc465ff13b504c99469fb6c4d695e399",
         "type": "github"
       },
       "original": {
-        "owner": "LordHerdier",
-        "ref": "feat/fprintd",
+        "owner": "Axenide",
         "repo": "Ambxst",
         "type": "github"
       }
@@ -31,11 +29,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774572912,
-        "narHash": "sha256-1cK0jZAVZL5xhEc6soqdsdm1+uhP9/jmwdP/VsHZnUc=",
+        "lastModified": 1775093664,
+        "narHash": "sha256-V+G+xjZndXWACpN3YLkH1T8XePmGXJby4VpIwePKXsY=",
         "owner": "Axenide",
         "repo": "axctl",
-        "rev": "d8b2f0e8e52bfef49b95c561deaecfcbe6a74958",
+        "rev": "bb47ec7e39ee81f64daa45de2eb99d9a726e49a8",
         "type": "github"
       },
       "original": {
@@ -284,43 +282,22 @@
         "type": "github"
       }
     },
-    "quickshell": {
-      "inputs": {
-        "nixpkgs": [
-          "ambxst",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1774422996,
-        "narHash": "sha256-mWjBJIbiMPCpljAQDk8RYf+92/lYZ5npHe2r2SJ+QWc=",
-        "ref": "refs/heads/master",
-        "rev": "08058326f04e9b5e55c903b3702405a8d3556ac6",
-        "revCount": 775,
-        "type": "git",
-        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
-      }
-    },
     "qylock": {
       "inputs": {
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1774541164,
-        "narHash": "sha256-Ix3GmtVwfOafnpwPLlFR2Kt2Geo1yWBKsVJx70Mg+pY=",
-        "ref": "refs/heads/main",
-        "rev": "ec3aeb6039e174b14b30a156dc11319dc1287808",
-        "revCount": 55,
-        "type": "git",
-        "url": "file:/home/charlotte/Downloads/qylock-nix/"
+        "lastModified": 1775145423,
+        "narHash": "sha256-YBz8jc36LI22iwYHotLqKhFVg9FeIPHih+Hy/SR4JXU=",
+        "owner": "LordHerdier",
+        "repo": "qylock-nix",
+        "rev": "bc44b214d75cf495dbfba66afee5760672d601a8",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:/home/charlotte/Downloads/qylock-nix/"
+        "owner": "LordHerdier",
+        "repo": "qylock-nix",
+        "type": "github"
       }
     },
     "root": {

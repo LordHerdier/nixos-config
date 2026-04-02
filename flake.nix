@@ -21,11 +21,9 @@
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
 
-    qylock.url = "git+file:/home/charlotte/Downloads/qylock-nix/";
+    qylock.url = "github:LordHerdier/qylock-nix";
 
-    # ambxst.url = "github:Axenide/Ambxst";
-    # ambxst.url = "github:LordHerdier/Ambxst/feat/fprintd";
-    ambxst.url = "git+file:/home/charlotte/Downloads/Ambxst/";
+    ambxst.url = "github:Axenide/Ambxst";
     ambxst.inputs.nixpkgs.follows = "nixpkgs";
   };
 

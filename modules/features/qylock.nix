@@ -5,8 +5,8 @@
 {
   programs.qylock = {
     enable = true;
-    theme = "paper";
-    sddmTheme = "paper";
+    theme = "pixel-night-city";
+    sddmTheme = "pixel-night-city";
   };
 
 }
