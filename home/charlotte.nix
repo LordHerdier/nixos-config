@@ -12,6 +12,7 @@
     ./modules/atuin.nix
     ./modules/zsh
     ./modules/tmux
+    ./modules/semaphore-cli.nix
   ];
 
   home.sessionVariables = {
