@@ -11,6 +11,7 @@
     [
       ansible
       claude-code
+      nodejs
       stylua
       shfmt
       shellcheck
