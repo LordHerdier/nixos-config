@@ -10,40 +10,41 @@
     with pkgs;
     [
       ansible
-      claude-code
-      nodejs
-      stylua
-      shfmt
-      shellcheck
-      oh-my-posh
-      pass
-      inetutils
       binwalk
-      unzip
-      sshpass
-      stow
-      zoxide
-      tmux
-      fzf
-      ripgrep
-      gnugrep
-      gnused
-      gh
-      gnupg
-      gcc
+      bun
+      claude-code
       coreutils
-      procps
-      yazi
-      ffmpegthumbnailer
-      poppler-utils
-      unzip
-      jq
-      python3
-      qemu
       fastfetch
-      wl-clipboard
+      ffmpegthumbnailer
+      fzf
+      gcc
+      gh
+      gnugrep
+      gnupg
+      gnused
+      inetutils
+      jq
       nerd-fonts.caskaydia-cove
       nmap
+      nodejs
+      oh-my-posh
+      pass
+      poppler-utils
+      procps
+      python3
+      qemu
+      ripgrep
+      shellcheck
+      shfmt
+      sshpass
+      stow
+      stylua
+      tmux
+      unzip
+      unzip
+      wl-clipboard
+      yazi
+      zoxide
     ]
   );
   #  ++ lib.optionals isWsl (with pkgs; [
