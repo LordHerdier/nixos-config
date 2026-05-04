@@ -5,10 +5,12 @@
 {
   wayland.windowManager.hyprland.settings = {
     monitor = [
-      "DP-2,2560x1440@60,0x0,1"
+      # "DP-2,2560x1440@60,0x0,1"
       "eDP-1,2880x1920@120,auto,1.33"
-      "DP-3,2560x1440@165,auto,1"
-      ",1920x1080,auto,1"
+      # "eDP-1, 1920x1080@120, auto, 1"
+      # "DP-3,2560x1440@165,auto,1"
+      # ",1920x1080,auto,1"
+      # ",1920x1080,auto,1,mirror/* , */eDP-1"
     ];
 
     workspace = [

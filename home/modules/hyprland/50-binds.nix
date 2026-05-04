@@ -43,7 +43,7 @@
       "$mainMod, SPACE, exec, $menu"
       "$mainMod, H, exec, $bindsMenu"
       "$mainMod, Return, exec, $terminal"
-      "$mainMod, T, exec, kitty"
+      "$mainMod, T, exec, [float] kitty"
       "$mainMod SHIFT, S, exec, $screenshot"
       "$mainMod SHIFT, C, exec, $colorpicker"
       "$mainMod, E, exec, thunar"
@@ -54,7 +54,7 @@
       # Window management
       "$mainMod, F, fullscreen"
       "$mainMod, P, pseudo"
-      "$mainMod SHIFT, S, togglefloating"
+      "$mainMod SHIFT, F, togglefloating"
       "$mainMod SHIFT, P, pin"
 
       # Focus (Colemak-based + arrow keys)
