@@ -12,6 +12,7 @@
       (python3.withPackages (ps: with ps; [ packaging ]))
       ansible
       binwalk
+      bun
       claude-code
       coreutils
       fastfetch
@@ -26,6 +27,7 @@
       jq
       nerd-fonts.caskaydia-cove
       nmap
+      nodejs
       oh-my-posh
       pass
       poppler-utils
@@ -38,7 +40,6 @@
       stow
       stylua
       tmux
-      unzip
       unzip
       wl-clipboard
       yazi
