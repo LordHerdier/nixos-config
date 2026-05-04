@@ -9,40 +9,40 @@
   home.packages = (
     with pkgs;
     [
+      (python3.withPackages (ps: with ps; [ packaging ]))
       ansible
-      claude-code
-      stylua
-      shfmt
-      shellcheck
-      oh-my-posh
-      pass
-      inetutils
       binwalk
-      unzip
-      sshpass
-      stow
-      zoxide
-      tmux
-      fzf
-      ripgrep
-      gnugrep
-      gnused
-      gh
-      gnupg
-      gcc
+      claude-code
       coreutils
-      procps
-      yazi
-      ffmpegthumbnailer
-      poppler-utils
-      unzip
-      jq
-      python3
-      qemu
       fastfetch
-      wl-clipboard
+      ffmpegthumbnailer
+      fzf
+      gcc
+      gh
+      gnugrep
+      gnupg
+      gnused
+      inetutils
+      jq
       nerd-fonts.caskaydia-cove
       nmap
+      oh-my-posh
+      pass
+      poppler-utils
+      procps
+      qemu
+      ripgrep
+      shellcheck
+      shfmt
+      sshpass
+      stow
+      stylua
+      tmux
+      unzip
+      unzip
+      wl-clipboard
+      yazi
+      zoxide
     ]
   );
   #  ++ lib.optionals isWsl (with pkgs; [
