@@ -24,7 +24,10 @@ in
     ./20-status-and-titles.nix
     ./30-colors-kanagawa.nix
     ./50-smart-vim.nix
+    ./60-tmuxinator.nix
   ];
+
+  home.packages = [ pkgs.tmuxinator ];
 
   programs.tmux = {
     enable = true;

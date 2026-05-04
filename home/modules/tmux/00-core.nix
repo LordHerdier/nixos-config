@@ -10,6 +10,9 @@
     unbind r
     bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"
 
+    # Continuum restore on new instance
+    set -g @continuum-restore 'on'
+
     # Terminal settings
     set -ag terminal-overrides ",xterm-256color:RGB"
     set -as terminal-overrides ',*:smcup@:rmcup@'
