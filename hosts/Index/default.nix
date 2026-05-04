@@ -17,6 +17,8 @@
     ../../modules/features/systemd-boot-silent/default.nix
     ../../modules/common/ssh.nix
     ../../modules/features/fingerprint-reader.nix
+    ../../modules/features/ollama.nix
+    ../../modules/features/gvfs.nix
   ];
 
   system.stateVersion = "25.11";
