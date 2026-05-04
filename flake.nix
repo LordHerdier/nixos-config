@@ -70,9 +70,8 @@
               extraModules ? [ ],
             }:
             nixpkgs.lib.nixosSystem {
-              inherit system;
-
               modules = [
+                { nixpkgs.hostPlatform = system; }
                 # Common system bits
                 ./modules/common/packages.nix
                 ./modules/common/security.nix
