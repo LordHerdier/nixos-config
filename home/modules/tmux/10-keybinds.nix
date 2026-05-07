@@ -24,6 +24,9 @@
     # zoom
     bind-key z resize-pane -Z
 
+    # Toggle status bar
+    bind-key b set-option -g status
+
     # Session Switching
     bind-key ] switch-client -n
     bind-key [ switch-client -p
