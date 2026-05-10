@@ -23,6 +23,7 @@
       tailscale
       thunar
       tsukimi
+      winboat
     ]
   );
 }
