@@ -4,8 +4,17 @@
 
 {
   networking = {
-    nameservers = [ "146.163.252.126" "146.163.252.127" ];
-    search = [ "lorscapa.arpa" "siue.edu" "id.siue.edu" ];
+    nameservers = [
+      "146.163.252.126"
+      "146.163.252.127"
+      "10.0.10.2"
+    ];
+    search = [
+      "id.siue.edu"
+      "siue.edu"
+      "campus.siue.edu"
+      "h.lorscapa.com"
+    ];
   };
 
 }
