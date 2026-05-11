@@ -39,6 +39,7 @@
       sshpass
       stow
       stylua
+      tldr
       tmux
       unzip
       wl-clipboard
