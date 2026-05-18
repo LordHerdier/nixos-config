@@ -22,6 +22,7 @@
     settings.exec-once = [
       "axctl"
       "gnome-keyring-daemon --start --components=secrets,pkcs11"
+      "sleep 5 && /etc/profiles/per-user/charlotte/bin/kitty zsh -i -c t"
     ];
   };
 }
