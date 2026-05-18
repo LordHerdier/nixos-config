@@ -27,8 +27,11 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
 
-  # home-manager activation runs on nixos-rebuild switch, not every boot
-  systemd.services.home-manager-charlotte.wantedBy = lib.mkForce [];
+  # run HM asynchronously — don't block user sessions at boot
+  systemd.services.home-manager-charlotte = {
+    before = lib.mkForce [];
+    wantedBy = lib.mkForce [ "multi-user.target" ];
+  };
 
   # tailscale starts in the background without blocking graphical login
   systemd.services.tailscaled.before = lib.mkForce [];
