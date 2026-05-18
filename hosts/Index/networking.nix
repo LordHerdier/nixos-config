@@ -3,6 +3,8 @@
 { ... }:
 
 {
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   networking = {
     nameservers = [
       "192.168.50.123"

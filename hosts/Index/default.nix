@@ -14,14 +14,16 @@
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
     ../../modules/features/tailscale.nix
-    ../../modules/features/systemd-boot-silent/default.nix
+    # ../../modules/features/systemd-boot-silent/default.nix
     ../../modules/common/ssh.nix
     ../../modules/features/fingerprint-reader.nix
-    ../../modules/features/ollama.nix
     ../../modules/features/gvfs.nix
   ];
 
   system.stateVersion = "25.11";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
 
