@@ -1,6 +1,6 @@
 # hosts/Index/default.nix
 
-{ hostName, ... }:
+{ hostName, lib, ... }:
 
 {
   networking.hostName = hostName;
@@ -23,7 +23,19 @@
   system.stateVersion = "25.11";
 
   boot.loader.systemd-boot.enable = true;
+  boot.loader.timeout = 0;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.initrd.systemd.enable = true;
+
+  # home-manager activation runs on nixos-rebuild switch, not every boot
+  systemd.services.home-manager-charlotte.wantedBy = lib.mkForce [];
+
+  # tailscale starts in the background without blocking graphical login
+  systemd.services.tailscaled.before = lib.mkForce [];
+
+  services.atd.enable = lib.mkForce false;
+  services.openssh.startWhenNeeded = true;
+  hardware.sensor.iio.enable = false;
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
 

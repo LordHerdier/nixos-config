@@ -5,6 +5,7 @@
 {
   virtualisation.docker = {
     enable = true;
+    enableOnBoot = false;
   };
 
   users.users.charlotte.extraGroups = [ "docker" ];
