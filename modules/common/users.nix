@@ -8,7 +8,11 @@
       charlotte = {
         isNormalUser = true;
         description = "Charlotte";
-        extraGroups = [ "wheel" ];
+        extraGroups = [
+          "wheel"
+          "input"
+          "video"
+        ];
         shell = pkgs.zsh;
       };
     };
