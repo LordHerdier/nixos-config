@@ -7,7 +7,8 @@
     with pkgs;
     [
       audacity
-      bitwarden-desktop
+      # bitwarden-desktop
+      proton-vpn
       discord
       firefox
       fladder
