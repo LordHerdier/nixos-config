@@ -15,13 +15,10 @@
   wayland.windowManager.hyprland = {
     enable = true;
 
-    extraConfig = ''
-      source = ~/.local/share/ambxst/hyprland.conf
-    '';
-
     settings.exec-once = [
-      "axctl"
-      "gnome-keyring-daemon --start --components=secrets,pkcs11"
+      "noctalia-shell"
+      # gnome-keyring is now started by PAM at login via
+      # services.gnome.gnome-keyring.enable (system config).
       "sleep 2 && /etc/profiles/per-user/charlotte/bin/kitty zsh -i -c t"
     ];
   };

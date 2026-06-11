@@ -23,7 +23,7 @@
     "$calculator" = "qalculate-gtk";
     "$fileManager" = "thunar";
     "$ide" = "code";
-    "$menu" = "rofi -show drun";
+    "$menu" = "noctalia-shell ipc call launcher toggle";
     "$mailApp" = "thunderbird";
     "$music" = "spotify-launcher";
     "$terminal" = "kitty";

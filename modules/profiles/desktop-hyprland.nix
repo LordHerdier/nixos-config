@@ -37,6 +37,11 @@
 
   programs.dconf.enable = true;
 
+  # Provides the org.freedesktop.secrets D-Bus service (keyring) and PAM
+  # integration so the login keyring is unlocked at SDDM login. Apps like
+  # ProtonVPN need this to store credentials.
+  services.gnome.gnome-keyring.enable = true;
+
   services = {
     pipewire = {
       enable = true;
@@ -45,10 +50,6 @@
     };
 
     dbus = {
-      enable = true;
-    };
-
-    seatd = {
       enable = true;
     };
 
@@ -85,5 +86,8 @@
 
   hardware.graphics.enable = true;
 
-  programs.ambxst.enable = true;
+  # Required by Noctalia's battery / power-profile widgets
+  # (previously provided as mkDefault by the Ambxst module).
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true;
 }

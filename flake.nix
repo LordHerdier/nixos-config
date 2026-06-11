@@ -1,6 +1,13 @@
 {
   description = "Nix configs for Charlotte's machines (WSL + NixOS)";
 
+  nixConfig = {
+    extra-substituters = [ "https://noctalia.cachix.org" ];
+    extra-trusted-public-keys = [
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -21,10 +28,10 @@
     dotfiles.url = "github:LordHerdier/Dotfiles";
     dotfiles.flake = false;
 
-    qylock.url = "github:LordHerdier/qylock-nix";
+    qylock.url = "github:Darkkal44/qylock";
 
-    ambxst.url = "github:Axenide/Ambxst";
-    ambxst.inputs.nixpkgs.follows = "nixpkgs";
+    noctalia.url = "github:noctalia-dev/noctalia";
+    noctalia.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -36,7 +43,6 @@
       nixos-hardware,
       nvf,
       dotfiles,
-      ambxst,
       qylock,
       ...
     }:
@@ -132,10 +138,6 @@
               hostName = "Pine";
               isWsl = false;
               hostPath = ./hosts/Pine/default.nix;
-              extraModules = [
-                ambxst.nixosModules.default
-                { programs.ambxst.enable = nixpkgs.lib.mkDefault false; }
-              ];
             };
 
             "Index" = mkHost {
@@ -144,8 +146,6 @@
               hostPath = ./hosts/Index/default.nix;
               extraModules = [
                 nixos-hardware.nixosModules.framework-amd-ai-300-series
-                ambxst.nixosModules.default
-                { programs.ambxst.enable = nixpkgs.lib.mkDefault false; }
                 qylock.nixosModules.default
                 ./modules/features/qylock.nix
 

@@ -5,6 +5,7 @@
 {
   imports = [
     ../modules/hyprland/default.nix
+    ../modules/noctalia.nix
     ../modules/desktop-files.nix
     ../modules/desktop-packages.nix
     ../modules/kitty.nix
