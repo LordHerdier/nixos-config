@@ -30,7 +30,8 @@
 
     qylock.url = "github:Darkkal44/qylock";
 
-    noctalia.url = "github:noctalia-dev/noctalia";
+    noctalia.url = "github:noctalia-dev/noctalia/legacy-v4";
+    noctalia.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

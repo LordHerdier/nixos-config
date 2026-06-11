@@ -592,7 +592,7 @@ in
 
   # Enable the shell/package but deliberately leave `settings` unset so the
   # module does not symlink a read-only settings.json from the store.
-  programs.noctalia.enable = true;
+  programs.noctalia-shell.enable = true;
 
   # Seed the writable settings.json from our defaults on first activation only.
   # If the file already exists (i.e. the GUI has written it), leave it alone.
