@@ -10,7 +10,9 @@
     with pkgs;
     [
       (python3.withPackages (ps: with ps; [ packaging ]))
-      ansible
+      (ansible.overrideAttrs (old: {
+        propagatedBuildInputs = old.propagatedBuildInputs ++ [ python3Packages.paramiko ];
+      }))
       binwalk
       bun
       claude-code

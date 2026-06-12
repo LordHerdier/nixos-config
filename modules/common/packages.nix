@@ -9,6 +9,7 @@
     gnumake
     curl
     wget
+    fping
     fd
     eza
     htop

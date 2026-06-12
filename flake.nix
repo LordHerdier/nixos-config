@@ -140,6 +140,12 @@
               hostPath = ./hosts/Pine/default.nix;
             };
 
+            "Apthos" = mkHost {
+              hostName = "Apthos";
+              isWsl = false;
+              hostPath = ./hosts/Apthos/default.nix;
+            };
+
             "Index" = mkHost {
               hostName = "Index";
               isWsl = false;

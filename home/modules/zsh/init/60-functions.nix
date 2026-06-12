@@ -12,6 +12,10 @@
       eval "sudo $last_cmd"
     }
 
+    dssh() {
+      ssh -t "$1" docker exec -it "''${2:-sh}" "''${3:-sh}"
+    }
+
     theme() {
       if [[ -z "$1" ]]; then
         echo "Usage: omp-theme <theme>"
