@@ -18,6 +18,7 @@
     ../../modules/common/ssh.nix
     ../../modules/features/fingerprint-reader.nix
     ../../modules/features/gvfs.nix
+    ../../modules/features/cifs-mounts.nix
   ];
 
   system.stateVersion = "25.11";
