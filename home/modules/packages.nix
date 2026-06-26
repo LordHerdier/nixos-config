@@ -28,6 +28,7 @@
       gnused
       inetutils
       jq
+      mpv
       nerd-fonts.caskaydia-cove
       nmap
       nodejs
