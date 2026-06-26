@@ -14,6 +14,7 @@
         propagatedBuildInputs = old.propagatedBuildInputs ++ [ python3Packages.paramiko ];
       }))
       binwalk
+      concord
       bun
       claude-code
       coreutils

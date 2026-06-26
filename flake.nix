@@ -77,7 +77,14 @@
             }:
             nixpkgs.lib.nixosSystem {
               modules = [
-                { nixpkgs.hostPlatform = system; }
+                {
+                  nixpkgs.hostPlatform = system;
+                  nixpkgs.overlays = [
+                    (final: _: {
+                      concord = final.callPackage ./pkgs/concord.nix { };
+                    })
+                  ];
+                }
                 # Common system bits
                 ./modules/common/packages.nix
                 ./modules/common/security.nix
