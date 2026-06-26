@@ -9,15 +9,15 @@
   opus,
 }:
 let
-  version = "2.2.7";
+  version = "2.2.8";
   assets = {
     "x86_64-linux" = {
       url = "https://github.com/chojs23/concord/releases/download/v${version}/concord-x86_64-unknown-linux-gnu.tar.xz";
-      sha256 = "e58582792d815a58a565236bdbd6dd72e13ac0e5282924a3965b9f96482051dc";
+      sha256 = "56d2ff04d07f2446c4a2d150d9391f3e8e67c74bf3c062cc5788574287b40810";
     };
     "aarch64-linux" = {
       url = "https://github.com/chojs23/concord/releases/download/v${version}/concord-aarch64-unknown-linux-gnu.tar.xz";
-      sha256 = "c3921e183bee3d27d212e07d1a5becdb1112cf01bf4f63cd73e9c9de7e683dde";
+      sha256 = "a28e5dd72fb1399f010e0d4383dae8bcf5c3e13d46a9a097fd562b38711fc73a";
     };
   };
   asset =
