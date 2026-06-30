@@ -1,6 +1,36 @@
 # home/modules/tmux/70-utilities.nix
 { lib, pkgs, ... }:
 {
+  home.file.".config/tmux/scripts/session-picker.sh" = {
+    executable = true;
+    text = ''
+      #!${pkgs.bash}/bin/bash
+
+      CURRENT=$(tmux display-message -p '#{session_name}' 2>/dev/null || echo "")
+
+      SESSION=$(tmux list-sessions -F '#{session_name}|#{session_windows}|#{session_attached}' 2>/dev/null \
+        | while IFS='|' read -r name windows attached; do
+            [ "$name" = "$CURRENT" ] && marker="●" || marker="○"
+            [ "$attached" -gt 0 ] && here=" (here)" || here=""
+            printf '%s|%s %s  %s win%s\n' "$name" "$marker" "$name" "$windows" "$here"
+          done \
+        | ${pkgs.fzf}/bin/fzf \
+            --no-sort \
+            --delimiter='|' \
+            --with-nth=2 \
+            --prompt="  sessions  " \
+            --bind='e:down,u:up,ctrl-e:preview-down,ctrl-u:preview-up' \
+            --preview='tmux list-windows -t {1} -F "  #{window_index}  #{window_name}#{?window_active,  ←,}" 2>/dev/null' \
+            --preview-window='right:40%:border-left' \
+            --height=100% \
+            --color='bg:#16161D,bg+:#2A2A37,fg:#727169,fg+:#dcd7ba,hl:#7fb4ca,hl+:#7fb4ca,prompt:#e6c384,pointer:#D27E99,marker:#98bb6c,border:#2A2A37,info:#727169' \
+        | cut -d'|' -f1)
+
+      [ -z "$SESSION" ] && exit 0
+      tmux switch-client -t "$SESSION"
+    '';
+  };
+
   home.file.".config/tmux/scripts/now-playing.sh" = {
     executable = true;
     text = ''

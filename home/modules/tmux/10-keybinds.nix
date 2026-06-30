@@ -38,5 +38,8 @@
     bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel \
       'command -v wl-copy >/dev/null && wl-copy || command -v xclip >/dev/null && xclip -in -selection clipboard || command -v pbcopy >/dev/null && pbcopy || command -v clip.exe >/dev/null && clip.exe'
 
+    # Session picker (fzf-based, replaces choose-tree)
+    bind-key s display-popup -E -w 55% -h 60% "~/.config/tmux/scripts/session-picker.sh"
+
   '';
 }
