@@ -33,6 +33,7 @@
       nmap
       nodejs
       oh-my-posh
+      p7zip
       pass
       playerctl
       poppler-utils
