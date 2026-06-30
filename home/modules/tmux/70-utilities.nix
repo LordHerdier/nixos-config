@@ -59,7 +59,7 @@
       #!${pkgs.bash}/bin/bash
       WINDOW="$1"
       CMD="$2"
-      SESSION="utilities"
+      SESSION="utils"
       if ! tmux has-session -t "$SESSION" 2>/dev/null; then
         tmux new-session -d -s "$SESSION" -n spotify spotify_player
         tmux new-window  -t "$SESSION" -n concord concord
