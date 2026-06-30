@@ -12,6 +12,7 @@
     ./modules/atuin.nix
     ./modules/zsh
     ./modules/tmux
+    ./modules/spotify-player.nix
   ];
 
   home.sessionVariables = {

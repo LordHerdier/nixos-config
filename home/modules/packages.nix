@@ -34,6 +34,7 @@
       nodejs
       oh-my-posh
       pass
+      playerctl
       poppler-utils
       procps
       qemu
@@ -43,6 +44,7 @@
       sshpass
       stow
       stylua
+      spotify-player
       tldr
       tmux
       unzip

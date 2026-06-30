@@ -25,6 +25,7 @@ in
     ./30-colors-kanagawa.nix
     ./50-smart-vim.nix
     ./60-tmuxinator.nix
+    ./70-utilities.nix
   ];
 
   home.packages = [ pkgs.tmuxinator ];
