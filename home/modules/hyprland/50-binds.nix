@@ -10,13 +10,18 @@
     "$colorpicker" = "hyprpicker -qaf rgb";
     "$lock" = "qylock-lock";
     "$logout" = "hyprctl dispatch exit";
-    "$micMute" = "pactl set-source-mute @DEFAULT_SOURCE@ toggle";
     "$screenshot" = "hyprshot --mode region --output-folder /tmp";
-    "$volUp" = "pactl set-sink-volume @DEFAULT_SINK@ +1%";
-    "$volDown" = "pactl set-sink-volume @DEFAULT_SINK@ -1%";
-    "$volMute" = "pactl set-sink-mute @DEFAULT_SINK@ toggle";
     "$wallScript" = "~/bin/wall_video";
     "$bindsMenu" = "~/bin/binds-menu";
+
+    # Noctalia shell IPC (routed through the shell for OSD feedback)
+    "$ipc" = "noctalia-shell ipc call";
+    "$micMute" = "noctalia-shell ipc call volume muteInput";
+    "$volUp" = "noctalia-shell ipc call volume increase";
+    "$volDown" = "noctalia-shell ipc call volume decrease";
+    "$volMute" = "noctalia-shell ipc call volume muteOutput";
+    "$brightUp" = "noctalia-shell ipc call brightness increase";
+    "$brightDown" = "noctalia-shell ipc call brightness decrease";
 
     # Apps
     "$browser" = "zen";
@@ -37,7 +42,7 @@
       # Wallpapers
       "$mainMod ALT, 1, exec, $wallScript next"
       "$mainMod ALT, 2, exec, $wallScript prev"
-      "$mainMod ALT, 3, exec, $wallScript random"
+      "$mainMod ALT, 3, exec, $ipc wallpaper random"
 
       # Launchers
       "$mainMod, SPACE, exec, $menu"
@@ -50,6 +55,27 @@
       "$mainMod, C, exec, code"
       "$mainMod, B, exec, zen-beta"
       "$mainMod, M, exec, spotify"
+
+      # Noctalia launchers
+      "$mainMod, V, exec, $ipc launcher clipboard"
+      "$mainMod, period, exec, $ipc launcher emoji"
+      "$mainMod, Tab, exec, $ipc launcher windows"
+      "$mainMod SHIFT, SPACE, exec, $ipc launcher command"
+
+      # Noctalia panels & menus
+      "$mainMod, A, exec, $ipc controlCenter toggle"
+      "$mainMod, O, exec, $ipc sessionMenu toggle"
+      "$mainMod, W, exec, $ipc notifications toggleHistory"
+      "$mainMod SHIFT, W, exec, $ipc notifications toggleDND"
+      "$mainMod, comma, exec, $ipc settings toggle"
+      "$mainMod, K, exec, $ipc calendar toggle"
+
+      # Noctalia toggles
+      "$mainMod SHIFT, B, exec, $ipc bar toggle"
+      "$mainMod SHIFT, D, exec, $ipc darkMode toggle"
+      "$mainMod SHIFT, N, exec, $ipc nightLight toggle"
+      "$mainMod SHIFT, I, exec, $ipc idleInhibitor toggle"
+      "$mainMod SHIFT, R, exec, $ipc plugin:screen-recorder toggle"
 
       # Window management
       "$mainMod, F, fullscreen"
@@ -94,12 +120,12 @@
       ", XF86AudioLowerVolume, exec, $volDown"
       ", XF86AudioMute, exec, $volMute"
       ", XF86AudioMicMute, exec, $micMute"
-      ", XF86AudioPlay, exec, playerctl play-pause"
-      ", XF86AudioStop, exec, playerctl stop"
-      ", XF86AudioPrev, exec, playerctl previous"
-      ", XF86AudioNext, exec, playerctl next"
-      ", XF86MonBrightnessUp, exec, brightnessctl s +2%"
-      ", XF86MonBrightnessDown, exec, brightnessctl s 2%-"
+      ", XF86AudioPlay, exec, $ipc media playPause"
+      ", XF86AudioStop, exec, $ipc media stop"
+      ", XF86AudioPrev, exec, $ipc media previous"
+      ", XF86AudioNext, exec, $ipc media next"
+      ", XF86MonBrightnessUp, exec, $brightUp"
+      ", XF86MonBrightnessDown, exec, $brightDown"
     ];
 
     bindm = [
