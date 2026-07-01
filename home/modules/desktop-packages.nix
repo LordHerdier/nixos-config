@@ -15,6 +15,7 @@
       hyprcursor
       gimp
       gnome-keyring
+      libreoffice
       moonlight-qt
       nautilus
       mpvpaper
