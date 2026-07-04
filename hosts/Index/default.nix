@@ -1,6 +1,6 @@
 # hosts/Index/default.nix
 
-{ hostName, lib, ... }:
+{ hostName, lib, pkgs, ... }:
 
 {
   networking.hostName = hostName;
@@ -40,6 +40,15 @@
   services.atd.enable = lib.mkForce false;
   services.openssh.startWhenNeeded = true;
   hardware.sensor.iio.enable = false;
+
+  # Use greetd + tuigreet instead of SDDM (from desktop-hyprland profile).
+  # start-hyprland is the wrapper script provided by programs.hyprland.enable.
+  services.displayManager.sddm.enable = lib.mkForce false;
+  services.greetd = {
+    enable = true;
+    settings.default_session.command =
+      "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd start-hyprland";
+  };
 
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
 
