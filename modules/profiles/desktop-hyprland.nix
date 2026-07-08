@@ -37,10 +37,16 @@
 
   programs.dconf.enable = true;
 
-  # Provides the org.freedesktop.secrets D-Bus service (keyring) and PAM
-  # integration so the login keyring is unlocked at SDDM login. Apps like
-  # ProtonVPN need this to store credentials.
+  # Provides the org.freedesktop.secrets D-Bus service (keyring). Apps like
+  # ProtonVPN need this to store credentials. Note: enabling this alone does
+  # NOT unlock the login keyring — pam_gnome_keyring must be wired into the
+  # authenticating PAM service too (see enableGnomeKeyring below / per host).
   services.gnome.gnome-keyring.enable = true;
+
+  # Hand the login password to gnome-keyring at SDDM login so the login
+  # keyring is unlocked automatically. Hosts that swap SDDM for another
+  # greeter (e.g. greetd on Index) must enable this on that PAM service.
+  security.pam.services.sddm.enableGnomeKeyring = true;
 
   services = {
     pipewire = {

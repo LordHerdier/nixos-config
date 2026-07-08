@@ -50,6 +50,11 @@
       "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd start-hyprland";
   };
 
+  # Unlock the login keyring at login. gnome-keyring.enable only ships the
+  # daemon/D-Bus service; the login password is only handed to the keyring if
+  # pam_gnome_keyring is wired into the authenticating PAM service (greetd).
+  security.pam.services.greetd.enableGnomeKeyring = true;
+
   # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
 
   # Set the timezone
