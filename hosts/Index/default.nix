@@ -1,6 +1,6 @@
 # hosts/Index/default.nix
 
-{ hostName, lib, pkgs, ... }:
+{ hostName, config, lib, pkgs, ... }:
 
 {
   networking.hostName = hostName;
@@ -44,10 +44,15 @@
   # Use greetd + tuigreet instead of SDDM (from desktop-hyprland profile).
   # start-hyprland is the wrapper script provided by programs.hyprland.enable.
   services.displayManager.sddm.enable = lib.mkForce false;
+  # tuigreet defaults to Hyprland (--cmd start-hyprland) but browses the
+  # registered session files (--sessions), so the gamescope "Steam" session
+  # (from programs.steam.gamescopeSession) can be picked with F3 at login.
+  # --remember-session keeps whatever was chosen last, so booting straight
+  # into Big Picture is one selection away.
   services.greetd = {
     enable = true;
     settings.default_session.command =
-      "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd start-hyprland";
+      "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd start-hyprland";
   };
 
   # Unlock the login keyring at login. gnome-keyring.enable only ships the
