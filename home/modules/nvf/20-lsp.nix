@@ -23,7 +23,11 @@
 
       assembly.enable = true;
       bash.enable = true;
-      clang.enable = true;
+      # clang pulls in cpplint, which fails its test suite on the current
+      # nixpkgs (cpplint-2.0.2 check phase asserts empty stderr, but a newer
+      # Python emits a codecs.open() DeprecationWarning -> 17 test failures).
+      # Disabled to unblock rebuilds; re-enable once nixpkgs fixes cpplint.
+      # clang.enable = true;
       cmake.enable = true;
       css.enable = true;
       html.enable = true;
