@@ -10,6 +10,7 @@
       # bitwarden-desktop
       proton-vpn
       discord
+      legcord
       firefox
       fladder
       hyprcursor

@@ -14,6 +14,7 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
+    configType = "hyprlang";
 
     settings.exec-once = [
       "noctalia-shell"
