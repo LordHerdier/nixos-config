@@ -6,6 +6,11 @@
   systemd.services.NetworkManager-wait-online.enable = false;
 
   networking = {
+    # Upstream router advertises IPv6 it doesn't actually route, so apps that
+    # prefer AAAA records (e.g. spotify_player's dealer websocket) hang on a
+    # dead IPv6 path. Disable IPv6 here until the upstream routing is fixed.
+    enableIPv6 = false;
+
     nameservers = [
       "192.168.50.123"
       "1.1.1.1"

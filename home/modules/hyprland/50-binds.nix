@@ -51,6 +51,7 @@
       "$mainMod, T, exec, [float] kitty"
       "$mainMod SHIFT, S, exec, $screenshot"
       "$mainMod SHIFT, C, exec, $colorpicker"
+      "$mainMod SHIFT, W, exec, moonlight stream 'nico' 'desktop'"
       "$mainMod, E, exec, thunar"
       "$mainMod, C, exec, code"
       "$mainMod, B, exec, zen-beta"
@@ -66,7 +67,7 @@
       "$mainMod, A, exec, $ipc controlCenter toggle"
       "$mainMod, O, exec, $ipc sessionMenu toggle"
       "$mainMod, W, exec, $ipc notifications toggleHistory"
-      "$mainMod SHIFT, W, exec, $ipc notifications toggleDND"
+      "$mainMod ALT, W, exec, $ipc notifications toggleDND"
       "$mainMod, comma, exec, $ipc settings toggle"
       "$mainMod, K, exec, $ipc calendar toggle"
 
