@@ -32,6 +32,9 @@
 
     noctalia.url = "github:noctalia-dev/noctalia/legacy-v4";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
+
+    forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
+    forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

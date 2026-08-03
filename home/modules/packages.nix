@@ -2,6 +2,7 @@
 
 {
   pkgs,
+  inputs,
   ...
 }:
 
@@ -27,6 +28,7 @@
       gnupg
       gnused
       inetutils
+      inputs.forgejo-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       jq
       mpv
       nerd-fonts.caskaydia-cove
