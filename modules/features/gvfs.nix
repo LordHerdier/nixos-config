@@ -6,7 +6,7 @@
   services.gvfs.enable = true;
   environment.systemPackages = [
     pkgs.gvfs
-    pkgs.jmtpfs
+    pkgs.simple-mtpfs
   ];
   users.users.charlotte.extraGroups = [ "plugdev" ];
 }

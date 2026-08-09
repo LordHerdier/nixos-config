@@ -19,6 +19,7 @@
     ../../modules/features/fingerprint-reader.nix
     ../../modules/features/gvfs.nix
     ../../modules/features/cifs-mounts.nix
+    ../../modules/features/usbmuxd.nix
   ];
 
   system.stateVersion = "25.11";
