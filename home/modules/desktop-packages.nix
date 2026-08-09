@@ -16,6 +16,7 @@
       hyprcursor
       gimp
       gnome-keyring
+      loupe
       libreoffice
       moonlight-qt
       nautilus
@@ -25,7 +26,7 @@
       tailscale
       thunar
       tsukimi
-      winboat
+      # winboat  # pins EOL electron-40.10.5 (insecure); re-enable when nixpkgs bumps electron
     ]
   );
 }
