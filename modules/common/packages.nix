@@ -8,6 +8,7 @@
     at
     gnumake
     curl
+    dnsutils
     wget
     fping
     fd
