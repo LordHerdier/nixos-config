@@ -74,7 +74,7 @@
     mkcd() { mkdir -p -- "$1" && cd -P -- "$1"; }
 
     t() {
-      for session in base exo homelab nixos work; do
+      for session in base exo homelab nixos work dev; do
         tmux has-session -t "$session" 2>/dev/null || tmuxinator start "$session" --no-attach
       done
       tmux attach -t base

@@ -100,4 +100,16 @@
           panes:
             - clear
   '';
+  home.file.".config/tmuxinator/dev.yml".text = ''
+    name: dev
+    root: ~/documents/code
+    windows:
+      - berry:
+          root: ~/documents/berrytree
+          layout: main-vertical
+          panes:
+            - claude
+            - nvim
+            - [nix develop, cd companion]
+  '';
 }
