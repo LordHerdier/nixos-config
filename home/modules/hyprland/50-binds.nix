@@ -52,7 +52,7 @@
       "$mainMod SHIFT, S, exec, $screenshot"
       "$mainMod SHIFT, C, exec, $colorpicker"
       "$mainMod SHIFT, W, exec, moonlight stream 'nico' 'desktop'"
-      "$mainMod, E, exec, thunar"
+      "$mainMod, E, exec, nautilus"
       "$mainMod, C, exec, code"
       "$mainMod, B, exec, zen-beta"
       "$mainMod, M, exec, spotify"
