@@ -10,7 +10,7 @@
     "$colorpicker" = "hyprpicker -qaf rgb";
     "$lock" = "qylock-lock";
     "$logout" = "hyprctl dispatch exit";
-    "$screenshot" = "hyprshot --mode region --output-folder /tmp";
+    "$screenshot" = "hyprshot --mode region --output-folder ~/Pictures/Screenshots";
     "$wallScript" = "~/bin/wall_video";
     "$bindsMenu" = "~/bin/binds-menu";
 
