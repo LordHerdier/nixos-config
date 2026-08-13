@@ -30,6 +30,34 @@
     met_; (tap-hold 200 ; lmet)
 
     rctl-mod (tap-hold 200 rctl (layer-toggle rctl-layer))
+
+    spc_mirror (tap-hold 200 spc (layer-toggle mirror))
+
+    mir_q p
+    mir_w o
+    mir_e i
+    mir_r u
+    mir_t y
+
+    mir_a ;
+    mir_s l
+    mir_d k
+    mir_f j
+    mir_g h
+
+    mir_z /
+    mir_x .
+    mir_c ,
+    mir_v m
+    mir_b n
+
+    mir_grv bspc
+    mir_1 =
+    mir_2 -
+    mir_3 0
+    mir_4 9
+    mir_5 8
+    mir_6 7
 )
 
 (deflayer default
@@ -54,7 +82,7 @@
 
 (deflayer rctl-layer
     _     _                    _                    _     _     _     _     _     _     _     _     _     _     _     _
-    _     (layer-switch default) (layer-switch nomod) _   _     _     _     _     _     _     _     _     _     _
+    _     (layer-switch default) (layer-switch nomod) (layer-switch left-hand) _     _     _     _     _     _     _     _     _     _
     _     _       _       _       _       _       _       _       _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _       _       _
     _     _       _       _     _     _     _     _     _     _     _     _
@@ -69,5 +97,25 @@
     _     _       _       _       _       _       _       _       _       _       _       _       _
     _     _       _       _     _     _     _     _     _     _     _     _
     _     _       _       _          _                  _     @rctl-mod   _     _     _
+                                                                _     _     _
+)
+
+(deflayer left-hand
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _     _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _
+    _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h @ctl_j  @sft_k  @alt_l  @met_;  _       _
+    _     _       _       _     _     _     _     _     _     _     _     _
+    _     _       _       _          @spc_mirror        _     @rctl-mod   _     _     _
+                                                                _     _     _
+)
+
+(deflayer mirror
+    _     _       _       _       _       _       _       _       _       _       _       _       _       _     _
+    @mir_grv @mir_1 @mir_2 @mir_3 @mir_4 @mir_5 @mir_6 _ _ _ _ _ _ _
+    bspc  @mir_q  @mir_w  @mir_e  @mir_r  @mir_t  _       _       _       _       _       _       _       _
+    ret   @mir_a  @mir_s  @mir_d  @mir_f  @mir_g  _       _       _       _       _       _       _
+    _     @mir_z  @mir_x  @mir_c  @mir_v  @mir_b  _     _     _     _     _     _
+    _     _       _       _          _                  _     _     _     _     _
                                                                 _     _     _
 )
