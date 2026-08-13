@@ -86,6 +86,24 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_3"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -302,7 +320,29 @@
         "nixpkgs": "nixpkgs_2",
         "noctalia": "noctalia",
         "nvf": "nvf",
-        "qylock": "qylock"
+        "qylock": "qylock",
+        "sddm-hacker-theme": "sddm-hacker-theme"
+      }
+    },
+    "sddm-hacker-theme": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786632522,
+        "narHash": "sha256-Gi5NLnnbZMLpLQiyaQVG3/KHx5EdK3eOh8y6NL88gJo=",
+        "ref": "refs/heads/main",
+        "rev": "2f1b8e2686126b5fdd55728e896245756beb6b74",
+        "revCount": 92,
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/sddm-hacker-theme.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/sddm-hacker-theme.git"
       }
     },
     "systems": {
@@ -321,6 +361,21 @@
       }
     },
     "systems_2": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_3": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

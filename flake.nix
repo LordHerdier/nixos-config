@@ -30,6 +30,9 @@
 
     qylock.url = "github:Darkkal44/qylock";
 
+    sddm-hacker-theme.url = "git+ssh://git@git.lorscapa.com/LordHerdier/sddm-hacker-theme.git";
+    sddm-hacker-theme.inputs.nixpkgs.follows = "nixpkgs";
+
     noctalia.url = "github:noctalia-dev/noctalia/legacy-v4";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -44,6 +47,7 @@
       nvf,
       dotfiles,
       qylock,
+      sddm-hacker-theme,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -162,6 +166,8 @@
                 qylock.nixosModules.default
                 ./modules/features/qylock.nix
 
+                sddm-hacker-theme.nixosModules.default
+                ./modules/features/sddm-hacker-theme.nix
               ];
             };
           };
