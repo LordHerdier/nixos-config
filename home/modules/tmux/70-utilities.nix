@@ -91,6 +91,7 @@
       "~/.config/tmux/scripts/utility-popup.sh spotify spotify_player"
     bind-key M-d display-popup -E -w 90% -h 90% \
       "~/.config/tmux/scripts/utility-popup.sh concord concord"
+    bind-key M-g display-popup -E -w 90% -h 90% -d '#{pane_current_path}' lazygit
 
     ##### Mouse bindings for the now-playing segment #####
 

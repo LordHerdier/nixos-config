@@ -29,6 +29,7 @@
       gnused
       inetutils
       jq
+      lazygit
       mpv
       nerd-fonts.caskaydia-cove
       nmap
