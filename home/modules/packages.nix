@@ -29,6 +29,7 @@
       gnused
       inetutils
       jq
+      lazydocker
       lazygit
       mpv
       nerd-fonts.caskaydia-cove
