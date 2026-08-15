@@ -53,6 +53,16 @@
     '';
   };
 
+  home.file.".config/tmux/scripts/new-session-popup.sh" = {
+    executable = true;
+    text = ''
+      #!${pkgs.bash}/bin/bash
+      read -rp "Session name: " name
+      [ -z "$name" ] && exit 0
+      tmux new-session -d -s "$name" && tmux switch-client -t "$name"
+    '';
+  };
+
   home.file.".config/tmux/scripts/utility-popup.sh" = {
     executable = true;
     text = ''
@@ -92,6 +102,7 @@
     bind-key M-d display-popup -E -w 90% -h 90% \
       "~/.config/tmux/scripts/utility-popup.sh concord concord"
     bind-key M-g display-popup -E -w 90% -h 90% -d '#{pane_current_path}' lazygit
+    bind-key S display-popup -E "~/.config/tmux/scripts/new-session-popup.sh"
 
     ##### Mouse bindings for the now-playing segment #####
 
