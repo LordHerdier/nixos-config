@@ -54,6 +54,7 @@
       unzip
       wl-clipboard
       yazi
+      yt-dlp
       zoxide
     ]
   );
