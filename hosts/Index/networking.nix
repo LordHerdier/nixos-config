@@ -24,6 +24,17 @@
       "id.siue.edu"
     ];
 
+    firewall = {
+      allowedUDPPorts = [ 38850 ];
+      allowedTCPPorts = [
+        38810
+        38820
+        38830
+        38840
+      ];
+      checkReversePath = "loose";
+    };
+
     networkmanager = {
       enable = true;
 
