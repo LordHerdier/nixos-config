@@ -20,6 +20,7 @@
     ../../modules/features/gvfs.nix
     ../../modules/features/cifs-mounts.nix
     ../../modules/features/usbmuxd.nix
+    ../../modules/features/nix-ld.nix
   ];
 
   system.stateVersion = "25.11";
