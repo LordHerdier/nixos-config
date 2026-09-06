@@ -13,6 +13,7 @@
     ./modules/zsh
     ./modules/tmux
     ./modules/spotify-player.nix
+    ./modules/case-insensitive-dirs.nix
   ];
 
   home.sessionVariables = {
