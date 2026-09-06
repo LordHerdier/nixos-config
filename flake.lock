@@ -102,6 +102,46 @@
         "type": "github"
       }
     },
+    "hacky-launcher": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786934458,
+        "narHash": "sha256-QB/qw/BgxbUs9/vmwlc2yertTPywEC8TagoV0hP/5Sk=",
+        "ref": "refs/heads/main",
+        "rev": "0d261cc6add99a827cc635a8415c1ac9a0ab1c68",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git"
+      }
+    },
+    "hacky-tts": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786833771,
+        "narHash": "sha256-rO4s9ly15D8Mf9zyvG6MeZhkDVdvf9gK6Zo6WFlwzSY=",
+        "ref": "refs/heads/main",
+        "rev": "5f4eedef4c27cdabfdb7b5890353f9c2d4907929",
+        "revCount": 4,
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -313,6 +353,8 @@
       "inputs": {
         "dotfiles": "dotfiles",
         "flake-parts": "flake-parts",
+        "hacky-launcher": "hacky-launcher",
+        "hacky-tts": "hacky-tts",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",

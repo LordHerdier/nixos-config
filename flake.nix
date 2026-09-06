@@ -32,6 +32,12 @@
 
     noctalia.url = "github:noctalia-dev/noctalia/legacy-v4";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
+
+    hacky-tts.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git";
+    hacky-tts.inputs.nixpkgs.follows = "nixpkgs";
+
+    hacky-launcher.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git";
+    hacky-launcher.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
