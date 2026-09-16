@@ -16,6 +16,7 @@
     networkmanagerapplet
     brightnessctl
     hyprpaper
+    hyprpolkitagent
     phinger-cursors
     (python3.withPackages (
       ps: with ps; [

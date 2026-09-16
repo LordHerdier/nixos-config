@@ -16,6 +16,7 @@
       hyprcursor
       gimp
       gnome-keyring
+      gparted
       loupe
       libreoffice
       moonlight-qt

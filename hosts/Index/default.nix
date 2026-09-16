@@ -1,6 +1,12 @@
 # hosts/Index/default.nix
 
-{ hostName, config, lib, pkgs, ... }:
+{
+  hostName,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   networking.hostName = hostName;
@@ -19,8 +25,10 @@
     ../../modules/features/fingerprint-reader.nix
     ../../modules/features/gvfs.nix
     ../../modules/features/cifs-mounts.nix
+    ../../modules/features/games-mount.nix
     ../../modules/features/usbmuxd.nix
     ../../modules/features/nix-ld.nix
+    ../../modules/common/fonts.nix
   ];
 
   system.stateVersion = "25.11";
@@ -32,12 +40,12 @@
 
   # run HM asynchronously — don't block user sessions at boot
   systemd.services.home-manager-charlotte = {
-    before = lib.mkForce [];
+    before = lib.mkForce [ ];
     wantedBy = lib.mkForce [ "multi-user.target" ];
   };
 
   # tailscale starts in the background without blocking graphical login
-  systemd.services.tailscaled.before = lib.mkForce [];
+  systemd.services.tailscaled.before = lib.mkForce [ ];
 
   services.atd.enable = lib.mkForce false;
   services.openssh.startWhenNeeded = true;
@@ -53,8 +61,7 @@
   # into Big Picture is one selection away.
   services.greetd = {
     enable = true;
-    settings.default_session.command =
-      "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd start-hyprland";
+    settings.default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd start-hyprland";
   };
 
   # Unlock the login keyring at login. gnome-keyring.enable only ships the

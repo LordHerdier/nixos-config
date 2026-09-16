@@ -18,6 +18,7 @@
 
     settings.exec-once = [
       "noctalia-shell"
+      "hyprpolkitagent"
       # gnome-keyring is now started by PAM at login via
       # services.gnome.gnome-keyring.enable (system config).
       "sleep 2 && /etc/profiles/per-user/charlotte/bin/kitty zsh -i -c t"
