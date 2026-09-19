@@ -20,6 +20,7 @@
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
     ../../modules/features/tailscale.nix
+    ../../modules/features/xwayland.nix
     # ../../modules/features/systemd-boot-silent/default.nix
     ../../modules/common/ssh.nix
     ../../modules/features/fingerprint-reader.nix

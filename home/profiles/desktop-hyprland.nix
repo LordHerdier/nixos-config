@@ -8,6 +8,7 @@
     ../modules/noctalia.nix
     ../modules/desktop-files.nix
     ../modules/desktop-packages.nix
+    ../modules/font-rendering.nix
     ../modules/kitty.nix
     ../modules/steam.nix
     ../modules/games.nix

@@ -6,6 +6,9 @@
   home.packages = with pkgs; [
     prismlauncher
     lutris
+
+    # KSP Mod Tool
+    ckan
   ];
 
 }
