@@ -38,6 +38,8 @@
 
     hacky-launcher.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git";
     hacky-launcher.inputs.nixpkgs.follows = "nixpkgs";
+    forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
+    forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
