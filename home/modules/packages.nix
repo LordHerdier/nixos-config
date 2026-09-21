@@ -21,7 +21,6 @@
       coreutils
       fastfetch
       ffmpegthumbnailer
-      forgejo-cli
       fzf
       gcc
       gh
