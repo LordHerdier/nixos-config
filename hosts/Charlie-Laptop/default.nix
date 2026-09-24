@@ -15,4 +15,6 @@
 
   programs.nix-ld.enable = true;
 
+  users.users.charlotte.extraGroups = [ "kvm" ];
+
 }
