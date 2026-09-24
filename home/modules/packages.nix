@@ -16,6 +16,7 @@
       }))
       binwalk
       concord
+      deno # Peek nvim plugin requires this
       bun
       claude-code
       coreutils
