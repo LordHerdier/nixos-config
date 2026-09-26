@@ -82,6 +82,11 @@
               isWsl ? false,
               hostPath,
               extraModules ? [ ],
+              # Extra Home Manager users beyond charlotte, as
+              # username -> list of HM modules. charlotte is always
+              # configured from ./home/charlotte.nix + her per-host file;
+              # anyone here is configured purely from what's listed.
+              extraHomeUsers ? { },
             }:
             nixpkgs.lib.nixosSystem {
               modules = [
@@ -118,12 +123,15 @@
                       ;
                   };
 
-                  home-manager.users.charlotte = {
-                    imports = [
-                      ./home/charlotte.nix
-                      (./home/hosts + "/${hostName}.nix")
-                    ];
-                  };
+                  home-manager.users = {
+                    charlotte = {
+                      imports = [
+                        ./home/charlotte.nix
+                        (./home/hosts + "/${hostName}.nix")
+                      ];
+                    };
+                  }
+                  // nixpkgs.lib.mapAttrs (_: modules: { imports = modules; }) extraHomeUsers;
                 }
               ]
               ++ nixpkgs.lib.optionals isWsl [
@@ -171,6 +179,7 @@
                 ./modules/features/qylock.nix
 
               ];
+              extraHomeUsers.kiddo = [ ./home/kiddo.nix ];
             };
           };
         };

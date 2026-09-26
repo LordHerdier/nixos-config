@@ -17,6 +17,9 @@
     ../../modules/profiles/laptop.nix
     ../../modules/profiles/dev-docker.nix
     ../../modules/profiles/desktop-hyprland.nix
+    ../../modules/profiles/desktop-gnome.nix
+    ../../modules/users/kiddo.nix
+    ../../modules/features/parental-controls.nix
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
     ../../modules/features/tailscale.nix
@@ -41,6 +44,11 @@
 
   # run HM asynchronously — don't block user sessions at boot
   systemd.services.home-manager-charlotte = {
+    before = lib.mkForce [ ];
+    wantedBy = lib.mkForce [ "multi-user.target" ];
+  };
+
+  systemd.services.home-manager-kiddo = {
     before = lib.mkForce [ ];
     wantedBy = lib.mkForce [ "multi-user.target" ];
   };

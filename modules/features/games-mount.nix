@@ -16,5 +16,11 @@
 
   systemd.tmpfiles.rules = [
     "z /mnt/games 0775 charlotte users -"
+
+    # Her own Steam library root. /mnt/games itself is group-writable by
+    # "users" so she could create this herself, but pre-making it means
+    # "Add Library Folder" in Steam has somewhere obvious to point at,
+    # and it keeps her downloads out of Charlotte's steamapps tree.
+    "d /mnt/games/kiddo 0755 kiddo users -"
   ];
 }

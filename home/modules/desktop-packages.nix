@@ -11,6 +11,7 @@
       proton-vpn
       discord
       legcord
+      loupe
       firefox
       fladder
       hyprcursor
