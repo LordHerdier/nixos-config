@@ -11,6 +11,7 @@
     ../../modules/profiles/desktop-hyprland.nix
     ../../modules/features/nvidia.nix
     ../../modules/features/steam.nix
+    ../../modules/features/sunshine.nix
     ../../modules/common/ssh.nix
   ];
 
