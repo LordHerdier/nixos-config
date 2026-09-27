@@ -1,4 +1,4 @@
-# hosts/Apthos/default.nix — VM for QML shell development on Hyprland
+# hosts/Apthos/default.nix — gaming VM on twm (Proxmox), GPU/NVMe passed through
 
 { hostName, ... }:
 
@@ -9,6 +9,8 @@
     ./hardware-configuration.nix
     ./networking.nix
     ../../modules/profiles/desktop-hyprland.nix
+    ../../modules/features/nvidia.nix
+    ../../modules/features/steam.nix
     ../../modules/common/ssh.nix
   ];
 
@@ -26,6 +28,4 @@
   console = {
     keyMap = "colemak";
   };
-
-  virtualisation.hypervGuest.enable = true;
 }
