@@ -33,6 +33,7 @@
       jq
       lazydocker
       lazygit
+      lazyrsync
       mpv
       nerd-fonts.caskaydia-cove
       nmap

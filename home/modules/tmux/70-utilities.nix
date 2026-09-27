@@ -73,6 +73,7 @@
       if ! tmux has-session -t "$SESSION" 2>/dev/null; then
         tmux new-session -d -s "$SESSION" -n spotify spotify_player
         tmux new-window  -t "$SESSION" -n concord concord
+        tmux new-window  -t "$SESSION" -n rsync   lazyrsync
       fi
       if ! tmux list-windows -t "$SESSION" -F '#W' | grep -qx "$WINDOW"; then
         tmux new-window -t "$SESSION" -n "$WINDOW" "$CMD"
@@ -101,6 +102,8 @@
       "~/.config/tmux/scripts/utility-popup.sh spotify spotify_player"
     bind-key M-d display-popup -E -w 90% -h 90% \
       "~/.config/tmux/scripts/utility-popup.sh concord concord"
+    bind-key M-r display-popup -E -w 90% -h 90% \
+      "~/.config/tmux/scripts/utility-popup.sh rsync lazyrsync"
     bind-key M-g display-popup -E -w 90% -h 90% -d '#{pane_current_path}' lazygit
     bind-key M-c display-popup -E -w 90% -h 90% -d '#{pane_current_path}' claude
     bind-key S display-popup -E "~/.config/tmux/scripts/new-session-popup.sh"
