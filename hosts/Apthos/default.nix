@@ -29,4 +29,15 @@
   console = {
     keyMap = "colemak";
   };
+
+  # This box is driven remotely over Sunshine/Moonlight rather than from the
+  # physical console, so log straight into a Hyprland session at boot —
+  # otherwise Sunshine's user service never starts (it's gated on
+  # graphical-session.target) and there'd be no one at the keyboard to
+  # unlock SDDM.
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "charlotte";
+  };
+  services.displayManager.defaultSession = "hyprland";
 }
