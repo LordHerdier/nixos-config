@@ -8,7 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix
-    ../../modules/profiles/desktop-hyprland.nix
+    ../../modules/profiles/desktop-gnome.nix
     ../../modules/features/nvidia.nix
     ../../modules/features/steam.nix
     ../../modules/features/sunshine.nix
@@ -31,7 +31,7 @@
   };
 
   # This box is driven remotely over Sunshine/Moonlight rather than from the
-  # physical console, so log straight into a Hyprland session at boot —
+  # physical console, so log straight into a GNOME session at boot —
   # otherwise Sunshine's user service never starts (it's gated on
   # graphical-session.target) and there'd be no one at the keyboard to
   # unlock SDDM.
@@ -39,5 +39,5 @@
     enable = true;
     user = "charlotte";
   };
-  services.displayManager.defaultSession = "hyprland";
+  services.displayManager.defaultSession = "gnome";
 }

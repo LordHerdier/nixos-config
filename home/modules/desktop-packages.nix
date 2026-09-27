@@ -14,21 +14,17 @@
       loupe
       firefox
       fladder
-      hyprcursor
       gimp
       gnome-keyring
       gparted
-      loupe
       libreoffice
       moonlight-qt
       nautilus
-      mpvpaper
       remmina
       spotify
       tailscale
       thunar
       tsukimi
-      hyprshot
       # winboat  # pins EOL electron-40.10.5 (insecure); re-enable when nixpkgs bumps electron
     ]
   );

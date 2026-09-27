@@ -1,6 +1,6 @@
 # home/modules/hyprland/default.nix
 
-{ ... }:
+{ dotfiles, pkgs, ... }:
 
 {
   imports = [
@@ -11,6 +11,17 @@
     ./hypridle.nix
     ./hyprlock.nix
   ];
+
+  home.packages = with pkgs; [
+    hyprcursor
+    hyprshot
+    mpvpaper
+  ];
+
+  home.file.".config/eww" = {
+    source = "${dotfiles}/eww/.config/eww";
+    recursive = true;
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;

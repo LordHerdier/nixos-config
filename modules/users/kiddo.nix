@@ -30,4 +30,20 @@
     # with `passwd kiddo` and this line stops mattering.
     # initialPassword = "kiddo";
   };
+
+  # Mahjongg, sudoku, Quadrapassel and friends — genuinely the right
+  # difficulty level for a six-year-old, and they cost almost nothing.
+  services.gnome.games.enable = true;
+
+  # GNOME apps land in environment.systemPackages, so this prunes the
+  # whole machine, not just her session. Everything dropped here either
+  # duplicates something Charlotte already uses (console/kitty) or is
+  # an account-shaped dead end for a kid (Geary, Contacts, Connections).
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour
+    gnome-connections
+    gnome-contacts
+    geary
+    epiphany
+  ];
 }
