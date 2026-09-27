@@ -110,6 +110,10 @@
           name = "ABCya";
           url = "https://www.abcya.com/";
         }
+        {
+          name = "Jellyfin";
+          url = "https://jellyfin.lorscapa.com/";
+        }
       ];
     };
   };

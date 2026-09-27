@@ -3,12 +3,18 @@
 # Per-user GNOME tuning via dconf. Everything here is scoped to her
 # account — none of it touches Charlotte's Hyprland session.
 
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 let
   inherit (lib.hm.gvariant) mkArray mkTuple mkUint32;
 in
 {
+  # dash-to-dock is the one extension worth the upgrade-breakage risk
+  # disable-user-extensions otherwise guards against: it pins the dash
+  # to the desktop as a persistent taskbar, which is easier for her to
+  # navigate than diving into the Activities overview each time.
+  home.packages = [ pkgs.gnomeExtensions.dash-to-dock ];
+
   dconf.settings = {
     # The single most important setting in this file. The system default
     # is colemak (services.xserver.xkb.variant in the hyprland profile),
@@ -38,7 +44,7 @@ in
       cursor-size = 32;
       clock-format = "12h";
       clock-show-weekday = true;
-      color-scheme = "default";
+      color-scheme = "prefer-dark";
       enable-animations = true;
       # No hot corner: brushing the top-left by accident and having the
       # screen fly apart is confusing.
@@ -54,9 +60,18 @@ in
         "tuxpaint.desktop"
         "org.gnome.Nautilus.desktop"
       ];
-      # She has no way to install extensions and they only add failure
-      # modes across GNOME upgrades.
-      disable-user-extensions = true;
+      # She has no way to install extensions herself; this only lets
+      # dash-to-dock (configured below) run, not anything of her own.
+      disable-user-extensions = false;
+      enabled-extensions = [ "dash-to-dock@micxgx.gmail.com" ];
+    };
+
+    "org/gnome/shell/extensions/dash-to-dock" = {
+      dock-fixed = true;
+      dock-position = "BOTTOM";
+      extend-height = false;
+      autohide = false;
+      intellihide = false;
     };
 
     # One workspace. Dynamic workspaces are the most common way to
