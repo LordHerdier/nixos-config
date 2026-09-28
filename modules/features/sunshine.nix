@@ -98,6 +98,21 @@ in
         }
       ];
     };
+
+    # The sunshine systemd user service runs with no PATH (see nixpkgs'
+    # sunshine module — needed for its tray icon links to work), so every
+    # command below must be an absolute store path.
+    #
+    # Big Picture uses Steam's own "detached" launch: it's fired once and
+    # not tracked, so Sunshine just streams the desktop underneath it same
+    # as the "Desktop" app, and disconnecting doesn't kill Steam.
+    applications.apps = [
+      { name = "Desktop"; }
+      {
+        name = "Steam Big Picture";
+        detached = [ "${pkgs.util-linux}/bin/setsid ${pkgs.steam}/bin/steam steam://open/bigpicture" ];
+      }
+    ];
   };
 
   systemd.user.services.apthos-display-watchdog = {

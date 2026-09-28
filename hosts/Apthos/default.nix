@@ -10,8 +10,11 @@
     ./networking.nix
     ../../modules/profiles/desktop-gnome.nix
     ../../modules/features/nvidia.nix
+    ../../modules/features/rdp.nix
     ../../modules/features/steam.nix
     ../../modules/features/sunshine.nix
+    ../../modules/features/tailscale.nix
+    ../../modules/features/windows-game-drives.nix
     ../../modules/common/ssh.nix
   ];
 
