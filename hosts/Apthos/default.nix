@@ -9,6 +9,7 @@
     ./hardware-configuration.nix
     ./networking.nix
     ../../modules/profiles/desktop-gnome.nix
+    ../../modules/profiles/dev-docker.nix
     ../../modules/features/nvidia.nix
     ../../modules/features/rdp.nix
     ../../modules/features/steam.nix
@@ -43,4 +44,22 @@
     user = "charlotte";
   };
   services.displayManager.defaultSession = "gnome";
+
+  # SDDM's autologin defaults to firing once, at boot, only. If GNOME Shell
+  # ever dies mid-session (e.g. the Mutter crash documented in
+  # sunshine.nix, or any other cause) SDDM falls back to its normal greeter
+  # and just sits there, needing `systemctl restart display-manager` by
+  # hand (over SSH/Tailscale) to get a session back.
+  #
+  # Tried services.displayManager.sddm.autoLogin.relogin = true to make
+  # that self-healing -- SDDM re-autologins every time it lands back on the
+  # greeter, instead of just once at boot. Don't: on this box that turned
+  # into an uncontrolled restart loop (125+ session starts within a
+  # minute, each partially spinning up bluetoothd/wireplumber/keyring
+  # before failing) once autologin itself started hitting a keyring-unlock
+  # failure -- SDDM's Relogin has no backoff or attempt limit, so a login
+  # that fails for any reason becomes an instant, silent, resource-eating
+  # retry storm instead of the (recoverable, visible) stuck-at-greeter
+  # state. A quiet failure you can SSH in and fix beats a loop that keeps
+  # failing faster than anyone would notice.
 }

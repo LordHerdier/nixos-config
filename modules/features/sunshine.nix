@@ -4,6 +4,18 @@
 # Runs as a per-user systemd unit tied to graphical-session.target, so it
 # only comes up once a Wayland/X session (e.g. GNOME via SDDM) is
 # actually logged in and running.
+#
+# Do not run this alongside gnome-remote-desktop-headless (modules/features/
+# rdp.nix). Confirmed on this box: with an RDP client connected (so Mutter
+# has a virtual monitor up alongside the TV's real one) and Sunshine also
+# attached, a monitor reconfig -- the exact ApplyMonitorsConfig call
+# apthos-display-sync makes below -- segfaulted GNOME Shell itself
+# (crashed in mutter's meta_stage_view_inhibit_cursor_overlay, via
+# on_monitors_changed), taking down the whole session: Sunshine, the
+# portals, everything running under graphical-session.target. rdp.nix
+# keeps the RDP service manual/on-demand specifically so this combination
+# never happens; don't wire it back to start automatically without a real
+# fix for the crash upstream.
 
 { config, pkgs, ... }:
 
@@ -41,7 +53,10 @@ let
   # ever calls undo.
   displayWatchdog = pkgs.writeShellApplication {
     name = "apthos-display-watchdog";
-    runtimeInputs = [ pkgs.iproute2 ];
+    runtimeInputs = [
+      pkgs.iproute2
+      pkgs.gawk
+    ];
     text = ''
       state_file="$HOME/.local/state/sunshine-display-sync.json"
       [ -f "$state_file" ] || exit 0

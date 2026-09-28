@@ -29,13 +29,26 @@
 #
 #   grdctl --headless rdp set-credentials <username> <password>
 #   grdctl --headless rdp enable
+#
+# Not started at session start (no wantedBy here), and deliberately so: in
+# practice gnome-remote-desktop-headless claims Mutter's RemoteDesktop portal
+# backend for itself the moment it's running, even with no RDP client
+# connected. Sunshine's own startup needs that same portal (to ask for
+# keyboard/mouse injection) and just hangs forever waiting for it if the
+# headless service got there first -- Sunshine never finishes starting and
+# never opens its Moonlight ports. So headless mode not fighting Sunshine
+# for the live *display* (the thing this module's top comment is about)
+# doesn't save it from fighting Sunshine for the *portal*.
+#
+# Until upstream fixes that contention, this is manual/on-demand only:
+#
+#   systemctl --user start gnome-remote-desktop-headless   # before RDPing in
+#   systemctl --user stop gnome-remote-desktop-headless    # when done, to give Sunshine the portal back
 
 { ... }:
 
 {
   services.gnome.gnome-remote-desktop.enable = true;
-
-  systemd.user.services.gnome-remote-desktop-headless.wantedBy = [ "gnome-session.target" ];
 
   networking.firewall.allowedTCPPorts = [ 3389 ];
 }
