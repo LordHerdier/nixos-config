@@ -10,6 +10,7 @@
     ./networking.nix
     ../../modules/profiles/desktop-gnome.nix
     ../../modules/profiles/dev-docker.nix
+    ../../modules/features/cifs-mounts.nix
     ../../modules/features/nvidia.nix
     ../../modules/features/rdp.nix
     ../../modules/features/steam.nix
@@ -25,8 +26,24 @@
     enable = true;
     device = "nodev";
     efiSupport = true;
+    # Mirror the boot menu to the Proxmox serial0 device (qm terminal /
+    # `qm set 110 -serial0 socket`) as well as the local console, so the
+    # menu and early boot output are visible over `qm terminal 110` too.
+    extraConfig = ''
+      serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1
+      terminal_input --append serial
+      terminal_output --append serial
+    '';
   };
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # Kernel + a getty on ttyS0, which is what Proxmox's serial0 device shows
+  # up as in the guest. Keeps tty1 as the first console so the local
+  # (Proxmox noVNC) console still gets boot messages too.
+  boot.kernelParams = [
+    "console=tty1"
+    "console=ttyS0,115200n8"
+  ];
 
   time.timeZone = "America/Chicago";
 
