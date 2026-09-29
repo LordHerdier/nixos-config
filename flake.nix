@@ -40,6 +40,8 @@
     hacky-launcher.inputs.nixpkgs.follows = "nixpkgs";
     forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
+
+    zen-browser.url = "github:pfaj/zen-browser-flake";
   };
 
   outputs =

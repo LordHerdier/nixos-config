@@ -1,6 +1,6 @@
 # home/modules/desktop-packages.nix
 
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   home.packages = (
@@ -27,5 +27,8 @@
       tsukimi
       # winboat  # pins EOL electron-40.10.5 (insecure); re-enable when nixpkgs bumps electron
     ]
-  );
+  )
+  ++ [
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
 }
