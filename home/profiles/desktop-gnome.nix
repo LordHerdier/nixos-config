@@ -29,7 +29,7 @@
       dock-position = "BOTTOM";
       extend-height = false;
       autohide = false;
-      intellihide = false;
+      intellihide = true;
     };
   };
 }
