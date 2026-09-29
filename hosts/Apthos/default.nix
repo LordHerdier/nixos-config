@@ -12,6 +12,8 @@
     ../../modules/profiles/dev-docker.nix
     ../../modules/features/cifs-mounts.nix
     ../../modules/features/nvidia.nix
+    ../../modules/features/ollama-vulkan.nix
+    ../../modules/features/open-webui.nix
     ../../modules/features/rdp.nix
     ../../modules/features/steam.nix
     ../../modules/features/sunshine.nix
