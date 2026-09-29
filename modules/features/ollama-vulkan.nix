@@ -26,7 +26,13 @@
     };
   };
 
-  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
-    config.services.ollama.port
-  ];
+  networking.firewall.interfaces = {
+    tailscale0.allowedTCPPorts = [ config.services.ollama.port ];
+    # Open WebUI (open-webui.nix) runs in Docker and reaches Ollama via
+    # host.docker.internal -> the docker0 bridge gateway. That arrives on
+    # docker0, a real interface, not loopback (which the firewall trusts
+    # implicitly) -- without this it's silently dropped even though curling
+    # the same address from the host itself works fine.
+    docker0.allowedTCPPorts = [ config.services.ollama.port ];
+  };
 }
