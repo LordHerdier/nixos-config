@@ -33,6 +33,7 @@
     ../../modules/features/usbmuxd.nix
     ../../modules/features/nix-ld.nix
     ../../modules/common/fonts.nix
+    ../../modules/features/syncthing.nix
   ];
 
   system.stateVersion = "25.11";

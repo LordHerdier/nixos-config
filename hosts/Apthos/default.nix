@@ -20,6 +20,7 @@
     ../../modules/features/sunshine.nix
     ../../modules/features/tailscale.nix
     ../../modules/features/windows-game-drives.nix
+    ../../modules/features/syncthing.nix
     ../../modules/common/ssh.nix
   ];
 
