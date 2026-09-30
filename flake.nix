@@ -106,6 +106,7 @@
                   nixpkgs.overlays = [
                     (final: _: {
                       concord = final.callPackage ./pkgs/concord.nix { };
+                      oneshot-cursors = final.callPackage ./pkgs/oneshot-cursors { };
                     })
                   ];
                 }
