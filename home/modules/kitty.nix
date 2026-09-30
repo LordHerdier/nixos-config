@@ -1,6 +1,6 @@
 # home/modules/kitty.nix
 
-{ config, lib, ... }:
+{ config, lib, hostName, ... }:
 
 let
   inherit (lib) mkEnableOption mkOption types mkIf;
@@ -76,8 +76,7 @@ in
         tab_switch_strategy = "previous";
 
         # 🔥 Title = user@hostname
-        tab_title_template =
-          "${config.home.username}@${config.home.sessionVariables.HOSTNAME or config.home.username}";
+        tab_title_template = "${config.home.username}@${hostName}";
         active_tab_title_template = "none";
 
         # Transparency

@@ -23,13 +23,10 @@
     vim = "nvim";
     "v." = "nvim .";
     "v.." = "nvim ..";
-    em = "emacs -nw";
-    emacs = "emacs -nw";
 
     # Quick commands
     y = "yazi";
     browse = "yazi";
-    nb = "newsboat && clear";
     path = "realpath";
 
     # Nix
