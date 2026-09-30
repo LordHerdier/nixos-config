@@ -1,11 +1,7 @@
 # modules/features/syncthing.nix
 #
 # Syncs charlotte's ~/documents and ~/pictures between every host that
-# imports this module (currently Index and Apthos). Device IDs are
-# generated locally by each syncthing instance the first time it runs, so
-# they can't be known ahead of time — `peerDevices` below gets filled in
-# (and overrideDevices/overrideFolders flipped on) once both hosts have
-# started syncthing and their real IDs are known.
+# imports this module (currently Index and Apthos).
 #
 # hostName is used so each host only lists its *peers* as devices, never
 # itself.
@@ -13,15 +9,16 @@
 { hostName, lib, ... }:
 
 let
-  # Real device IDs, keyed by hostname. Add a host here once its
-  # syncthing has run at least once (GUI -> Actions -> Show ID, or
+  # Real device IDs, keyed by hostname. To add a new host to the mesh:
+  # deploy this module to it first (with no entry here yet) so it
+  # generates its own ID, fetch it with
   # `secretspec run -- curl -s -H "X-API-Key: $<HostName>" \
-  #   127.0.0.1:8384/rest/system/status | jq -r .myID`, run from the
-  # repo root, once each host's REST API key is stored in `pass` as
-  # syncthing/keys/<HostName> — see secretspec.toml).
+  #   127.0.0.1:8384/rest/system/status | jq -r .myID` (repo root, after
+  # storing that host's REST API key in `pass` as syncthing/keys/<HostName>
+  # — see secretspec.toml), then add it below and redeploy everywhere.
   allDevices = {
-    # Index = "...";
-    # Apthos = "...";
+    Index = "WUNK6WK-DTXJXYT-CSCXB3Q-UADN6GB-UJJGSUM-4Y3P55P-VC7YX2V-45FMYAZ";
+    Apthos = "7EZSYLY-EZNJMXC-UDCRDVK-FP5UDUH-FAT4RBI-Q63LYH3-VNTPKLO-KX2VDQH";
   };
 
   peerDevices = lib.filterAttrs (name: _: name != hostName) allDevices;
