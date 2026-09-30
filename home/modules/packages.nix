@@ -39,6 +39,7 @@
       nmap
       nodejs
       oh-my-posh
+      opencode
       p7zip
       pass
       playerctl
