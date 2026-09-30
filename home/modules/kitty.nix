@@ -1,9 +1,19 @@
 # home/modules/kitty.nix
 
-{ config, lib, hostName, ... }:
+{
+  config,
+  lib,
+  hostName,
+  ...
+}:
 
 let
-  inherit (lib) mkEnableOption mkOption types mkIf;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    mkIf
+    ;
 
   cfg = config.my.kitty;
 in
@@ -13,7 +23,7 @@ in
 
     opacity = mkOption {
       type = types.float;
-      default = 0.4;
+      default = 0.8;
       description = "Background opacity for kitty.";
     };
   };
@@ -88,16 +98,16 @@ in
         selection_background = "#44475a";
         selection_foreground = "none";
 
-        color0  = "#45475A";
-        color1  = "#F38BA8";
-        color2  = "#A6E3A1";
-        color3  = "#F9E2AF";
-        color4  = "#89B4FA";
-        color5  = "#F5C2E7";
-        color6  = "#94E2D5";
-        color7  = "#BAC2DE";
-        color8  = "#585B70";
-        color9  = "#F38BA8";
+        color0 = "#45475A";
+        color1 = "#F38BA8";
+        color2 = "#A6E3A1";
+        color3 = "#F9E2AF";
+        color4 = "#89B4FA";
+        color5 = "#F5C2E7";
+        color6 = "#94E2D5";
+        color7 = "#BAC2DE";
+        color8 = "#585B70";
+        color9 = "#F38BA8";
         color10 = "#A6E3A1";
         color11 = "#F9E2AF";
         color12 = "#89B4FA";
@@ -129,5 +139,3 @@ in
     };
   };
 }
-
-
