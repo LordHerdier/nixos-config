@@ -20,5 +20,6 @@
       fi
     }
     reconcile_case_dir documents Documents
+    reconcile_case_dir pictures Pictures
   '';
 }

@@ -45,7 +45,7 @@ in
           devices = peerNames;
         };
         "Pictures" = {
-          path = "/home/charlotte/pictures";
+          path = "/home/charlotte/Pictures";
           devices = peerNames;
         };
       };
