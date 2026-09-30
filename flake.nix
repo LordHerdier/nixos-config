@@ -72,6 +72,15 @@
         }:
         {
           formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
+
+          devShells.default = pkgs.mkShell {
+            # `secretspec run -- ...` reads secretspec.toml and injects the
+            # declared secrets (via the `pass` provider) as env vars.
+            packages = [
+              pkgs.secretspec
+              pkgs.pass
+            ];
+          };
         };
 
       flake =

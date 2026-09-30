@@ -15,8 +15,10 @@
 let
   # Real device IDs, keyed by hostname. Add a host here once its
   # syncthing has run at least once (GUI -> Actions -> Show ID, or
-  # `curl -s 127.0.0.1:8384/rest/system/status | jq -r .myID` with the
-  # API key from configDir/config.xml).
+  # `secretspec run -- curl -s -H "X-API-Key: $<HostName>" \
+  #   127.0.0.1:8384/rest/system/status | jq -r .myID`, run from the
+  # repo root, once each host's REST API key is stored in `pass` as
+  # syncthing/keys/<HostName> — see secretspec.toml).
   allDevices = {
     # Index = "...";
     # Apthos = "...";
