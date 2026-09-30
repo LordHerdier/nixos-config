@@ -130,6 +130,18 @@ in
     ];
   };
 
+  # ffmpeg's NVENC path dlopen()s libcuda.so.1 at runtime instead of linking
+  # it, and on NixOS that library lives only under the driver symlink -- it is
+  # never on the default loader path (`ldconfig -p | grep libcuda` comes back
+  # empty). nixpkgs' generated unit sets no LD_LIBRARY_PATH, so every nvenc
+  # probe died on "Cannot load libcuda.so.1" / "Failed to create a CUDA
+  # device: Operation not permitted", and the `encoder = "nvenc"` pin above
+  # then silently fell through Sunshine's probe order to hevc_vulkan -- i.e.
+  # straight into the flaky Vulkan path that pin exists to avoid. Without
+  # this, nvenc cannot initialise at all on this box.
+  systemd.user.services.sunshine.environment.LD_LIBRARY_PATH =
+    "${pkgs.addDriverRunpath.driverLink}/lib";
+
   systemd.user.services.apthos-display-watchdog = {
     description = "Revert Apthos's display if Sunshine's undo hook missed it";
     partOf = [ "graphical-session.target" ];
