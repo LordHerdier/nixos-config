@@ -1,7 +1,16 @@
 # home/modules/spotify-player.nix
 
-{ pkgs, isWsl, ... }:
+{
+  config,
+  pkgs,
+  isWsl,
+  ...
+}:
 
+let
+  t = config.my.theme.palettes.${config.my.theme.default};
+  p = t.palette;
+in
 {
   programs.spotify-player = {
     enable = true;
@@ -9,7 +18,7 @@
 
     # app.toml — point at our theme + WSL-friendly defaults
     settings = {
-      theme = "kanagawa";
+      theme = t.name;
       enable_streaming = if isWsl then "Never" else "Always";
       enable_media_control = true;
       enable_notify = false;
@@ -82,29 +91,32 @@
       }
     ];
 
-    # theme.toml — Kanagawa, matching your tmux palette
+    # theme.toml — built from my.theme so it tracks the system palette.
+    # component_style below stays in spotify-player's own named-color
+    # terms (Magenta, Cyan, ...), which resolve through the palette above
+    # -- those are already role assignments, just spelled in ANSI names.
     themes = [
       {
-        name = "kanagawa";
+        name = t.name;
         palette = {
-          background = "#1f1f28";
-          foreground = "#dcd7ba";
-          black = "#16161d";
-          red = "#c34043";
-          green = "#98bb6c";
-          yellow = "#e6c384";
-          blue = "#7e9cd8";
-          magenta = "#d27e99";
-          cyan = "#7fb4ca";
-          white = "#c8c093";
-          bright_black = "#727169";
-          bright_red = "#e82424";
-          bright_green = "#76946a";
-          bright_yellow = "#ff9e3b";
-          bright_blue = "#7fb4ca";
-          bright_magenta = "#957fb8";
-          bright_cyan = "#7aa89f";
-          bright_white = "#dcd7ba";
+          background = p.bg;
+          foreground = p.fg;
+          black = p.black;
+          red = p.red;
+          green = p.green;
+          yellow = p.yellow;
+          blue = p.blue;
+          magenta = p.magenta;
+          cyan = p.cyan;
+          white = p.white;
+          bright_black = p.brightBlack;
+          bright_red = p.brightRed;
+          bright_green = p.brightGreen;
+          bright_yellow = p.brightYellow;
+          bright_blue = p.brightBlue;
+          bright_magenta = p.brightMagenta;
+          bright_cyan = p.brightCyan;
+          bright_white = p.brightWhite;
         };
         component_style = {
           block_title = {

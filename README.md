@@ -98,13 +98,54 @@ default.nix names the `nix run .#...` command that regenerates it.
 
 ---
 
+## color tokens
+
+colors live in one place: `home/modules/theme/`, exposed as `my.theme`.
+app modules ask for a token, not a hex value.
+
+```
+home/modules/theme/
+├── default.nix     # the my.theme option tree
+├── lib.nix         # role derivation + format helpers (noHash, rgbaHex, ...)
+└── palettes/       # one file per palette, plain data
+```
+
+a resolved palette has two layers, and the split is the point:
+
+| layer | contents | who reads it |
+|-------|----------|--------------|
+| `.palette` | the 16 ansi colors plus `bg`/`fg` | terminals, tuis, colorscheme plugins — they address colors by index or ansi name |
+| `.roles` | `accent`, `border`, `selectionBg`, `muted`, ... | ui chrome — "the accent" is a job, not a hue |
+
+roles default off the palette (`lib.nix`) and any palette can override one.
+palettes also carry `.name` for apps that select a theme by string.
+
+`my.theme.default` is the system palette. an app can pin a different one
+through its own option — `my.kitty.palette`, `my.nvim.palette` — which is
+what currently keeps kitty on catppuccin-mocha and neovim on
+gruvbox-nightfox while tmux, fzf and spotify-player follow the default.
+point those at `config.my.theme.default` to unify them.
+
+nvf gets the theme through `extraSpecialArgs`, not `config`: it runs its
+own `evalModules`, so home-manager's config is not in scope inside
+`home/modules/nvf/*.nix`.
+
+**scope.** this governs the terminal/editor/tui stack. it does *not*
+govern the hyprland desktop — noctalia and ambxst derive their colors
+from the wallpaper at runtime via matugen, and that is the source of
+truth there. hyprland's border colors, hyprlock and the shell stay on the
+runtime side deliberately. the gtk theme under `pkgs/oneshot-gtk-theme`
+still carries its own literals and is not tokenized yet.
+
+---
+
 ## shell
 
 | tool | role |
 |------|------|
 | zsh | shell — completions, autosuggestions, syntax highlighting |
 | oh-my-posh | prompt |
-| tmux | multiplexer — kanagawa theme, vim pane nav, session persistence |
+| tmux | multiplexer — colors from `my.theme`, vim pane nav, session persistence |
 | atuin | shell history sync |
 | zoxide + yazi | directory navigation + file manager |
 
@@ -116,7 +157,7 @@ neovim via [nvf](https://github.com/notashelf/nvf):
 
 - lsp + format-on-save for nix, lua, python, typescript, c/c++, bash, and more
 - telescope, neo-tree, treesitter, todo-comments, noice, which-key
-- nightfox theme with a custom gruvbox-inspired palette
+- nightfox theme, palette from `my.theme` (`my.nvim.palette`, currently gruvbox-nightfox)
 
 ---
 

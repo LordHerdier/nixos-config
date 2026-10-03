@@ -4,6 +4,7 @@
 
 {
   imports = [
+    ./modules/theme
     ./modules/packages.nix
     ./modules/files.nix
     ./modules/git.nix
@@ -15,6 +16,11 @@
     ./modules/spotify-player.nix
     ./modules/case-insensitive-dirs.nix
   ];
+
+  # System-wide color tokens. Individual apps can pin a different
+  # palette through their own option (my.kitty.palette, my.nvim.palette);
+  # everything else follows this.
+  my.theme.default = "kanagawa";
 
   home.sessionVariables = {
     NIX_HOST = hostName;

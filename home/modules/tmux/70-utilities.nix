@@ -1,5 +1,33 @@
 # home/modules/tmux/70-utilities.nix
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  theme = config.my.theme.palettes.${config.my.theme.default};
+  p = theme.palette;
+  r = theme.roles;
+
+  # fzf takes one flat --color argument. Spelled out rather than built
+  # with a helper because the mapping from fzf's slot names to our roles
+  # is the interesting part.
+  fzfColors = lib.concatStringsSep "," [
+    "bg:${r.surface}"
+    "bg+:${r.surfaceAlt}"
+    "fg:${r.muted}"
+    "fg+:${p.fg}"
+    "hl:${r.accent}"
+    "hl+:${r.accent}"
+    "prompt:${p.yellow}"
+    "pointer:${p.magenta}"
+    "marker:${p.green}"
+    "border:${r.surfaceAlt}"
+    "info:${r.muted}"
+  ];
+in
 {
   home.file.".config/tmux/scripts/session-picker.sh" = {
     executable = true;
@@ -23,7 +51,7 @@
             --preview='tmux list-windows -t {1} -F "  #{window_index}  #{window_name}#{?window_active,  ←,}" 2>/dev/null' \
             --preview-window='right:40%:border-left' \
             --height=100% \
-            --color='bg:#16161D,bg+:#2A2A37,fg:#727169,fg+:#dcd7ba,hl:#7fb4ca,hl+:#7fb4ca,prompt:#e6c384,pointer:#D27E99,marker:#98bb6c,border:#2A2A37,info:#727169' \
+            --color='${fzfColors}' \
         | cut -d'|' -f1)
 
       [ -z "$SESSION" ] && exit 0
@@ -85,9 +113,6 @@
 
   programs.tmux.extraConfig = lib.mkAfter ''
     ##### Utility popups + spotify mouse controls #####
-
-    # Kanagawa pink for the now-playing accent
-    kanagawa_pink="#D27E99"
 
     # Transport controls (work from anywhere)
     bind-key -r Space run-shell "playerctl --player=spotify_player,spotify play-pause"

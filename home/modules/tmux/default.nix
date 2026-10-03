@@ -22,7 +22,7 @@ in
     ./00-core.nix
     ./10-keybinds.nix
     ./20-status-and-titles.nix
-    ./30-colors-kanagawa.nix
+    ./30-colors.nix
     ./50-smart-vim.nix
     ./60-tmuxinator.nix
     ./70-utilities.nix
