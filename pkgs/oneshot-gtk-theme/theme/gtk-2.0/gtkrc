@@ -8,9 +8,9 @@
 style "oneshot-default"
 {
   bg[NORMAL]      = "#000000"
-  bg[ACTIVE]      = "#9664FF"
+  bg[ACTIVE]      = "#9664ff"
   bg[PRELIGHT]    = "#1a1a1a"
-  bg[SELECTED]    = "#9664FF"
+  bg[SELECTED]    = "#9664ff"
   bg[INSENSITIVE] = "#000000"
 
   fg[NORMAL]      = "#cbb8ff"
@@ -20,7 +20,7 @@ style "oneshot-default"
   fg[INSENSITIVE] = "#4a3d66"
 
   base[NORMAL]    = "#000000"
-  base[SELECTED]  = "#9664FF"
+  base[SELECTED]  = "#9664ff"
 
   text[NORMAL]    = "#cbb8ff"
   text[SELECTED]  = "#000000"

@@ -59,6 +59,16 @@ gnome (wayland), autologin, driven remotely over sunshine/moonlight. riced
 after OneShot's in-fiction "World Machine" OS — pure black surfaces, one
 saturated purple accent (`#9664ff`), square corners, inverted selection.
 
+the gtk stylesheets' colors are build arguments, not literals.
+`pkgs/oneshot-gtk-theme` takes six (`background`, `backgroundHover`,
+`accent`, `accentDim`, `accentMuted`, `accentStandalone`) and remaps every
+call site by value; `home/modules/oneshot-gtk.nix` fills them from the
+`oneshot` palette in `my.theme`. building the package with no arguments
+still reproduces the stylesheets byte for byte, so they stay readable as
+plain css. `my.oneshot-gtk.palette` re-skins the whole theme — gtk2, gtk3,
+gtk4, the gnome accent enum and the wallpaper letterbox — without touching
+a stylesheet.
+
 | component | source |
 |-----------|--------|
 | cursor | `pkgs/oneshot-cursors` → `home/modules/oneshot-cursors.nix` |
@@ -133,12 +143,11 @@ nvf gets the theme through `extraSpecialArgs`, not `config`: it runs its
 own `evalModules`, so home-manager's config is not in scope inside
 `home/modules/nvf/*.nix`.
 
-**scope.** this governs the terminal/editor/tui stack. it does *not*
-govern the hyprland desktop — noctalia and ambxst derive their colors
-from the wallpaper at runtime via matugen, and that is the source of
-truth there. hyprland's border colors, hyprlock and the shell stay on the
-runtime side deliberately. the gtk theme under `pkgs/oneshot-gtk-theme`
-still carries its own literals and is not tokenized yet.
+**scope.** this governs the terminal/editor/tui stack and apthos's gtk
+theme. it does *not* govern the hyprland desktop — noctalia and ambxst
+derive their colors from the wallpaper at runtime via matugen, and that
+is the source of truth there. hyprland's border colors, hyprlock and the
+shell stay on the runtime side deliberately.
 
 ---
 

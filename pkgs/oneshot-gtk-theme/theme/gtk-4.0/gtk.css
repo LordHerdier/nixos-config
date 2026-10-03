@@ -603,5 +603,6 @@ separator {
 /* Not themed here, same as the GTK3 sheet: symbolic arrow/expander
  * glyphs come from the icon theme (pan-*-symbolic), not this stylesheet,
  * so they follow whatever Oneshot-Icons inherits. libadwaita recolors
- * them with currentColor, so in practice they pick up #cbb8ff — better
- * than the GTK3 case, where they stayed neutral. */
+ * them with currentColor, so in practice they pick up the accent's
+ * standalone shade — better than the GTK3 case, where they stayed
+ * neutral. */

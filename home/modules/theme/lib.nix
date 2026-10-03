@@ -116,6 +116,41 @@ let
       in
       "rgba(${toString c.r}, ${toString c.g}, ${toString c.b}, ${toString alpha})";
 
+    # Linear blend of two colors in sRGB. `t` is how much of `b` to take,
+    # so `mix accent bg 0.5` is the accent halfway to the background.
+    # Crude -- blending in sRGB rather than a perceptual space -- but it
+    # is enough for the one thing it is used for, which is deriving a
+    # dimmed accent for palettes that do not name one.
+    mix =
+      a: b: t:
+      let
+        ca = self.hexToRgb a;
+        cb = self.hexToRgb b;
+        chan =
+          x: y:
+          let
+            v = builtins.floor ((x * (1.0 - t)) + (y * t) + 0.5);
+          in
+          self.hexByte (
+            if v < 0 then
+              0
+            else if v > 255 then
+              255
+            else
+              v
+          );
+      in
+      "#${chan ca.r cb.r}${chan ca.g cb.g}${chan ca.b cb.b}";
+
+    # 0-255 -> two lowercase hex digits.
+    hexByte =
+      n:
+      let
+        digits = stringToCharacters "0123456789abcdef";
+        hi = n / 16;
+      in
+      builtins.elemAt digits hi + builtins.elemAt digits (n - (hi * 16));
+
     # Normalize to lowercase #rrggbb so the same color written two
     # different ways in two apps stops being two different strings.
     normalize = hex: "#${self.noHash hex}";
@@ -123,22 +158,32 @@ let
     # Role defaults, derived from the palette. Every one of these is
     # overridable per palette -- they are a sane starting point, not a
     # claim that e.g. the accent is always the blue.
-    defaultRoles = p: {
-      surface = p.black;
-      surfaceAlt = p.brightBlack;
-      muted = p.brightBlack;
-      accent = p.blue;
-      accentFg = p.black;
-      border = p.blue;
-      borderInactive = p.brightBlack;
-      selectionBg = p.brightBlack;
-      selectionFg = p.fg;
-      cursor = p.fg;
-      url = p.blue;
-      success = p.green;
-      warning = p.yellow;
-      error = p.red;
-    };
+    defaultRoles =
+      p:
+      let
+        accent = p.blue;
+      in
+      {
+        inherit accent;
+        surface = p.black;
+        surfaceAlt = p.brightBlack;
+        muted = p.brightBlack;
+        accentFg = p.black;
+        # A dimmed/pressed variant of the accent. Derived rather than
+        # pulled from a palette slot, because none of the ANSI 16 is
+        # "the accent, but quieter" -- a palette that cares should name
+        # it.
+        accentDim = self.mix accent p.bg 0.5;
+        border = p.blue;
+        borderInactive = p.brightBlack;
+        selectionBg = p.brightBlack;
+        selectionFg = p.fg;
+        cursor = p.fg;
+        url = p.blue;
+        success = p.green;
+        warning = p.yellow;
+        error = p.red;
+      };
 
     # Turn a palette file into a resolved theme: palette normalized, roles
     # filled in from the defaults, name/polarity carried through.
@@ -162,6 +207,47 @@ let
         polarity = raw.polarity or "dark";
         inherit palette roles;
       };
+
+    # GNOME 47+ exposes its accent as a nine-value enum, not free-form
+    # hex, so a tokenized accent has to be mapped onto the nearest of
+    # them. Reference values are libadwaita's own accent definitions
+    # (src/stylesheet/_colors.scss). Nearest by squared distance in
+    # sRGB -- not perceptually correct, but the candidates are far
+    # enough apart in hue that it does not matter.
+    gnomeAccents = {
+      blue = "#3584e4";
+      teal = "#2190a4";
+      green = "#3a944a";
+      yellow = "#c88800";
+      orange = "#ed5b00";
+      red = "#e62d42";
+      pink = "#d56199";
+      purple = "#9141ac";
+      slate = "#6f8396";
+    };
+
+    nearestGnomeAccent =
+      hex:
+      let
+        c = self.hexToRgb hex;
+        dist =
+          other:
+          let
+            o = self.hexToRgb other;
+            dr = c.r - o.r;
+            dg = c.g - o.g;
+            db = c.b - o.b;
+          in
+          (dr * dr) + (dg * dg) + (db * db);
+        best = lib.foldl' (
+          acc: name:
+          let
+            d = dist self.gnomeAccents.${name};
+          in
+          if acc == null || d < acc.d then { inherit name d; } else acc
+        ) null (attrNames self.gnomeAccents);
+      in
+      best.name;
 
     # fzf wants one flat --color= argument; building it from an attrset
     # keeps the ordering stable and the call sites readable.

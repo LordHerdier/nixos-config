@@ -10,9 +10,10 @@
 # gtk-3.0/gtk.css already makes for success/warning/error. The `roles`
 # below are the part that actually carries meaning here.
 #
-# No consumer yet: the GTK stylesheets still hold their own literals.
-# Wiring them up means turning pkgs/oneshot-gtk-theme into a substituted
-# template, which is a separate step from the terminal-side port.
+# Consumed by home/modules/oneshot-gtk.nix and oneshot-wallpaper.nix,
+# which hand these six values to pkgs/oneshot-gtk-theme. The six that
+# matter are bg, fg, accent, accentDim, accentMuted (muted) and
+# surfaceAlt -- those are every distinct color the stylesheets use.
 
 {
   name = "oneshot";
@@ -44,11 +45,12 @@
   roles = {
     accent = "#9664ff";
     accentFg = "#000000"; # inverted selection: accent fill, black text
+    accentDim = "#6442a5"; # pressed/destructive fill
     border = "#9664ff";
     borderInactive = "#4a3d66";
 
     surface = "#000000";
-    surfaceAlt = "#000000";
+    surfaceAlt = "#1a1a1a"; # the one non-black surface: GTK2 bg[PRELIGHT]
     muted = "#4a3d66";
 
     selectionBg = "#9664ff";
