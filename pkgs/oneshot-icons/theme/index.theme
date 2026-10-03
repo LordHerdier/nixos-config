@@ -1,0 +1,25 @@
+[Icon Theme]
+Name=Oneshot-Icons
+Comment=Desktop/window icons extracted from OneShot's World Machine OS
+Inherits=Adwaita,hicolor
+Directories=16x16/apps,16x16/places,32x32/apps,32x32/places
+
+[16x16/apps]
+Size=16
+Context=Applications
+Type=Fixed
+
+[16x16/places]
+Size=16
+Context=Places
+Type=Fixed
+
+[32x32/apps]
+Size=32
+Context=Applications
+Type=Fixed
+
+[32x32/places]
+Size=32
+Context=Places
+Type=Fixed

@@ -107,6 +107,9 @@
                     (final: _: {
                       concord = final.callPackage ./pkgs/concord.nix { };
                       oneshot-cursors = final.callPackage ./pkgs/oneshot-cursors { };
+                      oneshot-gtk-theme = final.callPackage ./pkgs/oneshot-gtk-theme { };
+                      oneshot-icons = final.callPackage ./pkgs/oneshot-icons { };
+                      oneshot-wallpaper = final.callPackage ./pkgs/oneshot-wallpaper { };
                     })
                   ];
                 }

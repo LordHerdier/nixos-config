@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Oneshot
+Comment=Black + purple pixel-UI theme based on OneShot's in-fiction World Machine OS
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Oneshot
+ButtonLayout=:minimize,maximize,close
+
+[X-GTK-Metatheme]
+GtkTheme=Oneshot

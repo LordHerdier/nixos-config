@@ -6,6 +6,9 @@
   imports = [
     ../profiles/desktop-gnome.nix
     ../modules/oneshot-cursors.nix
+    ../modules/oneshot-gtk.nix
+    ../modules/oneshot-icons.nix
+    ../modules/oneshot-wallpaper.nix
   ];
 
   # Single 4K display (Sony TV over DP-1), captured by Sunshine for

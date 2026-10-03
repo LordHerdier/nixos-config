@@ -53,6 +53,51 @@ idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → s
 
 ---
 
+## desktop — apthos
+
+gnome (wayland), autologin, driven remotely over sunshine/moonlight. riced
+after OneShot's in-fiction "World Machine" OS — pure black surfaces, one
+saturated purple accent (`#9664ff`), square corners, inverted selection.
+
+| component | source |
+|-----------|--------|
+| cursor | `pkgs/oneshot-cursors` → `home/modules/oneshot-cursors.nix` |
+| gtk2/3/4 theme | `pkgs/oneshot-gtk-theme` → `home/modules/oneshot-gtk.nix` |
+| icons | `pkgs/oneshot-icons` → `home/modules/oneshot-icons.nix` |
+| wallpaper | `pkgs/oneshot-wallpaper` → `home/modules/oneshot-wallpaper.nix` |
+| dock | dash-to-dock, bottom panel mode (`home/profiles/desktop-gnome.nix`) |
+
+both theme modules drive gnome through **dconf**, not home-manager's `gtk`
+module: gnome-settings-daemon overrides anything written to
+`gtk-3.0/settings.ini`, so settings.ini is the losing side of that race.
+
+the gtk4 half needs a second install path on top of the theme directory —
+libadwaita apps ignore `gtk-theme-name` outright, so `gtk-4.0/gtk.css` only
+reaches nautilus/settings/text-editor from the *user* stylesheet at
+`~/.config/gtk-4.0/`. `oneshot-gtk.nix` installs it there.
+
+not covered: gnome shell's own chrome (top bar, overview, dash) isn't gtk
+and is unaffected by any of this — it'd need a `gnome-shell.css` plus the
+user themes extension.
+
+optional: `my.oneshot-gtk.pixelFont = true;` swaps the interface font for
+Terminus 10, the bitmap font the game's UI uses. off by default.
+
+the icon theme only defines OneShot's *own* icon names (`customize`,
+`jukebox`, ...), not freedesktop standard ones — guessing those would swap
+icons desktop-wide. so it inherits Adwaita and mostly just makes the game's
+icons available by name; it is not a wholesale icon swap.
+
+`pkgs/oneshot-{cursors,icons,wallpaper}` are extracted game art, © Future
+Cat / Komodo, marked `license = unfree` and vendored so a rebuild doesn't
+need the game installed. `pkgs/oneshot-gtk-theme` is not — it's hand-written
+stylesheets plus four original widget PNGs.
+
+upstream for all four is `~/documents/code/oneshot-twm-rice`; each package's
+default.nix names the `nix run .#...` command that regenerates it.
+
+---
+
 ## shell
 
 | tool | role |

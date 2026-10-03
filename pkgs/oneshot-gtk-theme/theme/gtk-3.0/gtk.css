@@ -1,0 +1,245 @@
+/* Oneshot GTK3 theme.
+ *
+ * Modeled on the in-game "World Machine" OS look (see docs/rice-plan.md
+ * and the reference screenshots it links): pure black surfaces, a single
+ * saturated purple accent for borders/text, hard square corners, no
+ * gradients/shadows, and an "inverted" selection style (solid accent fill
+ * + black text/icon) matching the game's active-taskbar-tab / selected-
+ * desktop-icon look.
+ *
+ * Colors are hardcoded (not generated from themes/tokens.json) — a hex
+ * color isn't a copyrightable game asset, unlike the extracted PNGs, so
+ * there's no reason to keep this out of git or regenerate it. Default is
+ * the game's default "Purple" theme (#9664FF / #6442A5).
+ */
+
+@define-color bg_color #000000;
+@define-color fg_color #cbb8ff;
+@define-color accent_color #9664ff;
+@define-color accent_dim_color #6442a5;
+@define-color selected_bg_color #9664ff;
+@define-color selected_fg_color #000000;
+@define-color border_color #9664ff;
+@define-color disabled_fg_color #4a3d66;
+
+/* Standard Adwaita-style symbolic names — GTK's own built-in fallback
+ * rendering (e.g. the stock checkmark bitmap's -gtk-recolor(), and some
+ * apps' own CSS) keys off these exact names, not our custom ones above.
+ * Redefining them is what actually overrides GTK's compiled-in default
+ * blue for things like the checkbox tick and scale fill. */
+@define-color theme_bg_color #000000;
+@define-color theme_fg_color #cbb8ff;
+@define-color theme_base_color #000000;
+@define-color theme_text_color #cbb8ff;
+@define-color theme_selected_bg_color #9664ff;
+@define-color theme_selected_fg_color #000000;
+@define-color theme_unfocused_bg_color #000000;
+@define-color theme_unfocused_fg_color #cbb8ff;
+@define-color theme_unfocused_selected_bg_color #6442a5;
+@define-color theme_unfocused_selected_fg_color #000000;
+@define-color borders #9664ff;
+@define-color unfocused_borders #6442a5;
+@define-color insensitive_bg_color #000000;
+@define-color insensitive_fg_color #4a3d66;
+@define-color insensitive_base_color #000000;
+@define-color success_color #9664ff;
+@define-color warning_color #9664ff;
+@define-color error_color #9664ff;
+
+* {
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  outline-color: alpha(@accent_color, 0.5);
+}
+
+window, .background {
+  background-color: @bg_color;
+  color: @fg_color;
+}
+
+label {
+  color: @fg_color;
+}
+
+/* Buttons: black fill + purple border normally, full purple fill (with
+ * black text) when pressed/checked — the same inversion the game uses for
+ * the active taskbar tab and selected desktop icon. */
+button {
+  background-color: @bg_color;
+  color: @fg_color;
+  border: 1px solid @border_color;
+  padding: 2px 10px;
+  min-height: 16px;
+}
+button:hover {
+  background-color: alpha(@accent_color, 0.18);
+}
+button:active, button:checked {
+  background-color: @accent_color;
+  color: @selected_fg_color;
+}
+button:disabled {
+  color: @disabled_fg_color;
+  border-color: @disabled_fg_color;
+  background-color: @bg_color;
+}
+
+entry {
+  background-color: @bg_color;
+  color: @fg_color;
+  border: 1px solid @border_color;
+  caret-color: @accent_color;
+  padding: 2px 4px;
+}
+entry:focus {
+  border-color: @fg_color;
+}
+entry selection {
+  background-color: @selected_bg_color;
+  color: @selected_fg_color;
+}
+
+/* Generic "inverted" selection state — list rows, icon views, etc. */
+*:selected {
+  background-color: @selected_bg_color;
+  color: @selected_fg_color;
+}
+
+menu, .menu, .context-menu, popover, popover.background {
+  background-color: @bg_color;
+  color: @fg_color;
+  border: 1px solid @border_color;
+  padding: 2px;
+}
+menuitem {
+  color: @fg_color;
+}
+menuitem:hover {
+  background-color: @accent_color;
+  color: @selected_fg_color;
+}
+
+notebook > header {
+  background-color: @bg_color;
+  border-color: @accent_dim_color;
+}
+notebook > header tabs tab {
+  background-color: @bg_color;
+  color: @fg_color;
+  border: 1px solid @accent_dim_color;
+  padding: 2px 8px;
+}
+notebook > header tabs tab:checked {
+  background-color: @accent_color;
+  color: @selected_fg_color;
+}
+
+/* Scrollbars: black trough, flat purple thumb (diamond motif is reserved
+ * for the scale slider below — a full diamond scrollbar thumb reads badly
+ * at the thin widths XFCE apps actually use it at). */
+scrollbar {
+  background-color: @bg_color;
+}
+scrollbar slider {
+  background-color: @accent_color;
+  min-width: 8px;
+  min-height: 8px;
+}
+scrollbar slider:hover {
+  background-color: @fg_color;
+}
+
+/* Sliders (GtkScale — volume/brightness in the reference screenshot):
+ * diamond handle on a thin purple-outlined black trough. */
+scale {
+  padding: 6px 0;
+}
+scale trough {
+  background-color: @bg_color;
+  border: 1px solid @border_color;
+  min-height: 4px;
+  min-width: 4px;
+}
+scale highlight {
+  background-color: @accent_color;
+  min-height: 4px;
+  min-width: 4px;
+}
+scale slider {
+  min-width: 14px;
+  min-height: 14px;
+  background-color: transparent;
+  background-image: url("assets/diamond.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+}
+scale slider:hover {
+  background-image: url("assets/diamond-hover.png");
+}
+
+/* checkbutton/radiobutton draw their tick/dot via -gtk-icon-source, not
+ * background-color — a plain background-color rule (tried first) has no
+ * visible effect since GTK paints the fallback theme's icon on top of it. */
+checkbutton check, radiobutton radio {
+  background-color: @bg_color;
+  border: 1px solid @border_color;
+  min-width: 12px;
+  min-height: 12px;
+}
+radiobutton radio {
+  border-radius: 9999px;
+}
+checkbutton check:checked, radiobutton radio:checked {
+  background-color: @accent_color;
+  border-color: @accent_color;
+}
+checkbutton check:checked {
+  -gtk-icon-source: url("assets/check.png");
+}
+radiobutton radio:checked {
+  -gtk-icon-source: url("assets/radio-dot.png");
+}
+
+progressbar trough {
+  background-color: @bg_color;
+  border: 1px solid @border_color;
+  min-height: 10px;
+}
+progressbar progress {
+  background-color: @accent_color;
+  min-height: 8px;
+}
+
+tooltip, tooltip.background {
+  background-color: @bg_color;
+  color: @fg_color;
+  border: 1px solid @border_color;
+}
+
+/* Client-side-decorated headerbars (apps that don't use xfwm4 chrome) —
+ * keep them visually consistent with the xfwm4 titlebar from phase 5. */
+headerbar {
+  background-color: @bg_color;
+  color: @fg_color;
+  border-color: @border_color;
+  box-shadow: none;
+}
+headerbar button {
+  min-width: 16px;
+  min-height: 16px;
+}
+
+separator {
+  background-color: @accent_dim_color;
+  min-width: 1px;
+  min-height: 1px;
+}
+
+/* Not yet themed: spinbutton/combobox arrow glyphs and the scrollbar's own
+ * step-arrows come from the icon theme (symbolic "pan-*" icons), not this
+ * stylesheet, so they'll show up in whatever neutral color the fallback
+ * icon theme (Adwaita, see themes/oneshot-icons) uses rather than accent
+ * purple. Low-priority polish — see docs/rice-plan.md phase 4 notes.
+ */

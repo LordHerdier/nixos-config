@@ -1,0 +1,32 @@
+# Oneshot GTK2 theme — legacy-app fallback only under XFCE.
+#
+# Kept intentionally minimal (flat colors via gtkrc, no pixmap engine):
+# GTK2 apps are rare under a modern XFCE session, so this just keeps them
+# from looking jarringly out of place next to the GTK3 theme, not a
+# pixel-perfect match to it.
+
+style "oneshot-default"
+{
+  bg[NORMAL]      = "#000000"
+  bg[ACTIVE]      = "#9664FF"
+  bg[PRELIGHT]    = "#1a1a1a"
+  bg[SELECTED]    = "#9664FF"
+  bg[INSENSITIVE] = "#000000"
+
+  fg[NORMAL]      = "#cbb8ff"
+  fg[ACTIVE]      = "#000000"
+  fg[PRELIGHT]    = "#cbb8ff"
+  fg[SELECTED]    = "#000000"
+  fg[INSENSITIVE] = "#4a3d66"
+
+  base[NORMAL]    = "#000000"
+  base[SELECTED]  = "#9664FF"
+
+  text[NORMAL]    = "#cbb8ff"
+  text[SELECTED]  = "#000000"
+
+  xthickness = 1
+  ythickness = 1
+}
+
+class "GtkWidget" style "oneshot-default"

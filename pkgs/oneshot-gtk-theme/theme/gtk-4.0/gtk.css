@@ -1,0 +1,607 @@
+/* Oneshot GTK4 / libadwaita override.
+ *
+ * Same design as gtk-3.0/gtk.css (black surfaces, one purple accent,
+ * square corners, no gradients/shadows, "inverted" selection) — see the
+ * header comment there and docs/rice-plan.md.
+ *
+ * WHY THIS FILE IS SEPARATE, AND WHY IT ALSO HAS TO BE INSTALLED SEPARATELY:
+ *
+ *   libadwaita apps ignore `gtk-theme-name` entirely. adw_init() installs
+ *   Adwaita's own stylesheet and does not consult ~/.themes/<name>/, so
+ *   selecting "Oneshot" in a theme picker has NO effect on Nautilus,
+ *   GNOME Settings, Text Editor, etc. The only provider that outranks the
+ *   libadwaita sheet without patching it is the user stylesheet at
+ *   $XDG_CONFIG_HOME/gtk-4.0/gtk.css (GTK_STYLE_PROVIDER_PRIORITY_USER =
+ *   800, vs. THEME = 200). `nix run .#install-gtk4` symlinks this file
+ *   there. Keeping the canonical copy inside the theme dir still earns its
+ *   place: plain (non-libadwaita) GTK4 apps DO honour gtk-theme-name and
+ *   will load it from here.
+ *
+ * HOW libadwaita 1.9 ACTUALLY RESOLVES COLORS — verified against the real
+ * stylesheet source (`nix build nixpkgs#libadwaita.src`,
+ * src/stylesheet/_colors.scss + _common.scss), not from an example theme:
+ *
+ *   Widget rules use CSS custom properties — `var(--accent-bg-color)`,
+ *   `var(--window-bg-color)`, ... — NOT the legacy `@accent_bg_color`
+ *   named colors. The `@define-color` names still exist, but only as a
+ *   compat layer that :root reads to seed the custom properties. So
+ *   overriding ONLY `@define-color` (which is what every pre-1.6 theming
+ *   guide tells you to do) leaves most widgets untouched, with no warning.
+ *   This file therefore sets the custom properties as the primary surface
+ *   and mirrors them into the @define-color names as a fallback, so it
+ *   works on either generation.
+ *
+ *   Two derived values need explicit overrides or they fight us:
+ *     --accent-color is computed as
+ *       oklab(from var(--accent-bg-color) var(--standalone-color-oklab))
+ *     and on dark --standalone-color-oklab is `max(l, 0.85) a b`, i.e. it
+ *     force-lightens the accent to L>=0.85 for standalone text/icons.
+ *     Left alone that yields a washed-out lavender, so we pin it.
+ *     --window-radius (default 15px, from _common.scss) is what rounds
+ *     window corners; `border-radius: 0` on `window` does not reach it.
+ */
+
+/* ---- libadwaita semantic palette (primary surface, 1.6+) ------------- */
+
+:root {
+  --window-radius: 0;
+
+  --accent-bg-color: #9664ff;
+  --accent-fg-color: #000000;
+  --accent-color: #9664ff;
+
+  /* The game UI has exactly one hue — collapse every semantic color onto
+   * the accent, same choice gtk-3.0/gtk.css makes for success/warning/
+   * error. Destructive stays distinguishable by its own dim variant
+   * rather than by turning red. */
+  --destructive-bg-color: #6442a5;
+  --destructive-fg-color: #000000;
+  --destructive-color: #cbb8ff;
+
+  --success-bg-color: #9664ff;
+  --success-fg-color: #000000;
+  --success-color: #9664ff;
+
+  --warning-bg-color: #9664ff;
+  --warning-fg-color: #000000;
+  --warning-color: #9664ff;
+
+  --error-bg-color: #9664ff;
+  --error-fg-color: #000000;
+  --error-color: #9664ff;
+
+  --window-bg-color: #000000;
+  --window-fg-color: #cbb8ff;
+
+  --view-bg-color: #000000;
+  --view-fg-color: #cbb8ff;
+
+  --headerbar-bg-color: #000000;
+  --headerbar-fg-color: #cbb8ff;
+  --headerbar-border-color: #9664ff;
+  --headerbar-backdrop-color: #000000;
+  --headerbar-shade-color: transparent;
+  --headerbar-darker-shade-color: transparent;
+
+  --sidebar-bg-color: #000000;
+  --sidebar-fg-color: #cbb8ff;
+  --sidebar-backdrop-color: #000000;
+  --sidebar-border-color: #6442a5;
+  --sidebar-shade-color: transparent;
+
+  --secondary-sidebar-bg-color: #000000;
+  --secondary-sidebar-fg-color: #cbb8ff;
+  --secondary-sidebar-backdrop-color: #000000;
+  --secondary-sidebar-border-color: #6442a5;
+  --secondary-sidebar-shade-color: transparent;
+
+  --card-bg-color: #000000;
+  --card-fg-color: #cbb8ff;
+  --card-shade-color: #6442a5;
+
+  --dialog-bg-color: #000000;
+  --dialog-fg-color: #cbb8ff;
+
+  --popover-bg-color: #000000;
+  --popover-fg-color: #cbb8ff;
+  --popover-shade-color: transparent;
+
+  --thumbnail-bg-color: #000000;
+  --thumbnail-fg-color: #cbb8ff;
+
+  --shade-color: transparent;
+  --scrollbar-outline-color: transparent;
+
+  --active-toggle-bg-color: #9664ff;
+  --active-toggle-fg-color: #000000;
+
+  --overview-bg-color: #000000;
+  --overview-fg-color: #cbb8ff;
+}
+
+/* ---- legacy named colors (compat: plain GTK4, older libadwaita) ------ */
+
+@define-color accent_bg_color #9664ff;
+@define-color accent_fg_color #000000;
+@define-color accent_color #9664ff;
+@define-color window_bg_color #000000;
+@define-color window_fg_color #cbb8ff;
+@define-color view_bg_color #000000;
+@define-color view_fg_color #cbb8ff;
+@define-color headerbar_bg_color #000000;
+@define-color headerbar_fg_color #cbb8ff;
+@define-color headerbar_border_color #9664ff;
+@define-color headerbar_backdrop_color #000000;
+@define-color headerbar_shade_color transparent;
+@define-color headerbar_darker_shade_color transparent;
+@define-color sidebar_bg_color #000000;
+@define-color sidebar_fg_color #cbb8ff;
+@define-color sidebar_backdrop_color #000000;
+@define-color sidebar_border_color #6442a5;
+@define-color sidebar_shade_color transparent;
+@define-color secondary_sidebar_bg_color #000000;
+@define-color secondary_sidebar_fg_color #cbb8ff;
+@define-color secondary_sidebar_backdrop_color #000000;
+@define-color secondary_sidebar_border_color #6442a5;
+@define-color secondary_sidebar_shade_color transparent;
+@define-color card_bg_color #000000;
+@define-color card_fg_color #cbb8ff;
+@define-color card_shade_color #6442a5;
+@define-color dialog_bg_color #000000;
+@define-color dialog_fg_color #cbb8ff;
+@define-color popover_bg_color #000000;
+@define-color popover_fg_color #cbb8ff;
+@define-color popover_shade_color transparent;
+@define-color thumbnail_bg_color #000000;
+@define-color thumbnail_fg_color #cbb8ff;
+@define-color shade_color transparent;
+@define-color scrollbar_outline_color transparent;
+@define-color borders #9664ff;
+@define-color unfocused_borders #6442a5;
+@define-color theme_bg_color #000000;
+@define-color theme_fg_color #cbb8ff;
+@define-color theme_base_color #000000;
+@define-color theme_text_color #cbb8ff;
+@define-color theme_selected_bg_color #9664ff;
+@define-color theme_selected_fg_color #000000;
+@define-color insensitive_bg_color #000000;
+@define-color insensitive_fg_color #4a3d66;
+@define-color insensitive_base_color #000000;
+@define-color success_bg_color #9664ff;
+@define-color success_color #9664ff;
+@define-color warning_bg_color #9664ff;
+@define-color warning_color #9664ff;
+@define-color error_bg_color #9664ff;
+@define-color error_color #9664ff;
+@define-color destructive_bg_color #6442a5;
+@define-color destructive_color #cbb8ff;
+
+/* ---- structure: square, flat, unshadowed ----------------------------- */
+
+* {
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  outline-color: color-mix(in srgb, #9664ff 50%, transparent);
+}
+
+/* window.csd carries libadwaita's drop shadow + a 1px outline; both have
+ * to go explicitly (the `*` rule above kills the shadow but not the
+ * outline, which is a real outline property, not a border). */
+window.csd,
+window.solid-csd {
+  box-shadow: none;
+  outline: 1px solid #9664ff;
+  outline-offset: -1px;
+}
+window.csd:backdrop,
+window.solid-csd:backdrop {
+  box-shadow: none;
+  outline-color: #6442a5;
+}
+window.csd.maximized,
+window.csd.fullscreen,
+window.csd.tiled {
+  outline: none;
+}
+
+.background {
+  background-color: #000000;
+  color: #cbb8ff;
+}
+
+/* ---- headerbar (this is GNOME's titlebar — no xfwm4 here) ------------ */
+
+headerbar {
+  background-color: #000000;
+  color: #cbb8ff;
+  box-shadow: none;
+  /* xfwm4's theme draws a double purple line under the title bar; the
+   * closest CSD equivalent is a 1px bottom border plus the window
+   * outline above, which reads as the same double rule. */
+  border-bottom: 1px solid #9664ff;
+  min-height: 25px;
+  padding: 0 2px;
+}
+headerbar:backdrop {
+  border-bottom-color: #6442a5;
+  color: #6442a5;
+}
+headerbar .title {
+  color: #cbb8ff;
+  font-weight: normal;
+}
+headerbar .subtitle {
+  color: #6442a5;
+}
+
+/* Min/max/close: square purple "chip" outline that inverts to a solid
+ * fill with a black glyph when pressed — matches both the GTK3 buttons
+ * and the xfwm4 pixmap buttons from phase 5. */
+windowcontrols > button {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+  min-width: 18px;
+  min-height: 18px;
+  margin: 2px 1px;
+  padding: 0;
+}
+windowcontrols > button:hover {
+  background-color: color-mix(in srgb, #9664ff 18%, transparent);
+}
+windowcontrols > button:active {
+  background-color: #9664ff;
+  color: #000000;
+}
+windowcontrols > button:backdrop {
+  border-color: #6442a5;
+  color: #6442a5;
+}
+
+.toolbar, searchbar, actionbar, tabbar {
+  background-color: #000000;
+  color: #cbb8ff;
+  box-shadow: none;
+}
+
+/* ---- buttons --------------------------------------------------------- */
+
+button {
+  background-color: #000000;
+  background-image: none;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+  padding: 2px 10px;
+  min-height: 16px;
+}
+button:hover {
+  background-color: color-mix(in srgb, #9664ff 18%, transparent);
+}
+button:active,
+button:checked,
+button.suggested-action,
+button.destructive-action {
+  background-color: #9664ff;
+  color: #000000;
+}
+button.destructive-action {
+  background-color: #6442a5;
+}
+button:disabled {
+  color: #4a3d66;
+  border-color: #4a3d66;
+  background-color: #000000;
+  filter: none;
+}
+/* Flat/icon buttons in headerbars and lists shouldn't all grow borders —
+ * only show the outline once they're interactive. */
+button.flat,
+button.image-button.flat,
+button.text-button.flat {
+  border-color: transparent;
+  background-color: transparent;
+}
+button.flat:hover {
+  border-color: #9664ff;
+}
+button.flat:active,
+button.flat:checked {
+  border-color: #9664ff;
+  background-color: #9664ff;
+  color: #000000;
+}
+
+/* ---- entries --------------------------------------------------------- */
+
+entry, spinbutton, .entry {
+  background-color: #000000;
+  background-image: none;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+  caret-color: #9664ff;
+  padding: 2px 4px;
+  min-height: 16px;
+}
+entry:focus, spinbutton:focus-within {
+  border-color: #cbb8ff;
+  outline: none;
+}
+entry > selection, textview > text > selection, label > selection {
+  background-color: #9664ff;
+  color: #000000;
+}
+
+/* ---- lists, rows, boxed lists, sidebars ------------------------------ */
+
+listview, list, columnview, gridview, treeview.view {
+  background-color: #000000;
+  color: #cbb8ff;
+}
+row, listview > row, list > row {
+  background-color: #000000;
+  color: #cbb8ff;
+}
+row:selected, listview > row:selected, list > row:selected,
+columnview > listview > row:selected,
+gridview > child:selected {
+  background-color: #9664ff;
+  color: #000000;
+}
+row:hover:not(:selected) {
+  background-color: color-mix(in srgb, #9664ff 12%, transparent);
+}
+list.boxed-list, list.boxed-list-separate, .card {
+  background-color: #000000;
+  border: 1px solid #6442a5;
+}
+list.boxed-list > row:not(:last-child) {
+  border-bottom: 1px solid #6442a5;
+}
+.navigation-sidebar {
+  background-color: #000000;
+  color: #cbb8ff;
+}
+.navigation-sidebar > row:selected {
+  background-color: #9664ff;
+  color: #000000;
+}
+preferencespage, preferencesgroup, .preferences {
+  background-color: #000000;
+}
+
+/* ---- popovers and menus ---------------------------------------------- */
+
+popover > contents,
+popover > arrow {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+  box-shadow: none;
+  padding: 2px;
+}
+popover.menu > contents modelbutton,
+popover > contents modelbutton {
+  color: #cbb8ff;
+  border-radius: 0;
+  min-height: 18px;
+  padding: 2px 8px;
+}
+popover.menu > contents modelbutton:hover,
+popover > contents modelbutton:hover {
+  background-color: #9664ff;
+  color: #000000;
+}
+dropdown > button, combobox > box > button {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+}
+
+/* ---- scrollbars ------------------------------------------------------ */
+
+scrollbar {
+  background-color: #000000;
+  border: none;
+}
+scrollbar > range > trough {
+  background-color: #000000;
+  border: none;
+}
+scrollbar > range > trough > slider {
+  background-color: #9664ff;
+  border: none;
+  min-width: 8px;
+  min-height: 8px;
+}
+scrollbar > range > trough > slider:hover {
+  background-color: #cbb8ff;
+}
+
+/* ---- scale: the diamond handle motif --------------------------------- */
+
+scale {
+  padding: 6px 0;
+}
+scale > trough {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  min-height: 4px;
+  min-width: 4px;
+}
+scale > trough > highlight,
+scale > trough > fill {
+  background-color: #9664ff;
+  min-height: 4px;
+  min-width: 4px;
+}
+/* GTK4 nests the handle one level deeper than GTK3 (scale > trough >
+ * slider, not scale > slider) — a flat `scale slider` selector still
+ * matches, but the explicit path documents the real node tree. */
+scale > trough > slider {
+  background-color: transparent;
+  background-image: url("assets/diamond.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  box-shadow: none;
+  min-width: 14px;
+  min-height: 14px;
+  margin: -6px;
+}
+scale > trough > slider:hover {
+  background-image: url("assets/diamond-hover.png");
+}
+
+/* ---- check / radio --------------------------------------------------- */
+
+/* libadwaita draws the tick with
+ *   -gtk-icon-source: -gtk-recolor(url("assets/check-symbolic.svg"))
+ * recolored via currentColor, so unlike GTK3 (where the baked-in blue
+ * fallback won — see rice-plan phase 4's deferred gap) setting `color`
+ * here is enough; no PNG icon-source override needed. Ours is supplied
+ * anyway for pixel-consistency with the GTK3 theme. */
+check, radio {
+  background-color: #000000;
+  background-image: none;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+  box-shadow: none;
+  min-width: 12px;
+  min-height: 12px;
+  -gtk-icon-size: 12px;
+}
+radio {
+  border-radius: 9999px;
+}
+check:checked, check:indeterminate,
+radio:checked, radio:indeterminate {
+  background-color: #9664ff;
+  border-color: #9664ff;
+  color: #000000;
+}
+check:checked {
+  -gtk-icon-source: url("assets/check.png");
+}
+radio:checked {
+  -gtk-icon-source: url("assets/radio-dot.png");
+}
+check:disabled, radio:disabled {
+  border-color: #4a3d66;
+  color: #4a3d66;
+  filter: none;
+}
+
+/* ---- switch ---------------------------------------------------------- */
+
+/* No rounding (the `*` rule already squares it) and no slider shadow —
+ * reads as a filled/unfilled box, closer to the game's toggle rows than
+ * a pill. */
+switch {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  padding: 2px;
+}
+switch > slider {
+  background-color: #9664ff;
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 14px;
+  min-height: 14px;
+}
+switch:checked {
+  background-color: #9664ff;
+}
+switch:checked > slider {
+  background-color: #000000;
+}
+switch:disabled {
+  border-color: #4a3d66;
+  filter: none;
+}
+switch:disabled > slider {
+  background-color: #4a3d66;
+}
+
+/* ---- progress, levelbar, spinner ------------------------------------- */
+
+progressbar > trough {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  min-height: 10px;
+}
+progressbar > trough > progress {
+  background-color: #9664ff;
+  border-radius: 0;
+  min-height: 8px;
+}
+levelbar > trough {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+}
+levelbar > trough > block.filled {
+  background-color: #9664ff;
+  border: none;
+}
+spinner {
+  color: #9664ff;
+}
+
+/* ---- tabs (notebook + AdwTabView) ------------------------------------ */
+
+notebook > header {
+  background-color: #000000;
+  border-color: #6442a5;
+}
+notebook > header > tabs > tab {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #6442a5;
+  padding: 2px 8px;
+}
+notebook > header > tabs > tab:checked {
+  background-color: #9664ff;
+  color: #000000;
+}
+tabbar tabbox > tabboxchild > tab {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #6442a5;
+}
+tabbar tabbox > tabboxchild > tab:checked {
+  background-color: #9664ff;
+  color: #000000;
+}
+viewswitcher > button:checked,
+.view-switcher > button:checked {
+  background-color: #9664ff;
+  color: #000000;
+}
+
+/* ---- tooltips, toasts, banners, separators --------------------------- */
+
+tooltip, tooltip.background {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+}
+toast {
+  background-color: #000000;
+  color: #cbb8ff;
+  border: 1px solid #9664ff;
+}
+banner > revealer > widget {
+  background-color: #9664ff;
+  color: #000000;
+}
+separator {
+  background-color: #6442a5;
+  min-width: 1px;
+  min-height: 1px;
+}
+
+/* Not themed here, same as the GTK3 sheet: symbolic arrow/expander
+ * glyphs come from the icon theme (pan-*-symbolic), not this stylesheet,
+ * so they follow whatever Oneshot-Icons inherits. libadwaita recolors
+ * them with currentColor, so in practice they pick up #cbb8ff — better
+ * than the GTK3 case, where they stayed neutral. */
