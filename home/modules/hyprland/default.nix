@@ -10,6 +10,7 @@
     ./50-binds.nix
     ./hypridle.nix
     ./hyprlock.nix
+    ./hyprlock-colors.nix
   ];
 
   home.packages = with pkgs; [

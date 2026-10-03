@@ -1,12 +1,15 @@
 # home/modules/hyprland/hyprlock.nix
 
-{ ... }:
+{ config, ... }:
 
 {
   programs.hyprlock = {
     enable = true;
     extraConfig = ''
-      source = ~/.config/Ax-Shell/config/hypr/colors.conf
+      # $foreground, $primary, $secondary, $tertiary and $error come from
+      # noctalia's current scheme -- see hyprlock-colors.nix, which
+      # regenerates this file before each lock.
+      source = ${config.my.hyprlock-colors.file}
 
       background {
           monitor =

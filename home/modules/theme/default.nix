@@ -3,12 +3,12 @@
 # `my.theme` -- one place that owns the colors, so an app module says
 # "the accent" instead of "#7fb4ca".
 #
-# SCOPE. This governs the terminal/editor/TUI stack and (later) the GTK
-# theme. It deliberately does NOT govern the Hyprland desktop: noctalia
-# and ambxst derive their colors from the wallpaper at runtime via
-# matugen, and that is the source of truth there. Hyprland's own border
-# colors, hyprlock and the shell are left to the runtime side on purpose
-# -- see README.
+# SCOPE. This governs the terminal/editor/TUI stack and the GTK theme.
+# It deliberately does NOT govern the Hyprland desktop: noctalia derives
+# its colors from the wallpaper at runtime, and that is the source of
+# truth there. The one exception is a cold start -- see
+# home/modules/hyprland/hyprlock-colors.nix, which falls back to this
+# palette only until noctalia has written its colors once.
 #
 # WHAT A CONSUMER READS. `my.theme.palettes.<name>` is a resolved theme:
 #

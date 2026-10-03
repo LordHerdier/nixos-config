@@ -41,15 +41,25 @@ each module handles one concern. profiles compose modules into roles. hosts stay
 | component | choice |
 |-----------|--------|
 | compositor | hyprland (wayland) |
-| bar | waybar |
-| launcher | rofi |
+| bar | noctalia |
+| launcher | noctalia |
 | terminal | kitty — CaskaydiaCove Nerd Font, 0.8 opacity, colors from `my.theme` |
 | lock / idle | hyprlock + hypridle |
-| theming | [ambxst](https://github.com/Axenide/Ax-Shell) — material you wallpaper colors |
+| theming | [noctalia](https://github.com/noctalia-dev/noctalia) — material you wallpaper colors |
 | audio | pipewire |
 | screenshot | grim + slurp + swappy |
 
 idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → suspend at 30 min.
+
+the lock screen's colors follow noctalia's current scheme rather than
+`my.theme`. noctalia rewrites `~/.config/noctalia/colors.json` whenever
+the scheme changes; `home/modules/hyprland/hyprlock-colors.nix` turns
+that into the hyprlang variables hyprlock sources, and hypridle's
+`lock_cmd` regenerates it immediately before locking — hyprlock reads its
+config at launch, so that is the only moment it has to be right. if
+noctalia hasn't written colors.json yet, the generator falls back to
+`my.theme`; that is the one place the declared palette touches the
+hyprland desktop, and only as a cold start.
 
 ---
 
@@ -144,10 +154,16 @@ own `evalModules`, so home-manager's config is not in scope inside
 `home/modules/nvf/*.nix`.
 
 **scope.** this governs the terminal/editor/tui stack and apthos's gtk
-theme. it does *not* govern the hyprland desktop — noctalia and ambxst
-derive their colors from the wallpaper at runtime via matugen, and that
-is the source of truth there. hyprland's border colors, hyprlock and the
-shell stay on the runtime side deliberately.
+theme. it does *not* govern the hyprland desktop — noctalia derives its
+colors from the wallpaper at runtime, and that is the source of truth
+there. the bar, the shell and the lock screen all follow noctalia; see
+`hyprlock-colors.nix` for how the lock screen picks them up.
+
+hyprland's own window border colors are the gap: they are still literals
+in `home/modules/hyprland/40-design.nix`, neither tokenized nor
+runtime-driven. noctalia's hyprland template would cover them, but it has
+to be enabled in its gui and its post-process step wants to edit
+`~/.config/hypr/hyprland.conf`, which is a read-only store symlink here.
 
 ---
 
@@ -195,7 +211,6 @@ hold j → ctrl    hold k → shift  hold l → alt      hold ; → meta
 | nixos-wsl | wsl integration |
 | nixos-hardware | framework ai 300 hardware module |
 | nvf | declarative neovim configuration |
-| ambxst | desktop theming / ax-shell |
 | dotfiles | bin scripts, oh-my-posh themes, yazi config |
 | flake-parts | flake structure helpers |
 
