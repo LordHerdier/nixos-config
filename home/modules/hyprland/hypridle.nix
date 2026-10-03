@@ -1,14 +1,19 @@
 # home/modules/hyprland/hypridle.nix
 
-{ ... }:
+{ config, ... }:
 
 {
   services.hypridle = {
     enable = true;
     settings = {
       general = {
+        # hyprlock parses its config at launch, so refreshing the
+        # generated color file here is what keeps the lock screen on
+        # noctalia's current scheme -- see hyprlock-colors.nix. It runs
+        # unconditionally, before the `pidof` guard, so the colors are
+        # current even when hyprlock is already up.
         lock_cmd = [
-          "pidof hyprlock || hyprlock"
+          "${config.my.hyprlock-colors.package}/bin/hyprlock-colors; pidof hyprlock || hyprlock"
           "pidof mpvpaper || mpvpaper"
         ];
         before_sleep_cmd = "loginctl lock-session";

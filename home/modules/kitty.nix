@@ -16,6 +16,10 @@ let
     ;
 
   cfg = config.my.kitty;
+
+  theme = config.my.theme.palettes.${cfg.palette};
+  p = theme.palette;
+  r = theme.roles;
 in
 {
   options.my.kitty = {
@@ -25,6 +29,16 @@ in
       type = types.float;
       default = 0.8;
       description = "Background opacity for kitty.";
+    };
+
+    palette = mkOption {
+      type = types.enum (lib.attrNames config.my.theme.palettes);
+      default = config.my.theme.default;
+      defaultText = "config.my.theme.default";
+      description = ''
+        Which my.theme palette kitty draws its colors from. Follows the
+        system palette; set it to pin kitty to a different one.
+      '';
     };
   };
 
@@ -49,7 +63,7 @@ in
         disable_ligatures = "never";
 
         # Cursor
-        cursor = "#bbbbbb";
+        cursor = r.cursor;
         cursor_shape = "beam";
         cursor_beam_thickness = 1;
         cursor_blink_interval = 1;
@@ -66,7 +80,7 @@ in
         pointer_shape_when_dragging = "beam";
 
         # URL handling
-        url_color = "#0078d7";
+        url_color = r.url;
         url_style = "single";
         open_url_with = "default";
         detect_urls = "yes";
@@ -76,8 +90,8 @@ in
         window_padding_width = "0 8 8";
         draw_minimal_borders = "yes";
 
-        active_border_color = "#cba6f7";
-        inactive_border_color = "#777777";
+        active_border_color = r.accent;
+        inactive_border_color = r.borderInactive;
 
         # Tabs
         tab_bar_style = "powerline";
@@ -92,28 +106,29 @@ in
         # Transparency
         background_opacity = toString cfg.opacity;
 
-        # Theme (your palette)
-        background = "#161926";
-        foreground = "#CDD6F4";
-        selection_background = "#44475a";
+        # Theme -- see my.kitty.palette
+        background = p.bg;
+        foreground = p.fg;
+        selection_background = r.selectionBg;
+        # Not a color: tells kitty to keep each cell's own foreground.
         selection_foreground = "none";
 
-        color0 = "#45475A";
-        color1 = "#F38BA8";
-        color2 = "#A6E3A1";
-        color3 = "#F9E2AF";
-        color4 = "#89B4FA";
-        color5 = "#F5C2E7";
-        color6 = "#94E2D5";
-        color7 = "#BAC2DE";
-        color8 = "#585B70";
-        color9 = "#F38BA8";
-        color10 = "#A6E3A1";
-        color11 = "#F9E2AF";
-        color12 = "#89B4FA";
-        color13 = "#F5C2E7";
-        color14 = "#94E2D5";
-        color15 = "#A6ADC8";
+        color0 = p.black;
+        color1 = p.red;
+        color2 = p.green;
+        color3 = p.yellow;
+        color4 = p.blue;
+        color5 = p.magenta;
+        color6 = p.cyan;
+        color7 = p.white;
+        color8 = p.brightBlack;
+        color9 = p.brightRed;
+        color10 = p.brightGreen;
+        color11 = p.brightYellow;
+        color12 = p.brightBlue;
+        color13 = p.brightMagenta;
+        color14 = p.brightCyan;
+        color15 = p.brightWhite;
 
         editor = "vim";
         allow_remote_control = "yes";

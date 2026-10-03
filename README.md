@@ -41,15 +41,25 @@ each module handles one concern. profiles compose modules into roles. hosts stay
 | component | choice |
 |-----------|--------|
 | compositor | hyprland (wayland) |
-| bar | waybar |
-| launcher | rofi |
-| terminal | kitty — CaskaydiaCove Nerd Font, 0.4 opacity |
+| bar | noctalia |
+| launcher | noctalia |
+| terminal | kitty — CaskaydiaCove Nerd Font, 0.8 opacity, colors from `my.theme` |
 | lock / idle | hyprlock + hypridle |
-| theming | [ambxst](https://github.com/Axenide/Ax-Shell) — material you wallpaper colors |
+| theming | [noctalia](https://github.com/noctalia-dev/noctalia) — material you wallpaper colors |
 | audio | pipewire |
 | screenshot | grim + slurp + swappy |
 
 idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → suspend at 30 min.
+
+the lock screen's colors follow noctalia's current scheme rather than
+`my.theme`. noctalia rewrites `~/.config/noctalia/colors.json` whenever
+the scheme changes; `home/modules/hyprland/hyprlock-colors.nix` turns
+that into the hyprlang variables hyprlock sources, and hypridle's
+`lock_cmd` regenerates it immediately before locking — hyprlock reads its
+config at launch, so that is the only moment it has to be right. if
+noctalia hasn't written colors.json yet, the generator falls back to
+`my.theme`; that is the one place the declared palette touches the
+hyprland desktop, and only as a cold start.
 
 ---
 
@@ -58,6 +68,16 @@ idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → s
 gnome (wayland), autologin, driven remotely over sunshine/moonlight. riced
 after OneShot's in-fiction "World Machine" OS — pure black surfaces, one
 saturated purple accent (`#9664ff`), square corners, inverted selection.
+
+the gtk stylesheets' colors are build arguments, not literals.
+`pkgs/oneshot-gtk-theme` takes six (`background`, `backgroundHover`,
+`accent`, `accentDim`, `accentMuted`, `accentStandalone`) and remaps every
+call site by value; `home/modules/oneshot-gtk.nix` fills them from the
+`oneshot` palette in `my.theme`. building the package with no arguments
+still reproduces the stylesheets byte for byte, so they stay readable as
+plain css. `my.oneshot-gtk.palette` re-skins the whole theme — gtk2, gtk3,
+gtk4, the gnome accent enum and the wallpaper letterbox — without touching
+a stylesheet.
 
 | component | source |
 |-----------|--------|
@@ -98,13 +118,62 @@ default.nix names the `nix run .#...` command that regenerates it.
 
 ---
 
+## color tokens
+
+colors live in one place: `home/modules/theme/`, exposed as `my.theme`.
+app modules ask for a token, not a hex value.
+
+```
+home/modules/theme/
+├── default.nix     # the my.theme option tree
+├── lib.nix         # role derivation + format helpers (noHash, rgbaHex, ...)
+└── palettes/       # one file per palette, plain data
+```
+
+a resolved palette has two layers, and the split is the point:
+
+| layer | contents | who reads it |
+|-------|----------|--------------|
+| `.palette` | the 16 ansi colors plus `bg`/`fg` | terminals, tuis, colorscheme plugins — they address colors by index or ansi name |
+| `.roles` | `accent`, `border`, `selectionBg`, `muted`, ... | ui chrome — "the accent" is a job, not a hue |
+
+roles default off the palette (`lib.nix`) and any palette can override one.
+palettes also carry `.name` for apps that select a theme by string.
+
+`my.theme.default` is the system palette, currently kanagawa, and every
+app follows it: kitty, tmux, fzf, spotify-player and neovim all draw
+from the same file. an app can still pin a different palette through its
+own option (`my.kitty.palette`, `my.nvim.palette`).
+
+`catppuccin-mocha` and `gruvbox-nightfox` are kept as palettes because
+they are what kitty and neovim used to carry inline, and either can be
+pinned back on one line.
+
+nvf gets the theme through `extraSpecialArgs`, not `config`: it runs its
+own `evalModules`, so home-manager's config is not in scope inside
+`home/modules/nvf/*.nix`.
+
+**scope.** this governs the terminal/editor/tui stack and apthos's gtk
+theme. it does *not* govern the hyprland desktop — noctalia derives its
+colors from the wallpaper at runtime, and that is the source of truth
+there. the bar, the shell and the lock screen all follow noctalia; see
+`hyprlock-colors.nix` for how the lock screen picks them up.
+
+hyprland's own window border colors are the gap: they are still literals
+in `home/modules/hyprland/40-design.nix`, neither tokenized nor
+runtime-driven. noctalia's hyprland template would cover them, but it has
+to be enabled in its gui and its post-process step wants to edit
+`~/.config/hypr/hyprland.conf`, which is a read-only store symlink here.
+
+---
+
 ## shell
 
 | tool | role |
 |------|------|
 | zsh | shell — completions, autosuggestions, syntax highlighting |
 | oh-my-posh | prompt |
-| tmux | multiplexer — kanagawa theme, vim pane nav, session persistence |
+| tmux | multiplexer — colors from `my.theme`, vim pane nav, session persistence |
 | atuin | shell history sync |
 | zoxide + yazi | directory navigation + file manager |
 
@@ -116,7 +185,7 @@ neovim via [nvf](https://github.com/notashelf/nvf):
 
 - lsp + format-on-save for nix, lua, python, typescript, c/c++, bash, and more
 - telescope, neo-tree, treesitter, todo-comments, noice, which-key
-- nightfox theme with a custom gruvbox-inspired palette
+- nightfox theme, palette from `my.theme` (`my.nvim.palette`)
 
 ---
 
@@ -142,7 +211,6 @@ hold j → ctrl    hold k → shift  hold l → alt      hold ; → meta
 | nixos-wsl | wsl integration |
 | nixos-hardware | framework ai 300 hardware module |
 | nvf | declarative neovim configuration |
-| ambxst | desktop theming / ax-shell |
 | dotfiles | bin scripts, oh-my-posh themes, yazi config |
 | flake-parts | flake structure helpers |
 

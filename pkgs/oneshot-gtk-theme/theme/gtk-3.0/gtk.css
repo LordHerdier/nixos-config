@@ -7,10 +7,14 @@
  * + black text/icon) matching the game's active-taskbar-tab / selected-
  * desktop-icon look.
  *
- * Colors are hardcoded (not generated from themes/tokens.json) — a hex
- * color isn't a copyrightable game asset, unlike the extracted PNGs, so
- * there's no reason to keep this out of git or regenerate it. Default is
- * the game's default "Purple" theme (#9664FF / #6442A5).
+ * Colors are written out as literals (not generated from
+ * themes/tokens.json) — a hex color isn't a copyrightable game asset,
+ * unlike the extracted PNGs, so there's no reason to keep this out of
+ * git or regenerate it. The values here are the game's own "Purple"
+ * theme, and they are what you get if you build the theme with no
+ * arguments; ../default.nix remaps them by value when the Nix side
+ * passes a palette, so don't quote a specific hex in a comment — it
+ * would be rewritten along with the real declarations and then lie.
  */
 
 @define-color bg_color #000000;

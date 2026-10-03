@@ -1,7 +1,18 @@
 # home/modules/nvf/10-theme.nix
+#
+# `theme` is the resolved my.theme palette, passed in through
+# extraSpecialArgs by ./default.nix -- nvf evaluates its own module
+# system, so home-manager's config is not reachable from here.
+#
+# Nightfox addresses colors as base/bright pairs, which is exactly the
+# ANSI 16 split the palette already carries.
 
-{ pkgs, ... }:
+{ pkgs, theme, ... }:
 
+let
+  p = theme.palette;
+  r = theme.roles;
+in
 {
   config.vim = {
     # Don't use the built-in theme system
@@ -18,16 +29,16 @@
         require("nightfox").setup({
           palettes = {
             all = {
-              black    = "#1D2021",
-              red      = { base = "#CC241D", bright = "#F42C3E" },
-              green    = { base = "#98971A", bright = "#B8BB26" },
-              yellow   = { base = "#D79921", bright = "#FABD2F" },
-              blue     = { base = "#458588", bright = "#99C6CA" },
-              magenta  = { base = "#B16286", bright = "#D3869B" },
-              cyan     = { base = "#689D6A", bright = "#7EC16E" },
-              white    = { base = "#A89984", bright = "#EBDBB2" },
-              bg0      = "#181921",
-              fg1      = "#EBDBB2",
+              black    = "${p.black}",
+              red      = { base = "${p.red}", bright = "${p.brightRed}" },
+              green    = { base = "${p.green}", bright = "${p.brightGreen}" },
+              yellow   = { base = "${p.yellow}", bright = "${p.brightYellow}" },
+              blue     = { base = "${p.blue}", bright = "${p.brightBlue}" },
+              magenta  = { base = "${p.magenta}", bright = "${p.brightMagenta}" },
+              cyan     = { base = "${p.cyan}", bright = "${p.brightCyan}" },
+              white    = { base = "${p.white}", bright = "${p.brightWhite}" },
+              bg0      = "${p.bg}",
+              fg1      = "${p.fg}",
             },
           },
           options = {
@@ -37,7 +48,7 @@
           },
         })
         vim.cmd("colorscheme nightfox")
-        vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#458588", bg = "NONE" });
+        vim.api.nvim_set_hl(0, "WinSeparator", { fg = "${r.border}", bg = "NONE" });
       '';
   };
 }

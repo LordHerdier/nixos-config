@@ -27,9 +27,33 @@
 }:
 
 let
-  inherit (lib) mkEnableOption mkIf mkMerge;
-  theme = "${pkgs.oneshot-gtk-theme}/share/themes/Oneshot";
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkMerge
+    mkOption
+    types
+    ;
+
   cfg = config.my.oneshot-gtk;
+
+  t = config.my.theme.palettes.${cfg.palette};
+  p = t.palette;
+  r = t.roles;
+
+  # The stylesheets' colors are arguments now -- see
+  # pkgs/oneshot-gtk-theme/default.nix. These six are every distinct
+  # color they use.
+  themePkg = pkgs.oneshot-gtk-theme.override {
+    background = p.bg;
+    backgroundHover = r.surfaceAlt;
+    accent = r.accent;
+    accentDim = r.accentDim;
+    accentMuted = r.muted;
+    accentStandalone = p.fg;
+  };
+
+  theme = "${themePkg}/share/themes/Oneshot";
 in
 {
   options.my.oneshot-gtk = {
@@ -39,11 +63,23 @@ in
       un-antialiased look, and it applies to every GTK app, not just the
       ones that suit it
     '';
+
+    palette = mkOption {
+      type = types.enum (lib.attrNames config.my.theme.palettes);
+      # Pinned to "oneshot" rather than following my.theme.default, and
+      # this one is meant to stay pinned: the rice is an art-directed
+      # look for one host, and the oneshot palette collapses every ANSI
+      # slot onto a single hue, which makes it a fine UI palette and a
+      # useless terminal one. Point it at another palette to re-skin the
+      # GTK theme without touching the stylesheets.
+      default = "oneshot";
+      description = "Which my.theme palette the GTK stylesheets are built from.";
+    };
   };
 
   config = mkMerge [
     {
-      home.packages = [ pkgs.oneshot-gtk-theme ];
+      home.packages = [ themePkg ];
 
       dconf.settings."org/gnome/desktop/interface" = {
         gtk-theme = "Oneshot";
@@ -53,11 +89,14 @@ in
         # chrome in the places the stylesheet doesn't reach.
         color-scheme = "prefer-dark";
 
-        # GNOME 47+ accent color. It's an 8-value enum, not free-form hex,
-        # so this can't be the game's exact #9664ff -- it only steers the
-        # bits of GNOME Shell the GTK stylesheet can't touch (the overview,
-        # the top bar, switches in Settings). "purple" is the nearest.
-        accent-color = "purple";
+        # GNOME 47+ accent color. It's a nine-value enum, not free-form
+        # hex, so it can't be the accent exactly -- it only steers the
+        # bits of GNOME Shell the GTK stylesheet can't touch (the
+        # overview, the top bar, switches in Settings). The helper picks
+        # the nearest of the nine to whatever the palette's accent is,
+        # which for the oneshot purple lands on "purple", the value this
+        # was hardcoded to before.
+        accent-color = config.my.theme.lib.nearestGnomeAccent r.accent;
       };
 
       # Square titlebar buttons, minimize/maximize/close only, matching the
