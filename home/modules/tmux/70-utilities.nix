@@ -23,7 +23,7 @@ let
     "hl+:${r.accent}"
     "prompt:${p.yellow}"
     "pointer:${p.magenta}"
-    "marker:${p.green}"
+    "marker:${r.success}"
     "border:${r.surfaceAlt}"
     "info:${r.muted}"
   ];

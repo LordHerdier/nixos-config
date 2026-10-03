@@ -13,13 +13,19 @@
   name = "kanagawa";
   polarity = "dark";
 
+  # NOTE: green/brightGreen are swapped relative to upstream kanagawa's
+  # ANSI mapping, which has the bright slot (autumnGreen #76946a) darker
+  # than the base one (springGreen #98bb6c). Terminals and nightfox both
+  # expect bright to be the brighter of the pair, so the inversion read
+  # as a bug everywhere it showed up.
+
   palette = {
     bg = "#1f1f28"; # sumiInk3
     fg = "#dcd7ba"; # fujiWhite
 
     black = "#16161d"; # sumiInk0
     red = "#c34043"; # autumnRed
-    green = "#98bb6c"; # springGreen
+    green = "#76946a"; # autumnGreen
     yellow = "#e6c384"; # carpYellow
     blue = "#7e9cd8"; # crystalBlue
     magenta = "#d27e99"; # sakuraPink
@@ -28,7 +34,7 @@
 
     brightBlack = "#727169"; # fujiGray
     brightRed = "#e82424"; # samuraiRed
-    brightGreen = "#76946a"; # autumnGreen
+    brightGreen = "#98bb6c"; # springGreen
     brightYellow = "#ff9e3b"; # roninYellow
     brightBlue = "#7fb4ca"; # springBlue
     brightMagenta = "#957fb8"; # oniViolet
@@ -50,5 +56,10 @@
     # generic role default would pick fujiGray, and a grey selection
     # behind light text is unreadable.
     selectionBg = "#2d4f67";
+
+    # springGreen, not the base green the role default would take. A
+    # "this worked" marker wants the vivid green, and the green/
+    # brightGreen swap above moved that off the base slot.
+    success = "#98bb6c";
   };
 }
