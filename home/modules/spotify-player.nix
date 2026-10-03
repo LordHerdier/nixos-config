@@ -8,7 +8,7 @@
 }:
 
 let
-  t = config.my.theme.palettes.${config.my.theme.default};
+  t = config.my.theme.active;
   p = t.palette;
 in
 {

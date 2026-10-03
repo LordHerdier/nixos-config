@@ -9,7 +9,7 @@
 { config, lib, ... }:
 
 let
-  theme = config.my.theme.palettes.${config.my.theme.default};
+  theme = config.my.theme.active;
   p = theme.palette;
   r = theme.roles;
 in

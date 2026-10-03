@@ -1,7 +1,7 @@
 { config, lib, ... }:
 
 let
-  theme = config.my.theme.palettes.${config.my.theme.default};
+  theme = config.my.theme.active;
 in
 {
   programs.tmux.extraConfig = lib.mkAfter ''

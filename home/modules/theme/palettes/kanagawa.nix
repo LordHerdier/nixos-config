@@ -45,5 +45,10 @@
 
     surface = "#16161d"; # status bar / popup background
     surfaceAlt = "#2a2a37"; # sumiInk4 -- inactive borders, fzf cursorline
+
+    # waveBlue2, which is what kanagawa.nvim itself uses for Visual. The
+    # generic role default would pick fujiGray, and a grey selection
+    # behind light text is unreadable.
+    selectionBg = "#2d4f67";
   };
 }

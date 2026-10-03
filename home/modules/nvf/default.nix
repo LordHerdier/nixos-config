@@ -36,12 +36,12 @@ in
   options.my.nvim = {
     palette = mkOption {
       type = types.enum (lib.attrNames config.my.theme.palettes);
-      # Pinned rather than following my.theme.default: neovim, kitty and
-      # tmux are each on a different palette today, and this keeps that
-      # true while the colors move into tokens. Set it to
-      # `config.my.theme.default` to fold neovim into the system palette.
-      default = "gruvbox-nightfox";
-      description = "Which my.theme palette neovim draws its colors from.";
+      default = config.my.theme.default;
+      defaultText = "config.my.theme.default";
+      description = ''
+        Which my.theme palette neovim draws its colors from. Follows the
+        system palette; set it to pin neovim to a different one.
+      '';
     };
   };
 

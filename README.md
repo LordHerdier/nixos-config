@@ -43,7 +43,7 @@ each module handles one concern. profiles compose modules into roles. hosts stay
 | compositor | hyprland (wayland) |
 | bar | waybar |
 | launcher | rofi |
-| terminal | kitty — CaskaydiaCove Nerd Font, 0.4 opacity |
+| terminal | kitty — CaskaydiaCove Nerd Font, 0.8 opacity, colors from `my.theme` |
 | lock / idle | hyprlock + hypridle |
 | theming | [ambxst](https://github.com/Axenide/Ax-Shell) — material you wallpaper colors |
 | audio | pipewire |
@@ -120,11 +120,14 @@ a resolved palette has two layers, and the split is the point:
 roles default off the palette (`lib.nix`) and any palette can override one.
 palettes also carry `.name` for apps that select a theme by string.
 
-`my.theme.default` is the system palette. an app can pin a different one
-through its own option — `my.kitty.palette`, `my.nvim.palette` — which is
-what currently keeps kitty on catppuccin-mocha and neovim on
-gruvbox-nightfox while tmux, fzf and spotify-player follow the default.
-point those at `config.my.theme.default` to unify them.
+`my.theme.default` is the system palette, currently kanagawa, and every
+app follows it: kitty, tmux, fzf, spotify-player and neovim all draw
+from the same file. an app can still pin a different palette through its
+own option (`my.kitty.palette`, `my.nvim.palette`).
+
+`catppuccin-mocha` and `gruvbox-nightfox` are kept as palettes because
+they are what kitty and neovim used to carry inline, and either can be
+pinned back on one line.
 
 nvf gets the theme through `extraSpecialArgs`, not `config`: it runs its
 own `evalModules`, so home-manager's config is not in scope inside
@@ -157,7 +160,7 @@ neovim via [nvf](https://github.com/notashelf/nvf):
 
 - lsp + format-on-save for nix, lua, python, typescript, c/c++, bash, and more
 - telescope, neo-tree, treesitter, todo-comments, noice, which-key
-- nightfox theme, palette from `my.theme` (`my.nvim.palette`, currently gruvbox-nightfox)
+- nightfox theme, palette from `my.theme` (`my.nvim.palette`)
 
 ---
 

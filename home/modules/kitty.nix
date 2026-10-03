@@ -33,12 +33,12 @@ in
 
     palette = mkOption {
       type = types.enum (lib.attrNames config.my.theme.palettes);
-      # Pinned rather than following my.theme.default: kitty, tmux and
-      # neovim are each on a different palette today, and this keeps that
-      # true while the colors move into tokens. Set it to
-      # `config.my.theme.default` to fold kitty into the system palette.
-      default = "catppuccin-mocha";
-      description = "Which my.theme palette kitty draws its colors from.";
+      default = config.my.theme.default;
+      defaultText = "config.my.theme.default";
+      description = ''
+        Which my.theme palette kitty draws its colors from. Follows the
+        system palette; set it to pin kitty to a different one.
+      '';
     };
   };
 
