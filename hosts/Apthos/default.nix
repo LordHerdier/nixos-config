@@ -22,6 +22,7 @@
     ../../modules/features/windows-game-drives.nix
     ../../modules/features/syncthing.nix
     ../../modules/common/ssh.nix
+    ../../modules/common/kmonad/kmonad.nix
   ];
 
   system.stateVersion = "25.11";
