@@ -26,7 +26,10 @@ import gi
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
 
-CONNECTOR = "DP-1"
+# The TV has been moved between the GPU's HDMI and DisplayPort outputs
+# before, and that changes the connector name mutter reports. Try these in
+# order and use whichever is actually attached.
+CONNECTORS = ["HDMI-1", "DP-1"]
 STATE_FILE = os.path.expanduser("~/.local/state/sunshine-display-sync.json")
 METHOD_TEMPORARY = 1
 COLOR_MODE_SDR = 0
@@ -51,11 +54,12 @@ def get_state(p):
     ).unpack()
 
 
-def find_monitor(monitors, connector):
-    for ids, modes, mprops in monitors:
-        if ids[0] == connector:
-            return modes, mprops
-    raise SystemExit(f"monitor {connector} not present")
+def find_monitor(monitors, connectors):
+    attached = {ids[0]: (modes, mprops) for ids, modes, mprops in monitors}
+    for connector in connectors:
+        if connector in attached:
+            return (connector, *attached[connector])
+    raise SystemExit(f"none of {', '.join(connectors)} present")
 
 
 def current_mode(modes):
@@ -92,15 +96,16 @@ def apply(p, serial, connector, mode_id, scale, color_mode):
 def start():
     p = proxy()
     serial, monitors, logical_monitors, _ = get_state(p)
-    modes, mprops = find_monitor(monitors, CONNECTOR)
+    connector, modes, mprops = find_monitor(monitors, CONNECTORS)
     native = current_mode(modes)
-    scale = current_scale(logical_monitors, CONNECTOR)
+    scale = current_scale(logical_monitors, connector)
 
     if not os.path.exists(STATE_FILE):
         os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
         with open(STATE_FILE, "w") as f:
             json.dump(
                 {
+                    "connector": connector,
                     "mode_id": native[0],
                     "scale": scale,
                     "color_mode": mprops.get("color-mode", COLOR_MODE_SDR),
@@ -123,7 +128,7 @@ def start():
         return
     target = min(candidates, key=lambda m: abs(m[3] - fps))
 
-    apply(p, serial, CONNECTOR, target[0], scale, COLOR_MODE_HDR if hdr else COLOR_MODE_SDR)
+    apply(p, serial, connector, target[0], scale, COLOR_MODE_HDR if hdr else COLOR_MODE_SDR)
     print(f"apthos-display-sync: switched to {target[0]} hdr={hdr}", file=sys.stderr)
 
 
@@ -135,8 +140,11 @@ def stop():
     os.remove(STATE_FILE)
 
     p = proxy()
-    serial, _, _, _ = get_state(p)
-    apply(p, serial, CONNECTOR, native["mode_id"], native["scale"], native["color_mode"])
+    serial, monitors, _, _ = get_state(p)
+    # Restore the same output start() changed; fall back for state files
+    # written before the connector was recorded.
+    connector = native.get("connector") or find_monitor(monitors, CONNECTORS)[0]
+    apply(p, serial, connector, native["mode_id"], native["scale"], native["color_mode"])
     print(f"apthos-display-sync: restored {native['mode_id']}", file=sys.stderr)
 
 
