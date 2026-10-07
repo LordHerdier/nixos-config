@@ -17,6 +17,8 @@
     tree
     zsh
     psmisc
+    ncdu
+    usbutils
   ];
 
   services.atd.enable = true;
