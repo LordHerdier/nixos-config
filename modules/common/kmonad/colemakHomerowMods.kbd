@@ -14,7 +14,7 @@
     grv   1     2     3     4     5     6
     tab   q     w     e     r     t     y     u     i     o     p
     caps  a     s     d     f     g     h     j     k     l     ;
-    z     x     c     v     b
+    z     x     c     v     b     n     m     ,     .     /
     spc   @@layer-key@@
 )
 
@@ -32,6 +32,12 @@
     sft_k (tap-hold 200 k lsft)
     alt_l (tap-hold 200 l lalt)
     met_; (tap-hold 200 ; lmet)
+
+    ;; Hold caps for the extend layer, tap it for a plain caps lock.
+    ;; tap-hold-next (not tap-hold) so that pressing any other key resolves
+    ;; caps as a hold immediately, instead of stalling the next keystroke for
+    ;; the full 200ms while the tap/hold decision waits on caps' release.
+    extend (tap-hold-next 200 caps (layer-toggle extend))
 
     layer-mod (tap-hold 200 @@layer-key@@ (layer-toggle switcher))
 
@@ -64,16 +70,39 @@
 (deflayer default
     _     _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _
-    _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h  @ctl_j  @sft_k  @alt_l  @met_;
-    _     _       _       _       _
+    @extend @met_a @alt_s @sft_d @ctl_f  @nav_g  @nav_h  @ctl_j  @sft_k  @alt_l  @met_;
+    _     _       _       _       _       _       _       _       _       _
     _     @layer-mod
+)
+
+;; Extend: the whole nav/editing cluster under the right hand, held from caps.
+;; This is what makes hjkl-only TUIs a non-issue -- every one of them takes
+;; arrows, and arrows compose with counts and operators in vim (3<Down>,
+;; d<Right>), so nothing needs per-application rebinding.
+;;
+;; The arrow geometry is the same inverted-T as the nav layer below (up on the
+;; QWERTY i position, left/down/right on j/k/l) so the two don't fight each
+;; other's muscle memory.
+;;
+;; Everything else is ordered so the leftward key is the earlier position in
+;; the document: home before end, pgup before pgdn, left before right.
+;;
+;; The left hand stays transparent, which means it falls through to the home
+;; row mods in `default`: hold caps + f for ctrl, + d for shift, and the
+;; arrows become word-wise motions and selections.
+(deflayer extend
+    _     _       _       _       _       _       _
+    _     _       _       _       _       _       ins     home    up      end     del
+    _     _       _       _       _       _       esc     left    down    right   bspc
+    _     _       _       _       _       ret     pgup    pgdn    tab     S-tab
+    _     _
 )
 
 (deflayer nav
     _     _       _       _       _       _       _
     _     _       _       up      _       _       _       _       up      _       _
     _     _       left    down    right   _       _       left    down    right   _
-    _     _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
     _     _
 )
 
@@ -81,7 +110,7 @@
     _     (layer-switch default) (layer-switch nomod) (layer-switch left-hand) _ _ _
     _     _       _       _       _       _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _
-    _     _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
     _     _
 )
 
@@ -89,7 +118,7 @@
     _     _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _
-    _     _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
     _     @layer-mod
 )
 
@@ -97,7 +126,7 @@
     _     _       _       _       _       _       _
     _     _       _       _       _       _       _       _       _       _       _
     _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h  @ctl_j  @sft_k  @alt_l  @met_;
-    _     _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
     @spc_mirror   @layer-mod
 )
 
@@ -105,6 +134,6 @@
     @mir_grv @mir_1 @mir_2 @mir_3 @mir_4 @mir_5 @mir_6
     bspc  @mir_q  @mir_w  @mir_e  @mir_r  @mir_t  _       _       _       _       _
     ret   @mir_a  @mir_s  @mir_d  @mir_f  @mir_g  _       _       _       _       _
-    @mir_z @mir_x @mir_c @mir_v @mir_b
+    @mir_z @mir_x @mir_c @mir_v @mir_b  _       _       _       _       _
     _     _
 )
