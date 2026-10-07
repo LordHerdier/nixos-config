@@ -20,7 +20,7 @@
   # System-wide color tokens. Individual apps can pin a different
   # palette through their own option (my.kitty.palette, my.nvim.palette);
   # everything else follows this.
-  my.theme.default = "kanagawa";
+  my.theme.default = "gruvbox-nightfox";
 
   home.sessionVariables = {
     NIX_HOST = hostName;
