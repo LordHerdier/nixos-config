@@ -8,6 +8,7 @@
     ../modules/kitty.nix
     ../modules/steam.nix
     ../modules/games.nix
+    ../modules/gnome-extensions
   ];
 
   # font-rendering.nix isn't needed here: it exists to hand GTK/Qt apps
@@ -17,50 +18,24 @@
 
   my.kitty.enable = true;
 
-  # Vanilla GNOME only shows the dash inside the Activities overview.
-  # dash-to-dock pins it to the desktop as a persistent taskbar/dock.
-  home.packages = [ pkgs.gnomeExtensions.dash-to-dock ];
+  # GNOME Tweaks exposes the dconf keys Settings doesn't: the GTK/icon
+  # theme pickers, fonts and hinting, titlebar buttons, and the Startup
+  # Applications list. It's GNOME-session-specific, so it lives here
+  # rather than in the shared desktop-packages.nix that the Hyprland
+  # profile also imports.
+  #
+  # Caveat worth knowing before reaching for it: Tweaks is just a dconf
+  # editor with a nice face, so any key Home Manager already manages
+  # will be written back over on the next activation. On Apthos that
+  # includes gtk-theme, color-scheme, accent-color, font-name and
+  # button-layout, all set by oneshot-gtk.nix -- change those in Nix,
+  # and use Tweaks for the rest.
+  home.packages = [ pkgs.gnome-tweaks ];
 
-  dconf.settings = {
-    "org/gnome/shell".enabled-extensions = [ "dash-to-dock@micxgx.gmail.com" ];
-    "org/gnome/shell/extensions/dash-to-dock" = {
-      # Position and reach: a full-width bar glued to the bottom edge
-      # (panel mode), with the icons themselves centred rather than
-      # left-aligned. always-center-icons only has an effect while
-      # extend-height is on.
-      dock-position = "BOTTOM";
-      extend-height = true;
-      always-center-icons = true;
-      multi-monitor = true;
-
-      # Visibility. dock-fixed keeps it on screen; intellihide is what
-      # pulls it out of the way of a window that would overlap it.
-      dock-fixed = true;
-      autohide = false;
-      intellihide = true;
-
-      # Icons. 32px is a cap, not a fixed size — the dock still shrinks
-      # icons below this when the dash outgrows the screen width.
-      dash-max-icon-size = 32;
-      custom-theme-shrink = true;
-
-      show-favorites = true;
-      show-running = true;
-
-      # The overview is still the way to find an app that isn't pinned,
-      # so keep it on login rather than dropping straight to a bare
-      # desktop. The key is phrased negatively in the schema.
-      disable-overview-on-startup = false;
-
-      scroll-action = "switch-workspace";
-
-      # Per-window counter under each icon instead of the single default
-      # dot, so the dock shows how many windows an app has open.
-      custom-theme-customize-running-dots = true;
-      running-indicator-style = "SEGMENTED";
-
-      # Dock background fades in only when a window is near/behind it.
-      transparency-mode = "DYNAMIC";
-    };
+  # Each extension's packaging and dconf settings live in its own file
+  # under ../modules/gnome-extensions.
+  my.gnome-extensions = {
+    dash-to-dock.enable = true;
+    just-perfection.enable = true;
   };
 }

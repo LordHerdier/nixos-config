@@ -17,7 +17,7 @@
 # never happens; don't wire it back to start automatically without a real
 # fix for the crash upstream.
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   # Matches the TV's refresh rate / HDR to whatever a connecting Moonlight
@@ -72,11 +72,53 @@ let
       exec ${displaySync}/bin/apthos-display-sync stop
     '';
   };
+
+  # nixpkgs builds Sunshine with SUNSHINE_ENABLE_CUDA=false unless cudaSupport
+  # is set (pkgs/by-name/su/sunshine/package.nix), and config.cudaSupport is
+  # off by default. Without it SUNSHINE_BUILD_CUDA is never defined, so
+  # make_avcodec_encode_device() has no CUDA branch to take and falls through
+  # to a plain software encode device -- while the PipeWire capture side still
+  # negotiates DMA-BUF buffers, because that decision only tests
+  # `mem_type == cuda && display_is_nvidia` and is *not* behind the same
+  # #ifdef. The software path then assigns a GPU buffer straight to
+  # sws_input_frame->data[0], so every single frame dies in sws_scale with
+  # "Couldn't scale frame: Invalid argument" / "Could not convert image":
+  # Moonlight connects, input works (that's a separate path), and the picture
+  # is black forever while Sunshine rebuilds the encoder per failed frame and
+  # leaks its way to several GB of RSS. Enabling CUDA gives the DMA-BUF import
+  # the encode device it has already negotiated for.
+  sunshinePackage =
+    (pkgs.sunshine.override {
+      cudaSupport = true;
+      cudaPackages = pkgs.cudaPackages;
+    }).overrideAttrs
+      (_: {
+        # ffmpeg's NVENC path dlopen()s libcuda.so.1 at runtime instead of
+        # linking it, and on NixOS that library lives only under the driver
+        # symlink -- it is never on the default loader path (`ldconfig -p |
+        # grep libcuda` comes back empty). Without it every nvenc probe died
+        # on "Cannot load libcuda.so.1" / "Failed to create a CUDA device:
+        # Operation not permitted", and the `encoder = "nvenc"` pin below then
+        # silently fell through Sunshine's probe order to hevc_vulkan -- i.e.
+        # straight into the flaky Vulkan path that pin exists to avoid.
+        #
+        # This has to ride in the wrapper rather than in the unit's
+        # environment: nixpkgs' own cudaSupport postFixup wraps sunshine with
+        # `--set LD_LIBRARY_PATH <vulkan-loader>`, which would discard
+        # anything systemd put there.
+        postFixup = ''
+          wrapProgram $out/bin/sunshine \
+            --set LD_LIBRARY_PATH ${
+              lib.makeLibraryPath [ pkgs.vulkan-loader ]
+            }:${pkgs.addDriverRunpath.driverLink}/lib
+        '';
+      });
 in
 
 {
   services.sunshine = {
     enable = true;
+    package = sunshinePackage;
     openFirewall = true;
     autoStart = true;
 
@@ -129,18 +171,6 @@ in
       }
     ];
   };
-
-  # ffmpeg's NVENC path dlopen()s libcuda.so.1 at runtime instead of linking
-  # it, and on NixOS that library lives only under the driver symlink -- it is
-  # never on the default loader path (`ldconfig -p | grep libcuda` comes back
-  # empty). nixpkgs' generated unit sets no LD_LIBRARY_PATH, so every nvenc
-  # probe died on "Cannot load libcuda.so.1" / "Failed to create a CUDA
-  # device: Operation not permitted", and the `encoder = "nvenc"` pin above
-  # then silently fell through Sunshine's probe order to hevc_vulkan -- i.e.
-  # straight into the flaky Vulkan path that pin exists to avoid. Without
-  # this, nvenc cannot initialise at all on this box.
-  systemd.user.services.sunshine.environment.LD_LIBRARY_PATH =
-    "${pkgs.addDriverRunpath.driverLink}/lib";
 
   systemd.user.services.apthos-display-watchdog = {
     description = "Revert Apthos's display if Sunshine's undo hook missed it";
