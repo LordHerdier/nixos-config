@@ -115,5 +115,8 @@
           panes:
             - clear
             - nvim
+      - zsh:
+          panes:
+            - clear
   '';
 }
