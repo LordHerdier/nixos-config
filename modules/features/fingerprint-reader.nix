@@ -19,8 +19,13 @@
   # tod.driver above is what actually provides the driver .so.
 
   services.udev.extraRules = ''
-    # Disable USB autosuspend for Goodix fingerprint reader (27c6:609c)
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="27c6", ATTR{idProduct}=="609c", ATTR{power/autosuspend}="-1", ATTR{power/persist}="0"
+    # Keep the Goodix fingerprint reader (27c6:609c) from autosuspending.
+    # systemd's hwdb ships ID_AUTOSUSPEND=1 for this device, so the stock
+    # 60-autosuspend.rules leaves power/control at "auto"; a negative
+    # autosuspend delay is what actually stops it from suspending.
+    # power/persist is deliberately not set here -- hwdb already carries
+    # ID_PERSIST=0 for 27C6:609C, so 60-autosuspend.rules writes it for us.
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="27c6", ATTR{idProduct}=="609c", ATTR{power/autosuspend}="-1"
   '';
 
   security.polkit.extraConfig = ''
