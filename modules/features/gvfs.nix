@@ -7,5 +7,4 @@
   environment.systemPackages = [
     pkgs.gvfs
   ];
-  users.users.charlotte.extraGroups = [ "plugdev" ];
 }

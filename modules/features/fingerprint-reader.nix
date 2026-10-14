@@ -11,7 +11,12 @@
     tod.driver = pkgs.libfprint-2-tod1-goodix;
   };
 
-  services.udev.packages = [ pkgs.libfprint-2-tod1-goodix ];
+  # Deliberately NOT adding libfprint-2-tod1-goodix to services.udev.packages.
+  # The rules file it ships only matches Goodix 538c/533c/530c/5840; the sensor
+  # in this machine is 27c6:609c, so every line is inert here and the only
+  # effect is four "Failed to resolve group 'plugdev'" warnings per device
+  # event (plugdev is a Debian convention that does not exist on NixOS).
+  # tod.driver above is what actually provides the driver .so.
 
   services.udev.extraRules = ''
     # Disable USB autosuspend for Goodix fingerprint reader (27c6:609c)
