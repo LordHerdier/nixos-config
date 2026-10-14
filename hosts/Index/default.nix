@@ -34,6 +34,7 @@
     ../../modules/features/nix-ld.nix
     ../../modules/common/fonts.nix
     ../../modules/features/syncthing.nix
+    ../../modules/features/zram.nix
   ];
 
   system.stateVersion = "25.11";
