@@ -6,21 +6,43 @@
 { lib, ... }:
 
 let
-  # ── Colemak movement (shared across n/v/x/o) ──────────────────────
-  colemakMoves = [
+  # ── Colemak movement ──────────────────────────────────────────────
+  # Vertical movement is safe everywhere, operator-pending included:
+  # `du` / `de` act linewise and shadow nothing.
+  verticalMoves = [
     { key = "u";  action = "k";  desc = "Move up"; }
     { key = "e";  action = "j";  desc = "Move down"; }
-    { key = "n";  action = "h";  desc = "Move left"; }
-    { key = "i";  action = "l";  desc = "Move right"; }
     { key = "gu"; action = "gk"; desc = "Move up (wrapped)"; }
     { key = "ge"; action = "gj"; desc = "Move down (wrapped)"; }
   ];
 
-  moveModes = [ "n" "v" "x" "o" ];
+  # Horizontal movement deliberately skips operator-pending mode. There `i`
+  # and `a` introduce a textobject, so binding `i` -> `l` swallowed every
+  # inner textobject: `ciw` parsed as `cl` followed by a literal "w", and
+  # `ci(`, `yi{`, `di"` and friends were dead the same way. `a`-prefixed
+  # textobjects were unaffected, which is why `caw` kept working.
+  #
+  # Nothing is lost but `dn` / `di` (delete one character left/right);
+  # `dh` / `dl` still do that, since neither is mapped in this mode.
+  #
+  # Visual mode keeps the mapping on purpose, so `i` still extends a
+  # selection rightward. The cost is that `vi(` / `viw` stay unavailable --
+  # use the operator form (`ci(`) or the explicit treesitter textobjects
+  # from plugins/97-textobjects.nix instead.
+  horizontalMoves = [
+    { key = "n";  action = "h";  desc = "Move left"; }
+    { key = "i";  action = "l";  desc = "Move right"; }
+  ];
 
-  movementKeymaps = builtins.concatMap
-    (mode: map (m: m // { inherit mode; }) colemakMoves)
-    moveModes;
+  allModes = [ "n" "v" "x" "o" ];
+  nonOperatorModes = [ "n" "v" "x" ];
+
+  withModes = modes: moves:
+    builtins.concatMap (mode: map (m: m // { inherit mode; }) moves) modes;
+
+  movementKeymaps =
+    withModes allModes verticalMoves
+    ++ withModes nonOperatorModes horizontalMoves;
 in
 {
   config.vim.globals = {
