@@ -12,6 +12,9 @@
 
 local mainMod = "SUPER"
 
+-- Not auto-loaded; see 45-crt.nix.
+local crt = require("crt")
+
 -- Noctalia shell IPC (routed through the shell for OSD feedback)
 local ipc = "noctalia-shell ipc call "
 
@@ -82,9 +85,8 @@ hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(ipc .. "nightLight toggle"))
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(ipc .. "idleInhibitor toggle"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(ipc .. "plugin:screen-recorder toggle"))
 
--- Display filters. Still the crt-toggle script off PATH (home.packages in
--- 45-crt.nix); it becomes a Lua closure in the next commit.
-hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd("crt-toggle"))
+-- Display filters
+hl.bind(mainMod .. " + SHIFT + G", crt.toggle)
 
 -- Window management
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
