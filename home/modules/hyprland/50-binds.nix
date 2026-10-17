@@ -80,6 +80,9 @@
       "$mainMod SHIFT, I, exec, $ipc idleInhibitor toggle"
       "$mainMod SHIFT, R, exec, $ipc plugin:screen-recorder toggle"
 
+      # Display filters
+      "$mainMod SHIFT, G, exec, $crtToggle"
+
       # Window management
       "$mainMod, F, fullscreen"
       "$mainMod, P, pseudo"

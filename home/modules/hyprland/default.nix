@@ -7,6 +7,7 @@
     ./20-monitors.nix
     ./30-input.nix
     ./40-design.nix
+    ./45-crt.nix
     ./50-binds.nix
     ./hypridle.nix
     ./hyprlock.nix
