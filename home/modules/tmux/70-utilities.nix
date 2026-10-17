@@ -64,7 +64,11 @@ in
     text = ''
       #!${pkgs.bash}/bin/bash
       PLAYER="spotify_player,spotify"
-      MAX_LEN=30
+      # Kept short on purpose: this chunk shares status-right with a
+      # neovim statusline (see ../nvf/plugins/96-tpipeline.nix), and the
+      # branch / line:col segments are the ones that get truncated away
+      # when the track title runs long.
+      MAX_LEN=18
       status=$(${pkgs.playerctl}/bin/playerctl --player="$PLAYER" status 2>/dev/null)
       case "$status" in
         Playing) icon="♪" ;;

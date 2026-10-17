@@ -52,7 +52,10 @@
 
   config.vim.luaConfigRC.pane-borders = # lua
     ''
-      vim.opt.laststatus = 3 -- global statusline (avoids double bar)
+      -- Global statusline, so splits do not each get their own bar. Inside
+      -- tmux this is overridden to 0 by vim-tpipeline, which moves the bar
+      -- into the tmux status line instead (see plugins/96-tpipeline.nix).
+      vim.opt.laststatus = 3
       vim.opt.fillchars:append("vert:│,horiz:─,horizup:┴,horizdown:┬,vertleft:┤,vertright:├,verthoriz:┼")
     '';
 }
