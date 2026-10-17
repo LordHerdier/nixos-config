@@ -3,7 +3,10 @@
 { ... }:
 
 {
-  wayland.windowManager.hyprland.settings = {
+  # Everything that was a top-level hyprlang section now lives under
+  # `config`, which the modules merge into a single hl.config({ ... })
+  # call. See 40-design.nix for the rest of it.
+  wayland.windowManager.hyprland.settings.config = {
     input = {
       kb_layout = "us";
       kb_variant = "colemak";
