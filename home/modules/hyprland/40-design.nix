@@ -1,9 +1,16 @@
 # home/modules/hyprland/40-design.nix
 
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
   cursorSize = 32;
+
+  # The desktop's colors are noctalia's at runtime, but the window border
+  # is not something noctalia can reach -- see the README's theme note.
+  # So it is the one piece of Hyprland chrome that is declared, and it is
+  # declared from `my.theme` rather than from literals.
+  r = config.my.theme.active.roles;
+  inherit (config.my.theme.lib) rgbaCsv;
 in
 {
   home.pointerCursor = {
@@ -122,17 +129,22 @@ in
 
         # The quoted dotted keys are gone: col is a real nested table, and
         # a gradient is { colors, angle } instead of the hyprlang
-        # "rgba(..) rgba(..) 120deg" string. This is the shape that would
-        # let my.theme feed the border colors; see the README's hypr note.
+        # "rgba(..) rgba(..) 120deg" string -- which is what lets the
+        # roles below be dropped in with no string assembly.
+        #
+        # The gradient runs `border` -> `accentDim`, i.e. the border hue
+        # fading toward the background, because no role names "the other
+        # end of the active border" and inventing one for a single
+        # consumer would be worse than deriving it.
         col = {
           active_border = {
             colors = [
-              "rgba(113,255,255,0.33)"
-              "rgba(82,113,163,0.3)"
+              (rgbaCsv r.border 0.33)
+              (rgbaCsv r.accentDim 0.3)
             ];
             angle = 120;
           };
-          inactive_border = "rgba(89,70,196,0.3)";
+          inactive_border = rgbaCsv r.borderInactive 0.3;
         };
 
         resize_on_border = true;

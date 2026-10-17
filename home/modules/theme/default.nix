@@ -6,9 +6,12 @@
 # SCOPE. This governs the terminal/editor/TUI stack and the GTK theme.
 # It deliberately does NOT govern the Hyprland desktop: noctalia derives
 # its colors from the wallpaper at runtime, and that is the source of
-# truth there. The one exception is a cold start -- see
-# home/modules/hyprland/hyprlock-colors.nix, which falls back to this
-# palette only until noctalia has written its colors once.
+# truth there. Two exceptions, both because noctalia cannot reach them:
+# a cold start -- see home/modules/hyprland/hyprlock-colors.nix, which
+# falls back to this palette only until noctalia has written its colors
+# once -- and the window border colors in
+# home/modules/hyprland/40-design.nix, which are declared from the
+# `border`/`accentDim`/`borderInactive` roles outright.
 #
 # WHAT A CONSUMER READS. `my.theme.palettes.<name>` is a resolved theme:
 #

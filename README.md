@@ -176,22 +176,21 @@ colors from the wallpaper at runtime, and that is the source of truth
 there. the bar, the shell and the lock screen all follow noctalia; see
 `hyprlock-colors.nix` for how the lock screen picks them up.
 
-hyprland's own window border colors are the gap: they are still literals
-in `home/modules/hyprland/40-design.nix`, neither tokenized nor
-runtime-driven. closing it is a nix-side job now rather than a noctalia
-one. under the lua config a gradient is structured data —
-`col.active_border = { colors = [ ... ]; angle = 120; }` instead of an
-`"rgba(..) rgba(..) 120deg"` string — so `my.theme` could feed it
-directly, with no string assembly. noctalia's own hyprland template is
-out: it has to be enabled in its gui, it defines no foreground color,
-and its post-process step edits `~/.config/hypr/hyprland.conf`, which no
-longer exists here at all.
+hyprland's own window border colors are the one exception. they are fed
+from `my.theme`'s roles in `home/modules/hyprland/40-design.nix` —
+`border` and `accentDim` for the two ends of the active gradient,
+`borderInactive` for the idle one — which the lua config makes cheap,
+since a gradient there is structured data (`col.active_border =
+{ colors = [ ... ]; angle = 120; }`) rather than an
+`"rgba(..) rgba(..) 120deg"` string. noctalia cannot drive them: its
+hyprland template has to be enabled in its gui, defines no foreground
+color, and its post-process step edits `~/.config/hypr/hyprland.conf`,
+which no longer exists here at all.
 
-what is left is a policy question rather than a plumbing one. borders fed
-from `my.theme` would be *declared*, where everything else on this
-desktop is wallpaper-derived at runtime — so doing it would make the
-border the one part of the hyprland desktop that does not follow
-noctalia.
+so the border is *declared* where the rest of this desktop is
+wallpaper-derived at runtime. that is a deliberate trade — tokenized and
+consistent with the terminal stack, at the cost of being the one piece of
+hyprland chrome that does not follow the wallpaper.
 
 ---
 
