@@ -1,6 +1,6 @@
 # home/modules/hyprland/45-crt.nix
 
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   shaderPath = ".config/hypr/shaders/crt.frag";
@@ -39,9 +39,9 @@ in
 
   home.packages = [ toggle ];
 
-  # Bound to $mainMod SHIFT, G in 50-binds.nix. Deliberately off at
-  # login: a shader that fails to compile leaves a black screen, and
-  # recovering from that means blind-typing hyprctl. Opting in per
-  # session keeps a bad shader edit from costing a login.
-  wayland.windowManager.hyprland.settings."$crtToggle" = lib.getExe toggle;
+  # Bound to SUPER + SHIFT + G in binds.lua, which calls the script off
+  # PATH. Deliberately off at login: a shader that fails to compile
+  # leaves a black screen, and recovering from that means blind-typing
+  # hyprctl. Opting in per session keeps a bad shader edit from costing a
+  # login.
 }
