@@ -51,6 +51,23 @@ each module handles one concern. profiles compose modules into roles. hosts stay
 
 idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → suspend at 30 min.
 
+hyprland is configured in **lua**, not hyprlang. `home/modules/hyprland/`
+sets `configType = "lua"`, so home-manager generates
+`~/.config/hypr/hyprland.lua` from `settings`, alongside `binds.lua` and
+`crt.lua` — hand-written lua loaded through `extraLuaFiles`, because
+~90 `hl.bind()` calls and a closure that toggles a shader do not fit
+through nix attrs. hyprlock and hypridle are separate programs with
+their own hyprlang parsers and are untouched by this.
+
+two consequences worth knowing. hyprland picks its config format once at
+startup and never re-checks, so switching a host to lua needs a logout,
+not a reload — a reload makes it regenerate a stub `hyprland.conf` and
+the desktop comes up looking unconfigured. and `hyprctl keyword` is
+rejected under the lua parser; `hyprctl eval '<lua>'` replaces it, which
+is also the only way to inspect or poke config state by hand.
+`home/modules/hyprland/MIGRATION.md` has the details and the pre-switch
+verification recipe.
+
 the lock screen's colors follow noctalia's current scheme rather than
 `my.theme`. noctalia rewrites `~/.config/noctalia/colors.json` whenever
 the scheme changes; `home/modules/hyprland/hyprlock-colors.nix` turns
@@ -161,9 +178,20 @@ there. the bar, the shell and the lock screen all follow noctalia; see
 
 hyprland's own window border colors are the gap: they are still literals
 in `home/modules/hyprland/40-design.nix`, neither tokenized nor
-runtime-driven. noctalia's hyprland template would cover them, but it has
-to be enabled in its gui and its post-process step wants to edit
-`~/.config/hypr/hyprland.conf`, which is a read-only store symlink here.
+runtime-driven. closing it is a nix-side job now rather than a noctalia
+one. under the lua config a gradient is structured data —
+`col.active_border = { colors = [ ... ]; angle = 120; }` instead of an
+`"rgba(..) rgba(..) 120deg"` string — so `my.theme` could feed it
+directly, with no string assembly. noctalia's own hyprland template is
+out: it has to be enabled in its gui, it defines no foreground color,
+and its post-process step edits `~/.config/hypr/hyprland.conf`, which no
+longer exists here at all.
+
+what is left is a policy question rather than a plumbing one. borders fed
+from `my.theme` would be *declared*, where everything else on this
+desktop is wallpaper-derived at runtime — so doing it would make the
+border the one part of the hyprland desktop that does not follow
+noctalia.
 
 ---
 

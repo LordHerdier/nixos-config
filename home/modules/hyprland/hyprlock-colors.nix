@@ -21,8 +21,9 @@
 # (settings.json is GUI-owned after first activation, so we can't enable
 # it declaratively), it defines no foreground color, and its
 # postProcess step tries to edit ~/.config/hypr/hyprland.conf, which
-# here is a read-only store symlink. Reading colors.json instead needs
-# no GUI state and no cooperation: that file is always written.
+# does not exist here at all any more -- this config generates
+# hyprland.lua. Reading colors.json instead needs no GUI state and no
+# cooperation: that file is always written.
 #
 # WHY NO inotify WATCH. hyprlock parses its config when it launches, so
 # the file only has to be correct at that moment. Regenerating it in
