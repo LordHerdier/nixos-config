@@ -1,13 +1,6 @@
 {
   description = "Nix configs for Charlotte's machines (WSL + NixOS)";
 
-  nixConfig = {
-    extra-substituters = [ "https://noctalia.cachix.org" ];
-    extra-trusted-public-keys = [
-      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-    ];
-  };
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -30,7 +23,7 @@
 
     qylock.url = "github:Darkkal44/qylock";
 
-    noctalia.url = "github:noctalia-dev/noctalia/legacy-v4";
+    noctalia.url = "github:noctalia-dev/noctalia";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
 
     hacky-tts.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git";

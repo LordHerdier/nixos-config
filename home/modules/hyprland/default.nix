@@ -45,7 +45,7 @@
           "hyprland.start"
           (lib.generators.mkLuaInline ''
             function()
-              hl.exec_cmd("noctalia-shell")
+              hl.exec_cmd("noctalia")
               hl.exec_cmd("hyprpolkitagent")
               -- gnome-keyring is started by PAM at login via
               -- services.gnome.gnome-keyring.enable (system config).

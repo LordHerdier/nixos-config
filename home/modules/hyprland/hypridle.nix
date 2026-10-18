@@ -7,11 +7,12 @@
     enable = true;
     settings = {
       general = {
-        # hyprlock parses its config at launch, so refreshing the
-        # generated color file here is what keeps the lock screen on
-        # noctalia's current scheme -- see hyprlock-colors.nix. It runs
-        # unconditionally, before the `pidof` guard, so the colors are
-        # current even when hyprlock is already up.
+        # noctalia renders the generated color file itself now (see
+        # hyprlock-colors.nix), so this is only the guard against it not
+        # existing at all -- a host where noctalia has never run, where
+        # `source`-ing it would otherwise stop hyprlock from coming up.
+        # It is a no-op once the file is there, and runs before the
+        # `pidof` guard so a lock cannot race the seeding.
         lock_cmd = [
           "${config.my.hyprlock-colors.package}/bin/hyprlock-colors; pidof hyprlock || hyprlock"
           "pidof mpvpaper || mpvpaper"
