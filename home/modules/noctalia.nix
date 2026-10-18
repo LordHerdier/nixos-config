@@ -35,8 +35,6 @@
 
 let
   hlColors = config.my.hyprlock-colors;
-
-  palettes = ./noctalia-palettes;
 in
 {
   imports = [ inputs.noctalia.homeModules.default ];
@@ -53,10 +51,16 @@ in
     # palettes/<name>.json and the payload format is unchanged. Copied
     # into the repo so they survive a fresh home, which they would not
     # have as GUI-created files.
+    #
+    # Path literals, and they have to be: the module's generator takes a
+    # string as the file's *contents*, so an interpolated
+    # "${palettes}/x.json" lands in palettes/ as a file whose body is a
+    # store path, which noctalia then fails to parse at column 1. Only a
+    # real path hits its isPath branch and gets used as the source.
     customPalettes = {
-      "Lilac AMOLED" = "${palettes}/lilac-amoled.json";
-      "Neon Surf" = "${palettes}/neon-surf.json";
-      "Rosey AMOLED" = "${palettes}/rosey-amoled.json";
+      "Lilac AMOLED" = ./noctalia-palettes/lilac-amoled.json;
+      "Neon Surf" = ./noctalia-palettes/neon-surf.json;
+      "Rosey AMOLED" = ./noctalia-palettes/rosey-amoled.json;
     };
 
     settings = {
