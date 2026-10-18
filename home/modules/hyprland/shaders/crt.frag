@@ -43,7 +43,7 @@ const float CORNER_AA_PX = 1.5;  // softness of the bezel edge, in pixels
 
 // -- beam -------------------------------------------------------------
 const float SCAN_PERIOD   = 6.0;  // physical pixels per scanline pair
-const float SCAN_DEPTH    = 0.55; // 0.0 disables scanlines entirely
+const float SCAN_DEPTH    = 0.75; // 0.0 disables scanlines entirely
 const float SCAN_HARD     = -1.0; // beam falloff; more negative is tighter
 const float BEAM_MIN      = 0.30; // beam width in the shadows, in periods
 const float BEAM_MAX      = 0.55; // beam width in the highlights
