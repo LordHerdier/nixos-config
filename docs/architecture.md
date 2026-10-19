@@ -29,7 +29,9 @@ per tool, `home/profiles/` bundles them into roles
 `home/hosts/*.nix` is the thin per-machine layer that picks a profile and
 adds anything genuinely host-specific (e.g. `home/hosts/Index.nix` turns
 on easyeffects; `home/hosts/Apthos.nix` pulls in the oneshot rice
-modules).
+modules; `home/hosts/Charlie-Laptop.nix` forces `my.theme.default` to
+`kanagawa`, overriding the `oneshot` default `home/charlotte.nix` sets
+for everyone else).
 
 ## `mkHost`, in `flake.nix`
 

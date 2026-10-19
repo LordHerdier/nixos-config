@@ -102,6 +102,10 @@ nixos-wsl. `hosts/Charlie-Laptop/default.nix`.
 - `charlotte` added to the `kvm` group
 - home side: `home/profiles/wsl.nix` only — no desktop, no kmonad (wsl
   has no raw evdev access to the host keyboard anyway)
+- `home/hosts/Charlie-Laptop.nix` overrides `my.theme.default` to
+  `kanagawa` (`lib.mkForce`, since `home/charlotte.nix` sets the
+  `oneshot` default as a plain value) — everywhere else follows
+  charlotte's `oneshot` default
 
 ## nico
 
@@ -121,3 +125,4 @@ nixos-wsl, minimal. `hosts/Nico/default.nix`.
 | syncthing | no | yes | yes | yes | no |
 | docker | dev-docker | dev-docker | dev-docker | wsl docker-desktop | wsl docker-desktop |
 | second user | no | kiddo | no | no | no |
+| theme | oneshot | oneshot | oneshot | kanagawa | oneshot |
