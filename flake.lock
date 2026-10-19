@@ -190,11 +190,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792448977,
-        "narHash": "sha256-GPX4qd2Geh+JzD4Z1pU1sfz3vpbW05oCd5XScHacr2Y=",
+        "lastModified": 1792449275,
+        "narHash": "sha256-s1vmsTtc3fJbob4QSafPGGcmxdNfHQcIkmSG3tQV3GE=",
         "owner": "LordHerdier",
         "repo": "hyprCRT-shader",
-        "rev": "282343b8d644d0d3ae351f5173163448b150434d",
+        "rev": "cb5372ba61f911c2edcef357ec2b5c308ae057fd",
         "type": "github"
       },
       "original": {
