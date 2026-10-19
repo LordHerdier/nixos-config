@@ -26,10 +26,10 @@
     noctalia.url = "github:noctalia-dev/noctalia";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
 
-    hacky-tts.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git";
+    hacky-tts.url = "git+https://git.lorscapa.com/LordHerdier/hacky-tts.git";
     hacky-tts.inputs.nixpkgs.follows = "nixpkgs";
 
-    hacky-launcher.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git";
+    hacky-launcher.url = "git+https://git.lorscapa.com/LordHerdier/hacky-launcher.git";
     hacky-launcher.inputs.nixpkgs.follows = "nixpkgs";
     forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";

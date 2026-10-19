@@ -2,12 +2,38 @@
 
 > nix flakes + home-manager configuration for five machines
 
+[![flake check](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml/badge.svg)](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml)
+[![nixpkgs](https://img.shields.io/badge/nixpkgs-unstable-blue?logo=nixos&logoColor=white)](https://github.com/NixOS/nixpkgs/tree/nixos-unstable)
+[![license](https://img.shields.io/badge/license-unlicense-lightgrey)](LICENSE)
+
+every machine is a `mkHost` call that picks a profile; profiles compose
+opt-in feature modules; modules stay single-concern. the payoff is that a new
+host is a handful of lines, not a fork of an existing one — and the same
+conventions (colemak, theming, module shape) hold everywhere from a bare-metal
+laptop to a WSL dev shell.
+
 colemak _everywhere_. system keyboard layout, kmonad homerow mods on the native
 hosts, tmux/nvim/spotify-player navigation; it's all colemak, all sourced from
 the same convention. see [keyboard](#keyboard) below.
 
 the one deliberate exception is my sister's gnome session on index, which gets
 plain qwerty — see [`docs/kiddo.md`](docs/kiddo.md).
+
+---
+
+## contents
+
+- [documentation](#documentation)
+- [hosts](#hosts)
+- [structure](#structure)
+- [desktop — pine / index](#desktop--pine--index)
+- [desktop — apthos](#desktop--apthos)
+- [color tokens](#color-tokens)
+- [shell](#shell)
+- [editor](#editor)
+- [keyboard](#keyboard)
+- [flake inputs](#flake-inputs)
+- [usage](#usage)
 
 ---
 
@@ -78,6 +104,9 @@ home-manager users, how a host picks up its modules) is in
 idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → suspend
 at 30 min.
 
+<details>
+<summary>deep dive: lua config + lock screen colors</summary>
+
 hyprland is configured in **lua**, not hyprlang. `home/modules/hyprland/` sets
 `configType = "lua"`, so home-manager generates `~/.config/hypr/hyprland.lua`
 from `settings`, alongside `binds.lua` and `crt.lua` — hand-written lua loaded
@@ -102,6 +131,8 @@ only moment it has to be right. if noctalia hasn't written colors.json yet, the
 generator falls back to `my.theme`; that is the one place the declared palette
 touches the hyprland desktop, and only as a cold start.
 
+</details>
+
 ---
 
 ## desktop — apthos
@@ -111,6 +142,17 @@ bare metal. gnome (wayland), autologin, driven remotely over sunshine/moonlight.
 riced after OneShot's in-fiction "World Machine" OS — pure black surfaces, one
 saturated purple accent (`#9664ff`), square corners, inverted selection.
 
+| component      | source                                                              |
+| -------------- | ------------------------------------------------------------------- |
+| cursor         | `pkgs/oneshot-cursors` → `home/modules/oneshot-cursors.nix`         |
+| gtk2/3/4 theme | `pkgs/oneshot-gtk-theme` → `home/modules/oneshot-gtk.nix`           |
+| icons          | `pkgs/oneshot-icons` → `home/modules/oneshot-icons.nix`             |
+| wallpaper      | `pkgs/oneshot-wallpaper` → `home/modules/oneshot-wallpaper.nix`     |
+| dock           | dash-to-dock, bottom panel mode (`home/profiles/desktop-gnome.nix`) |
+
+<details>
+<summary>deep dive: gtk theming internals + asset provenance</summary>
+
 the gtk stylesheets' colors are build arguments, not literals.
 `pkgs/oneshot-gtk-theme` takes six (`background`, `backgroundHover`, `accent`,
 `accentDim`, `accentMuted`, `accentStandalone`) and remaps every call site by
@@ -119,14 +161,6 @@ value; `home/modules/oneshot-gtk.nix` fills them from the `oneshot` palette in
 stylesheets byte for byte, so they stay readable as plain css.
 `my.oneshot-gtk.palette` re-skins the whole theme — gtk2, gtk3, gtk4, the gnome
 accent enum and the wallpaper letterbox — without touching a stylesheet.
-
-| component      | source                                                              |
-| -------------- | ------------------------------------------------------------------- |
-| cursor         | `pkgs/oneshot-cursors` → `home/modules/oneshot-cursors.nix`         |
-| gtk2/3/4 theme | `pkgs/oneshot-gtk-theme` → `home/modules/oneshot-gtk.nix`           |
-| icons          | `pkgs/oneshot-icons` → `home/modules/oneshot-icons.nix`             |
-| wallpaper      | `pkgs/oneshot-wallpaper` → `home/modules/oneshot-wallpaper.nix`     |
-| dock           | dash-to-dock, bottom panel mode (`home/profiles/desktop-gnome.nix`) |
 
 both theme modules drive gnome through **dconf**, not home-manager's `gtk`
 module: gnome-settings-daemon overrides anything written to
@@ -156,6 +190,8 @@ plus four original widget PNGs.
 
 upstream for all four is `~/documents/code/oneshot-twm-rice`; each package's
 default.nix names the `nix run .#...` command that regenerates it.
+
+</details>
 
 ---
 
