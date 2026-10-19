@@ -2,20 +2,24 @@
 # Sunshine self-hosted game stream host, for Moonlight clients to connect to.
 #
 # Runs as a per-user systemd unit tied to graphical-session.target, so it
-# only comes up once a Wayland/X session (e.g. GNOME via SDDM) is
+# only comes up once a Wayland/X session (e.g. GNOME via GDM) is
 # actually logged in and running.
 #
-# Do not run this alongside gnome-remote-desktop-headless (modules/features/
-# rdp.nix). Confirmed on this box: with an RDP client connected (so Mutter
-# has a virtual monitor up alongside the TV's real one) and Sunshine also
-# attached, a monitor reconfig -- the exact ApplyMonitorsConfig call
-# apthos-display-sync makes below -- segfaulted GNOME Shell itself
-# (crashed in mutter's meta_stage_view_inhibit_cursor_overlay, via
-# on_monitors_changed), taking down the whole session: Sunshine, the
-# portals, everything running under graphical-session.target. rdp.nix
-# keeps the RDP service manual/on-demand specifically so this combination
-# never happens; don't wire it back to start automatically without a real
-# fix for the crash upstream.
+# Never let an RDP session share this session's Mutter. Confirmed on this
+# box back when rdp.nix ran gnome-remote-desktop in headless mode: with an
+# RDP client connected (so Mutter had a virtual monitor up alongside the
+# TV's real one) and Sunshine also attached, a monitor reconfig -- the exact
+# ApplyMonitorsConfig call apthos-display-sync makes below -- segfaulted
+# GNOME Shell itself (crashed in mutter's
+# meta_stage_view_inhibit_cursor_overlay, via on_monitors_changed), taking
+# down the whole session: Sunshine, the portals, everything running under
+# graphical-session.target.
+#
+# rdp.nix now runs in system mode, where GDM gives each RDP client a
+# separate session with its own Mutter, so the two never share a compositor
+# and the service can stay always-on. That's the property to preserve: if
+# RDP is ever moved back to a mode that attaches to the logged-in session,
+# this crash comes back with it.
 
 {
   config,
@@ -172,7 +176,9 @@ in
       { name = "Desktop"; }
       {
         name = "Steam Big Picture";
-        detached = [ "${pkgs.util-linux}/bin/setsid ${pkgs.steam}/bin/steam steam://open/bigpicture" ];
+        detached = [
+          "${pkgs.util-linux}/bin/setsid ${config.programs.steam.package}/bin/steam steam://open/bigpicture"
+        ];
       }
     ];
   };
