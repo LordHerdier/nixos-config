@@ -183,6 +183,26 @@
         "type": "github"
       }
     },
+    "hyprCRT-shader": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792447298,
+        "narHash": "sha256-7v19fVh3fNpzHB+lyRTfQ57XFv0iZZJys+a3Bz5i5ro=",
+        "owner": "LordHerdier",
+        "repo": "hyprCRT-shader",
+        "rev": "be08e81331f0f93239ce7b5721d05416f65d337e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "LordHerdier",
+        "repo": "hyprCRT-shader",
+        "type": "github"
+      }
+    },
     "mnw": {
       "locked": {
         "lastModified": 1784154424,
@@ -353,6 +373,7 @@
         "hacky-launcher": "hacky-launcher",
         "hacky-tts": "hacky-tts",
         "home-manager": "home-manager",
+        "hyprCRT-shader": "hyprCRT-shader",
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",

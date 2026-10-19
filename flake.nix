@@ -34,6 +34,9 @@
     forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
 
+    hyprCRT-shader.url = "github:LordHerdier/hyprCRT-shader";
+    hyprCRT-shader.inputs.nixpkgs.follows = "nixpkgs";
+
     # Upstream, not the pfaj fork: the fork lags on profile options
     # (extensionButtons and newer) that home/modules/zen-browser uses.
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
