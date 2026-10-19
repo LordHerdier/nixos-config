@@ -4,6 +4,6 @@
 
 {
   home.packages = [
-    inputs.hacky-launcher.packages.${pkgs.system}.default
+    inputs.hacky-launcher.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }

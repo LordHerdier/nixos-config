@@ -17,7 +17,12 @@
 # never happens; don't wire it back to start automatically without a real
 # fix for the crash upstream.
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Matches the TV's refresh rate / HDR to whatever a connecting Moonlight

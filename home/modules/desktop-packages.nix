@@ -3,9 +3,8 @@
 { pkgs, inputs, ... }:
 
 {
-  home.packages = (
-    with pkgs;
-    [
+  home.packages =
+    (with pkgs; [
       audacity
       # bitwarden-desktop
       proton-vpn
@@ -27,9 +26,8 @@
       thunar
       tsukimi
       # winboat  # pins EOL electron-40.10.5 (insecure); re-enable when nixpkgs bumps electron
-    ]
-  )
-  ++ [
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-  ];
+    ])
+    ++ [
+      inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    ];
 }

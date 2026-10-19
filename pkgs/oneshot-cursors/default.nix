@@ -17,15 +17,17 @@
 
 { lib, runCommandLocal }:
 
-runCommandLocal "oneshot-cursors" {
-  meta = {
-    description = "Cursor theme from OneShot's World Machine desktop UI";
-    # Game art, (c) Future Cat / Komodo. Fine for a personal rice, not
-    # something to redistribute.
-    license = lib.licenses.unfree;
-    platforms = lib.platforms.all;
-  };
-} ''
-  mkdir -p "$out/share/icons"
-  cp -a ${./theme} "$out/share/icons/Oneshot-Cursors"
-''
+runCommandLocal "oneshot-cursors"
+  {
+    meta = {
+      description = "Cursor theme from OneShot's World Machine desktop UI";
+      # Game art, (c) Future Cat / Komodo. Fine for a personal rice, not
+      # something to redistribute.
+      license = lib.licenses.unfree;
+      platforms = lib.platforms.all;
+    };
+  }
+  ''
+    mkdir -p "$out/share/icons"
+    cp -a ${./theme} "$out/share/icons/Oneshot-Cursors"
+  ''

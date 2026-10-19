@@ -25,4 +25,3 @@
     bind-key -n PageDown if-shell "$is_vim" 'send-keys PageDown' 'send-keys PageDown'
   '';
 }
-

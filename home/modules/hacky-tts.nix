@@ -4,6 +4,6 @@
 
 {
   home.packages = [
-    inputs.hacky-tts.packages.${pkgs.system}.default
+    inputs.hacky-tts.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
