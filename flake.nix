@@ -67,7 +67,7 @@
           ...
         }:
         {
-          formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
+          formatter = pkgs.nixfmt;
 
           devShells.default = pkgs.mkShell {
             # `secretspec run -- ...` reads secretspec.toml and injects the
