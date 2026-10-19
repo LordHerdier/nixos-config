@@ -136,11 +136,11 @@
         "rev": "0d261cc6add99a827cc635a8415c1ac9a0ab1c68",
         "revCount": 3,
         "type": "git",
-        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git"
+        "url": "https://git.lorscapa.com/LordHerdier/hacky-launcher.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git"
+        "url": "https://git.lorscapa.com/LordHerdier/hacky-launcher.git"
       }
     },
     "hacky-tts": {
@@ -156,11 +156,11 @@
         "rev": "5f4eedef4c27cdabfdb7b5890353f9c2d4907929",
         "revCount": 4,
         "type": "git",
-        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git"
+        "url": "https://git.lorscapa.com/LordHerdier/hacky-tts.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git"
+        "url": "https://git.lorscapa.com/LordHerdier/hacky-tts.git"
       }
     },
     "home-manager": {

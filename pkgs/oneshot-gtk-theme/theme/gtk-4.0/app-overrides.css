@@ -1,0 +1,85 @@
+/* Oneshot GTK4: per-application overrides.
+ *
+ * Concatenated onto gtk-4.0/gtk.css when that is installed as the *user*
+ * stylesheet — see home/modules/oneshot-gtk.nix, which is also where the
+ * explanation of why libadwaita apps only listen to that one path lives.
+ *
+ * WHY A SEPARATE FILE AND NOT MORE RULES IN gtk.css:
+ *
+ *   gtk.css is a verbatim copy of the upstream rice (see
+ *   pkgs/oneshot-gtk-theme/default.nix), which targets XFCE and so knows
+ *   nothing about libadwaita apps. Keeping our patches here means the
+ *   next sync from upstream is still a plain copy. The colors in this
+ *   file go through the same value-based remap as the rest of the theme,
+ *   so they stay the six palette literals, not hardcoded purple.
+ *
+ * WHY ANY OF THIS IS NEEDED AT ALL — the one cascade rule that matters:
+ *
+ *   GTK sorts matched declarations by provider priority before
+ *   specificity, so a USER-priority rule (800) beats an app's own
+ *   APPLICATION-priority rule (600) even when the app's selector is far
+ *   more specific. That is why gtk.css can get away with a bare
+ *   `* { border-radius: 0 }` and still square a `.nautilus-pathbar`.
+ *
+ *   The exception is inheritance. A custom property declared *on a node*
+ *   always beats one inherited from an ancestor, whichever provider set
+ *   it, because inheritance only fills in where nothing matched. So an
+ *   app that re-declares `--accent-bg-color` somewhere inside its own
+ *   widget tree silently opts out of the `:root` block in gtk.css, and
+ *   the only fix is to name the same node at USER priority — which is
+ *   what the Nautilus rule below does.
+ */
+
+/* ---- Nautilus -------------------------------------------------------- */
+
+/* Nautilus' own stylesheet (src/resources/style.css) deliberately
+ * neutralises the accent inside the file views:
+ *
+ *   .nautilus-list-view listview, .nautilus-grid-view gridview, ... {
+ *     --accent-bg-color: #959595;
+ *   }
+ *
+ * — the upstream reasoning being that a saturated selection fights
+ * full-color file icons. The saturated inverted selection is the rice's
+ * central idiom, and Oneshot-Icons leaves nothing for it to fight, so
+ * put the accent back.
+ *
+ * Note what this does and does not change. Selected rows and grid cells
+ * were already purple, because gtk.css names those nodes directly
+ * (`columnview > listview > row:selected`, `gridview > child:selected`)
+ * and so wins on priority. What read the grey was everything that goes
+ * through the property instead of a background-color of its own:
+ * rubberband selection and drop feedback.
+ */
+.nautilus-list-view listview,
+.nautilus-grid-view gridview,
+.nautilus-network-view listview {
+  --accent-bg-color: #9664ff;
+  --accent-color: #9664ff;
+}
+
+/* The breadcrumb bar is a 10%-of-currentColor wash on a 9px-rounded box.
+ * Once `*` has squared the corners that reads as a muddy near-black
+ * rectangle with no edge, so give it the outlined chip the rice uses for
+ * entries and buttons instead. */
+.nautilus-pathbar {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+}
+
+/* File icons get their shadow from `filter`, not `box-shadow`, so the
+ * blanket `box-shadow: none` in gtk.css does not reach them. */
+.view .nautilus-image {
+  filter: none;
+}
+
+/* ---- shared: the floating status bar --------------------------------- */
+
+/* Both Nautilus ("12 items selected") and Console (its own copy, marked
+ * "Taken from nautilus") draw this as view-bg plus an inset shadow for
+ * contrast against the view behind it. gtk.css drops the shadow, which
+ * on this palette leaves black on black — invisible. Outline it. */
+.floating-bar {
+  background-color: #000000;
+  border: 1px solid #9664ff;
+}

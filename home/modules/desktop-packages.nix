@@ -3,9 +3,8 @@
 { pkgs, ... }:
 
 {
-  home.packages = (
-    with pkgs;
-    [
+  home.packages =
+    (with pkgs; [
       audacity
       # bitwarden-desktop
       proton-vpn

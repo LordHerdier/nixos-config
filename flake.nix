@@ -26,10 +26,10 @@
     noctalia.url = "github:noctalia-dev/noctalia";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
 
-    hacky-tts.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-tts.git";
+    hacky-tts.url = "git+https://git.lorscapa.com/LordHerdier/hacky-tts.git";
     hacky-tts.inputs.nixpkgs.follows = "nixpkgs";
 
-    hacky-launcher.url = "git+ssh://git@git.lorscapa.com/LordHerdier/hacky-launcher.git";
+    hacky-launcher.url = "git+https://git.lorscapa.com/LordHerdier/hacky-launcher.git";
     hacky-launcher.inputs.nixpkgs.follows = "nixpkgs";
     forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
@@ -73,7 +73,7 @@
           ...
         }:
         {
-          formatter = pkgs.nixfmt-rfc-style or pkgs.nixfmt;
+          formatter = pkgs.nixfmt;
 
           devShells.default = pkgs.mkShell {
             # `secretspec run -- ...` reads secretspec.toml and injects the
@@ -106,8 +106,17 @@
                 {
                   nixpkgs.hostPlatform = system;
                   nixpkgs.overlays = [
-                    (final: _: {
+                    (final: prev: {
                       concord = final.callPackage ./pkgs/concord.nix { };
+
+                      # Not a customised Console, just one with an
+                      # upstream bug fixed -- see pkgs/gnome-console.
+                      # `prev` is passed explicitly because callPackage
+                      # would otherwise hand the override itself back in.
+                      gnome-console = final.callPackage ./pkgs/gnome-console {
+                        inherit (prev) gnome-console;
+                      };
+
                       oneshot-cursors = final.callPackage ./pkgs/oneshot-cursors { };
                       oneshot-gtk-theme = final.callPackage ./pkgs/oneshot-gtk-theme { };
                       oneshot-icons = final.callPackage ./pkgs/oneshot-icons { };

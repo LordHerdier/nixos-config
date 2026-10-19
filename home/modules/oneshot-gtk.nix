@@ -1,23 +1,29 @@
 # home/modules/oneshot-gtk.nix
 #
-# The OneShot World Machine GTK theme (pkgs/oneshot-gtk-theme), wired up
-# for a GNOME session. Sibling of oneshot-cursors.nix, and like that one
-# it drives GNOME through dconf rather than Home Manager's `gtk` module:
+# The OneShot World Machine theme (pkgs/oneshot-gtk-theme), wired up for
+# a GNOME session. Sibling of oneshot-cursors.nix, and like that one it
+# drives GNOME through dconf rather than Home Manager's `gtk` module:
 # gnome-settings-daemon pushes the dconf values at GTK and XWayland apps
 # and overrides anything written to gtk-3.0/settings.ini, so settings.ini
 # is simply the losing side of that race under GNOME. (The `gtk` module is
 # also off for this user on GNOME hosts -- font-rendering.nix, which turns
 # it on, is only imported by the Hyprland profile.)
 #
-# Three separate things have to happen for the theme to actually land:
+# The theme covers three independent surfaces, and none of the three
+# installs the others. This module is where all of them get wired up, so
+# that one palette choice (`my.oneshot-gtk.palette`) governs the lot:
 #
 #   1. The package goes in home.packages so the theme directory shows up
 #      under ~/.nix-profile/share/themes, which is on XDG_DATA_DIRS and so
-#      is where GTK looks for a theme by name.
+#      is where GTK -- and the Shell's User Themes extension -- look for
+#      a theme by name.
 #   2. dconf gtk-theme = "Oneshot" selects it. This covers GTK2 and GTK3
 #      apps.
 #   3. The GTK4 stylesheet is copied to ~/.config/gtk-4.0/ separately,
 #      because step 2 does NOT reach libadwaita apps -- see below.
+#   4. GNOME Shell itself (top bar, overview, panel menus) is styled by
+#      neither of those; it needs the User Themes extension and its own
+#      `name` key -- also below.
 
 {
   pkgs,
@@ -54,6 +60,16 @@ let
   };
 
   theme = "${themePkg}/share/themes/Oneshot";
+
+  # What actually gets installed as the user stylesheet: the theme's GTK4
+  # sheet followed by our per-app patches. app-overrides.css explains why
+  # those cannot just live in gtk.css -- the short version is that an app
+  # redeclaring a libadwaita color property on its own widget tree beats
+  # an inherited one no matter which provider set it.
+  userGtk4Css = pkgs.concatText "gtk.css" [
+    "${theme}/gtk-4.0/gtk.css"
+    "${theme}/gtk-4.0/app-overrides.css"
+  ];
 in
 {
   options.my.oneshot-gtk = {
@@ -90,12 +106,20 @@ in
         color-scheme = "prefer-dark";
 
         # GNOME 47+ accent color. It's a nine-value enum, not free-form
-        # hex, so it can't be the accent exactly -- it only steers the
-        # bits of GNOME Shell the GTK stylesheet can't touch (the
-        # overview, the top bar, switches in Settings). The helper picks
-        # the nearest of the nine to whatever the palette's accent is,
-        # which for the oneshot purple lands on "purple", the value this
-        # was hardcoded to before.
+        # hex, so it can't be the accent exactly. The helper picks the
+        # nearest of the nine to whatever the palette's accent is, which
+        # for the oneshot purple lands on "purple", the value this was
+        # hardcoded to before.
+        #
+        # This is a fallback, not the Shell's colour scheme: the enum
+        # only reaches a handful of St widgets (switches, focus rings,
+        # the workspace indicator) and leaves the overview's own
+        # surfaces -- grid backdrop, app tiles, dash -- at GNOME's
+        # greys, which is why the accent never read as purple there.
+        # The shell theme below is what actually colours those. Keep it
+        # set anyway: libadwaita apps read the same key for their own
+        # accent, and it still applies in the places the shell theme
+        # leaves alone (GDM, for one, which runs its own session).
         accent-color = config.my.theme.lib.nearestGnomeAccent r.accent;
       };
 
@@ -113,6 +137,11 @@ in
       # (GTK_STYLE_PROVIDER_PRIORITY_USER = 800 vs. THEME = 200), which is
       # what these two lines install.
       #
+      # That priority wins against an app's own stylesheet too, but only
+      # on nodes both of them match -- so a handful of libadwaita apps
+      # need to be named explicitly. Those rules are the second half of
+      # userGtk4Css above; see theme/gtk-4.0/app-overrides.css.
+      #
       # assets/ has to come along as its own entry because the stylesheet
       # references it relatively -- url("assets/diamond.png") resolves
       # against the CSS file's own location, which is ~/.config/gtk-4.0
@@ -121,8 +150,24 @@ in
       # If the `gtk` module is ever enabled for this user, gtk.gtk4.extraCss
       # writes this same path and the two will collide; move this over to
       # that option rather than having both.
-      xdg.configFile."gtk-4.0/gtk.css".source = "${theme}/gtk-4.0/gtk.css";
+      xdg.configFile."gtk-4.0/gtk.css".source = userGtk4Css;
       xdg.configFile."gtk-4.0/assets".source = "${theme}/gtk-4.0/assets";
+
+      # --- The GNOME Shell half ------------------------------------------
+      #
+      # The top bar, the overview and the panel menus are St widgets, not
+      # GTK ones: they're styled by gnome-shell's own stylesheet, which
+      # is compiled into the binary as a GResource. gtk-theme doesn't
+      # reach them and neither does ~/.config/gtk-4.0. The User Themes
+      # extension is the only supported way in -- see its module for how
+      # it finds a theme, and theme/gnome-shell/gnome-shell.css in the
+      # package for what gets overridden and why it needn't be a
+      # complete stylesheet.
+      #
+      # `name` has to match the directory under share/themes, which is
+      # the same "Oneshot" that gtk-theme selects above.
+      my.gnome-extensions.user-themes.enable = true;
+      dconf.settings."org/gnome/shell/extensions/user-theme".name = "Oneshot";
     }
 
     (mkIf cfg.pixelFont {

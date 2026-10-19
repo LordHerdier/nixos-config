@@ -9,6 +9,7 @@
     ./networking.nix
     ../../modules/common/ssh.nix
     ../../modules/features/wsl-docker-desktop.nix
+    ../../modules/features/syncthing.nix
   ];
 
   system.stateVersion = "25.05";
