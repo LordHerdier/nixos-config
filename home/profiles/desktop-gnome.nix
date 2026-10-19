@@ -6,6 +6,7 @@
   imports = [
     ../modules/desktop-packages.nix
     ../modules/kitty.nix
+    ../modules/spicetify.nix
     ../modules/steam.nix
     ../modules/games.nix
     ../modules/gnome-extensions
@@ -17,6 +18,7 @@
   # gnome-settings-daemon already does this.
 
   my.kitty.enable = true;
+  my.spicetify.enable = true;
 
   # GNOME Tweaks exposes the dconf keys Settings doesn't: the GTK/icon
   # theme pickers, fonts and hinting, titlebar buttons, and the Startup

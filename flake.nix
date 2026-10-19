@@ -35,6 +35,9 @@
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
 
     zen-browser.url = "github:pfaj/zen-browser-flake";
+
+    spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+    spicetify-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

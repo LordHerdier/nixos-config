@@ -21,7 +21,8 @@
       moonlight-qt
       nautilus
       remmina
-      spotify
+      # spotify comes from ../modules/spicetify.nix as a patched build;
+      # installing it here too would be a collision.
       tailscale
       thunar
       tsukimi
