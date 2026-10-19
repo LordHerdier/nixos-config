@@ -6,6 +6,10 @@
 [![nixpkgs](https://img.shields.io/badge/nixpkgs-unstable-blue?logo=nixos&logoColor=white)](https://github.com/NixOS/nixpkgs/tree/nixos-unstable)
 [![license](https://img.shields.io/badge/license-unlicense-lightgrey)](LICENSE)
 
+|                                            apthos — gnome, riced after OneShot                                            |                                       index — hyprland, with the CRT shader on                                        |                                        index — kiddo's session, plain and scaled up                                        |
+| :-------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------: |
+| ![apthos desktop](screenshots/apthos-desktop.webp) | ![hyprland with CRT shader](screenshots/index-tmux-nvim.webp) | ![kiddo's gnome session](screenshots/kiddo-desktop.webp) |
+
 every machine is a `mkHost` call that picks a profile; profiles compose
 opt-in feature modules; modules stay single-concern. the payoff is that a new
 host is a handful of lines, not a fork of an existing one — and the same
@@ -16,8 +20,11 @@ colemak _everywhere_. system keyboard layout, kmonad homerow mods on the native
 hosts, tmux/nvim/spotify-player navigation; it's all colemak, all sourced from
 the same convention. see [keyboard](#keyboard) below.
 
-the one deliberate exception is my sister's gnome session on index, which gets
-plain qwerty — see [`docs/kiddo.md`](docs/kiddo.md).
+the one deliberate exception is my sister's gnome session on index: plain
+qwerty instead of colemak, plus accessibility tuning on top — 1.25x text
+scaling, a bigger cursor, and dash-to-dock pinned to the bottom as a
+persistent, easy-to-hit taskbar instead of the Activities overview. see
+[`docs/kiddo.md`](docs/kiddo.md).
 
 ---
 
@@ -57,6 +64,11 @@ inputs, known in-flight work). start at [`docs/README.md`](docs/README.md).
 | **nico**           | nixos-wsl                                  | windows wsl — minimal shell setup                                                                         |
 
 see [`docs/hosts.md`](docs/hosts.md) for what each host actually turns on.
+
+charlie-laptop's devshell in practice, building a toy exokernel across a few
+terminal tabs and a reference doc:
+
+![charlie-laptop's devshell in use](screenshots/WSL-in-use.webp)
 
 ---
 
@@ -263,6 +275,8 @@ not follow the wallpaper.
 | tmux          | multiplexer — colors from `my.theme`, vim pane nav, session persistence |
 | atuin         | shell history sync                                                      |
 | zoxide + yazi | directory navigation + file manager                                     |
+
+![zsh prompt, tmux, and yazi on charlie-laptop](screenshots/wsl-yazi-prompt.webp)
 
 ---
 

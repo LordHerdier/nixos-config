@@ -58,14 +58,15 @@ account:
   kmonad remaps the built-in keyboard at the evdev layer, below
   X/Wayland, and only grabs the specific `platform-i8042-serio-0-event-kbd`
   device, so an external USB keyboard would still be true qwerty
-  regardless of dconf. also sets: 1.25x text scaling and 32px cursor
-  (readability), no hot corners (an accidental trigger would be
-  confusing), one fixed workspace (dynamic workspaces are the most
+  regardless of dconf. the rest of the module is accessibility tuning for a
+  six-year-old, not just preference: 1.25x text scaling and a 32px cursor
+  (bigger targets, easier to read), no hot corners (an accidental trigger
+  would be confusing), one fixed workspace (dynamic workspaces are the most
   common way to "lose" a window), screen lock disabled entirely (a
   locked screen mid-cartoon needs an adult to unlock it — defeats the
   point of the account), gnome search restricted away from Settings/
-  Software, and dash-to-dock pinned to the bottom as a persistent
-  taskbar (easier to navigate than the Activities overview).
+  Software, and dash-to-dock pinned to the bottom as a persistent,
+  easy-to-hit taskbar instead of requiring the Activities overview.
 - **`kid/firefox.nix`** — enterprise policies she cannot turn off from
   the UI: DuckDuckGo SafeSearch, no accounts/sync/private browsing, no
   dev tools, extension installs restricted to addons.mozilla.org only
