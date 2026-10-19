@@ -4,7 +4,7 @@
   programs.git = {
     enable = true;
     settings = {
-      user.email = "brennwh@siue.edu";
+      user.email = "charlotte@whittleman.net";
       user.name = "Charlotte Whittleman";
       init.defaultBranch = "main";
       pull.rebase = false;
