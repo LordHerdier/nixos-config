@@ -21,7 +21,7 @@
   # System-wide color tokens. Individual apps can pin a different
   # palette through their own option (my.kitty.palette, my.nvim.palette);
   # everything else follows this.
-  my.theme.default = "oneshot";
+  my.theme.default = "kanagawa";
 
   home.sessionVariables = {
     NIX_HOST = hostName;
