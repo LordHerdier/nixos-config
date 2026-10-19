@@ -38,7 +38,7 @@ local menu = ipc .. "panel-toggle launcher"
 -- Commands
 local colorpicker = "hyprpicker -qaf rgb"
 local lock = "qylock-lock"
-local screenshot = "hyprshot --mode region --output-folder ~/Pictures/Screenshots"
+local screenshot = "hyprshot -z --mode region --output-folder ~/Pictures/Screenshots"
 local wallScript = "~/bin/wall_video"
 local bindsMenu = "~/bin/binds-menu"
 
