@@ -34,7 +34,13 @@
     forgejo-cli.url = "git+https://codeberg.org/forgejo-contrib/forgejo-cli";
     forgejo-cli.inputs.nixpkgs.follows = "nixpkgs";
 
-    zen-browser.url = "github:pfaj/zen-browser-flake";
+    # Upstream, not the pfaj fork: the fork lags on profile options
+    # (extensionButtons and newer) that home/modules/zen-browser uses.
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    # Upstream asks for nixpkgs-unstable here, to stay in step with the
+    # Firefox version the Zen artifacts are built against.
+    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    zen-browser.inputs.home-manager.follows = "home-manager";
 
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     spicetify-nix.inputs.nixpkgs.follows = "nixpkgs";

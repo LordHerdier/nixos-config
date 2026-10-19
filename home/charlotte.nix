@@ -15,6 +15,7 @@
     ./modules/tmux
     ./modules/spotify-player.nix
     ./modules/case-insensitive-dirs.nix
+    ./modules/zen-browser
   ];
 
   # System-wide color tokens. Individual apps can pin a different

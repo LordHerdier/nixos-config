@@ -1,6 +1,6 @@
 # home/modules/desktop-packages.nix
 
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
   home.packages = (
@@ -26,10 +26,9 @@
       tailscale
       thunar
       tsukimi
+      # zen comes from ../modules/zen-browser as a home-manager-wrapped
+      # build; installing the flake package here too is a collision.
       # winboat  # pins EOL electron-40.10.5 (insecure); re-enable when nixpkgs bumps electron
     ]
-  )
-  ++ [
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-  ];
+  );
 }
