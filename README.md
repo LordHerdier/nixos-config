@@ -160,6 +160,7 @@ saturated purple accent (`#9664ff`), square corners, inverted selection.
 | gtk2/3/4 theme | `pkgs/oneshot-gtk-theme` → `home/modules/oneshot-gtk.nix`           |
 | icons          | `pkgs/oneshot-icons` → `home/modules/oneshot-icons.nix`             |
 | wallpaper      | `pkgs/oneshot-wallpaper` → `home/modules/oneshot-wallpaper.nix`     |
+| gnome console  | `home/modules/oneshot-console.nix` (+ `pkgs/gnome-console`)         |
 | dock           | dash-to-dock, bottom panel mode (`home/profiles/desktop-gnome.nix`) |
 
 <details>
@@ -182,6 +183,30 @@ the gtk4 half needs a second install path on top of the theme directory —
 libadwaita apps ignore `gtk-theme-name` outright, so `gtk-4.0/gtk.css` only
 reaches nautilus/settings/text-editor from the _user_ stylesheet at
 `~/.config/gtk-4.0/`. `oneshot-gtk.nix` installs it there.
+
+user priority (800) beats an app's own stylesheet (600) on any node both of them
+match, which is how a bare `* { border-radius: 0 }` squares nautilus' rounded
+pathbar. the exception is **inheritance**: a libadwaita color property declared
+on a descendant always beats one inherited from `:root`, whichever provider set
+it. nautilus uses that to force a grey accent inside its file views, so
+`theme/gtk-4.0/app-overrides.css` names the same nodes and puts the purple back.
+it's concatenated onto `gtk.css` at install time, which keeps `gtk.css` itself a
+plain copy of the upstream rice.
+
+gnome console is the one app css can't finish: it hands its colors to vte
+programmatically, so the 16 ansi slots are out of reach of any stylesheet at any
+priority. they live in a "livery" instead — the color-scheme object console 49
+added, stored as an undocumented `a{sv}` in gsettings, which
+`home/modules/oneshot-console.nix` builds from `my.theme`. console 50.0 reads
+that key with a tuple format string against what is actually a dictionary entry,
+so the loader aborts on the first element and every custom livery is silently
+dropped; `pkgs/gnome-console` is the one-character fix, and nothing else. drop it
+when a nixpkgs bump fixes it upstream.
+
+the oneshot palette collapses all six hues onto the accent, so console's grid is
+monochrome purple by design — `my.oneshot-console.palette` points it at a
+readable palette inside the same black-and-purple window. kitty, the terminal
+actually used for work here, follows `my.theme.default` and is unaffected.
 
 not covered: gnome shell's own chrome (top bar, overview, dash) isn't gtk and is
 unaffected by any of this — it'd need a `gnome-shell.css` plus the user themes

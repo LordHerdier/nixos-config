@@ -41,7 +41,9 @@ what it does, in order:
 
 1. sets `nixpkgs.hostPlatform` and registers the `overlays` that add the
    few custom packages (`concord`, `oneshot-cursors`, `oneshot-gtk-theme`,
-   `oneshot-icons`, `oneshot-wallpaper`) to `pkgs`.
+   `oneshot-icons`, `oneshot-wallpaper`) to `pkgs`, plus one *replacement*
+   — `gnome-console`, patched for an upstream bug rather than customised,
+   which is why it's the one overlay entry that reads `prev`.
 2. imports the five `modules/common/*.nix` files unconditionally.
 3. imports `hostPath` — the host's own `default.nix` — which is where
    that host's `modules/features/*.nix` and `modules/profiles/*.nix`

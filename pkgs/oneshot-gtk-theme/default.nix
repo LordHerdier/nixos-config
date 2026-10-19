@@ -1,10 +1,10 @@
 # pkgs/oneshot-gtk-theme/default.nix
 #
-# GTK2 + GTK3 + GTK4 theme styled after OneShot's "World Machine" fake-OS
-# UI: pure black surfaces, a single saturated purple accent (#9664ff), hard
-# square corners, no gradients or shadows, and an "inverted" selection
-# (solid accent fill + black text) matching the game's active-tab and
-# selected-icon look.
+# GTK2 + GTK3 + GTK4 + GNOME Shell theme styled after OneShot's "World
+# Machine" fake-OS UI: pure black surfaces, a single saturated purple
+# accent (#9664ff), hard square corners, no gradients or shadows, and an
+# "inverted" selection (solid accent fill + black text) matching the
+# game's active-tab and selected-icon look.
 #
 # Unlike pkgs/oneshot-cursors, nothing here is extracted game art. The
 # stylesheets are hand-written and the four widget PNGs (diamond slider
@@ -14,18 +14,27 @@
 # public config repo; the extracted icon/wallpaper PNGs from the same
 # project are not, and deliberately aren't vendored here.
 #
-# Upstream is ~/documents/code/oneshot-twm-rice (themes/oneshot/); theme/
-# is a verbatim copy of its gtk-2.0, gtk-3.0 and gtk-4.0 directories, with
-# gtk-4.0/assets dereferenced from a symlink into real files so the store
-# path is self-contained. The XFCE half of that repo (xfwm4 pixmaps, panel
-# layout) is intentionally left out -- Mutter has no pixmap decoration
-# theme, and GNOME titlebars are client-side, styled by the `headerbar`
-# and `windowcontrols` rules inside the GTK3/GTK4 stylesheets instead.
+# Upstream is ~/documents/code/oneshot-twm-rice (themes/oneshot/);
+# theme/gtk-2.0, gtk-3.0 and gtk-4.0 are a verbatim copy of its
+# directories of the same names, with gtk-4.0/assets dereferenced from a
+# symlink into real files so the store path is self-contained. The XFCE
+# half of that repo (xfwm4 pixmaps, panel layout) is intentionally left
+# out -- Mutter has no pixmap decoration theme, and GNOME titlebars are
+# client-side, styled by the `headerbar` and `windowcontrols` rules
+# inside the GTK3/GTK4 stylesheets instead.
 #
-# Note the GTK4 half needs a second install step beyond this package:
-# libadwaita apps ignore gtk-theme-name entirely, so gtk-4.0/gtk.css only
-# reaches them from the *user* stylesheet path. See
-# home/modules/oneshot-gtk.nix.
+# theme/gnome-shell has no upstream counterpart: the rice targets XFCE,
+# so the Shell half (top bar, overview, panel menus) was written here.
+# It is overrides-only rather than a full stylesheet, for the reason its
+# own header explains. theme/gtk-4.0/app-overrides.css is likewise ours,
+# for the same reason -- the upstream rice has no libadwaita apps to
+# patch around. Keeping it beside gtk.css rather than inside it is what
+# lets gtk.css stay a plain copy.
+#
+# Note the GTK4 and GNOME Shell halves each need a second install step
+# beyond this package -- libadwaita apps ignore gtk-theme-name, and the
+# Shell only reads a theme directory when the User Themes extension
+# points it at one. See home/modules/oneshot-gtk.nix for both.
 #
 # COLORS ARE PARAMETERS. The six arguments below are every distinct color
 # the three stylesheets use, and their defaults are the values the

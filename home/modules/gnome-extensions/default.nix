@@ -51,6 +51,7 @@ in
   imports = [
     ./dash-to-dock.nix
     ./just-perfection.nix
+    ./user-themes.nix
   ];
 
   options.my.gnome-extensions = {

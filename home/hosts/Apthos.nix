@@ -5,6 +5,7 @@
 {
   imports = [
     ../profiles/desktop-gnome.nix
+    ../modules/oneshot-console.nix
     ../modules/oneshot-cursors.nix
     ../modules/oneshot-gtk.nix
     ../modules/oneshot-icons.nix

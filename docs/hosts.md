@@ -88,9 +88,9 @@ an nvme passed through. `hosts/Apthos/default.nix`.
   — sunshine's user unit needs `graphical-session.target` to ever start.
   deliberately *not* `sddm.autoLogin.relogin = true` — see the host
   file's comment for the retry-storm that caused
-- home side: `home/hosts/Apthos.nix` pulls in all four
-  `oneshot-{cursors,gtk,icons,wallpaper}` modules — the "World Machine"
-  rice described in the top-level README
+- home side: `home/hosts/Apthos.nix` pulls in all five
+  `oneshot-{console,cursors,gtk,icons,wallpaper}` modules — the "World
+  Machine" rice described in the top-level README
 
 ## charlie-laptop
 
