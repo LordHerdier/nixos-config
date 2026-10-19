@@ -12,9 +12,6 @@
 
 local mainMod = "SUPER"
 
--- Not auto-loaded; see 45-crt.nix.
-local crt = require("crt")
-
 -- Noctalia shell IPC (routed through the shell for OSD feedback).
 -- v5 replaced `noctalia-shell ipc call <namespace> <verb>` with a flat
 -- `noctalia msg <verb>`, so the verbs below are nothing like the v4
@@ -94,7 +91,7 @@ hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(ipc .. "caffeine-toggle"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(ipc .. "plugin noctalia/screen_recorder:service all toggle"))
 
 -- Display filters
-hl.bind(mainMod .. " + SHIFT + G", crt.toggle)
+hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd("hyprcrt-toggle"))
 
 -- Window management
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
