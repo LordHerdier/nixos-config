@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Formats staged .nix files with the flake's formatter before committing.
+# Enable with: git config core.hooksPath .githooks
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+mapfile -t staged < <(git diff --cached --name-only --diff-filter=ACM -- '*.nix')
+
+if [ "${#staged[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+if ! command -v nix >/dev/null 2>&1; then
+  echo "pre-commit: nix not found on PATH, skipping format" >&2
+  exit 0
+fi
+
+nix fmt -- "${staged[@]}"
+git add -- "${staged[@]}"
