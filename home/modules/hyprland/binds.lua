@@ -36,7 +36,6 @@ local menu = ipc .. "panel-toggle launcher"
 local colorpicker = "hyprpicker -qaf rgb"
 local lock = "qylock-lock"
 local screenshot = "hyprshot -z --mode region --output-folder ~/Pictures/Screenshots"
-local wallScript = "~/bin/wall_video"
 local bindsMenu = "~/bin/binds-menu"
 
 -- Essentials
@@ -45,8 +44,8 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(lock))
 hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exit())
 
 -- Wallpapers
-hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd(wallScript .. " next"))
-hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd(wallScript .. " prev"))
+hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd(ipc .. " wallpaper-next"))
+hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd(ipc .. " wallpaper-previous"))
 hl.bind(mainMod .. " + ALT + 3", hl.dsp.exec_cmd(ipc .. "wallpaper-random"))
 
 -- Launchers
@@ -54,7 +53,13 @@ hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(bindsMenu))
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 -- kitty only honours initial_window_* when remember_window_size is off.
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal .. " -o remember_window_size=no -o initial_window_width=80c -o initial_window_height=20c", { float = true }))
+hl.bind(
+  mainMod .. " + T",
+  hl.dsp.exec_cmd(
+    terminal .. " -o remember_window_size=no -o initial_window_width=80c -o initial_window_height=20c",
+    { float = true }
+  )
+)
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("hacky-tts-toggle"))
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("hacky-launcher-toggle"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(screenshot))
@@ -127,17 +132,13 @@ hl.bind(mainMod .. " + SHIFT + mouse:272", hl.dsp.window.resize(), { mouse = tru
 -- Hardware keys. `locked = true` is new: it lets volume and brightness
 -- work while hyprlock is up, which the hyprlang binds could not express
 -- and which matches Hyprland's own example config.
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. "volume-up 5"),
-  { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. "volume-down 5"),
-  { locked = true, repeating = true })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. "volume-up 5"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. "volume-down 5"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. "volume-mute"), { locked = true })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(ipc .. "mic-mute"), { locked = true })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd(ipc .. "media toggle"), { locked = true })
 hl.bind("XF86AudioStop", hl.dsp.exec_cmd(ipc .. "media stop"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd(ipc .. "media previous"), { locked = true })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd(ipc .. "media next"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. "brightness-up 5"),
-  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. "brightness-down 5"),
-  { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. "brightness-up 5"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. "brightness-down 5"), { locked = true, repeating = true })
