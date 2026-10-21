@@ -28,7 +28,7 @@
 
   home.file.".config/tmuxinator/exo.yml".text = ''
     name: exo
-    root: ~/documents/ExoDoom
+    root: ~/documents/code/exo/
     windows:
       - nvim:
           panes:
