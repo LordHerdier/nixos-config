@@ -3,9 +3,11 @@
 { pkgs, ... }:
 
 {
-  home.packages =
-    (with pkgs; [
-      audacity
+  home.packages = (
+    with pkgs;
+    [
+      # audacity 4.0.0 fails to build against Qt 6.12 (QML AOT cache); use 3.x until fixed
+      audacity_3
       # bitwarden-desktop
       proton-vpn
       discord
