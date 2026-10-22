@@ -192,6 +192,12 @@
               hostPath = ./hosts/Pine/default.nix;
             };
 
+            "Work-Laptop" = mkHost {
+              hostName = "Work-Laptop";
+              isWsl = false;
+              hostPath = ./hosts/Work-Laptop/default.nix;
+            };
+
             "Apthos" = mkHost {
               hostName = "Apthos";
               isWsl = false;

@@ -10,8 +10,8 @@ sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)
 sudo nixos-rebuild switch --flake /etc/nixos#Index
 ```
 
-the five valid targets are the `nixosConfigurations` names in
-`flake.nix`: `Pine`, `Index`, `Apthos`, `Charlie-Laptop`, `Nico` — see
+the six valid targets are the `nixosConfigurations` names in
+`flake.nix`: `Pine`, `Index`, `Apthos`, `Charlie-Laptop`, `Nico`, `Work-Laptop` — see
 [hosts.md](hosts.md).
 
 `nix.settings.warn-dirty = false` (`modules/common/nix.nix`) means

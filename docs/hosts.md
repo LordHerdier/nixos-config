@@ -1,6 +1,6 @@
 # hosts
 
-five `nixosConfigurations`, built by the same `mkHost` function (see
+six `nixosConfigurations`, built by the same `mkHost` function (see
 [architecture.md](architecture.md)). what follows is what each one
 actually turns on — the feature/profile names below are all under
 `modules/` unless noted, and link to [features.md](features.md) for
@@ -114,15 +114,28 @@ nixos-wsl, minimal. `hosts/Nico/default.nix`.
 - `features/wsl-docker-desktop.nix` only, plus `networking.nix`
 - home side: `home/profiles/wsl.nix`, same as charlie-laptop
 
+## work-laptop
+
+native nixos laptop, replacing the windows + wsl setup on the work
+machine. `hosts/Work-Laptop/default.nix`.
+
+- `profiles/laptop.nix` + `profiles/dev-docker.nix` +
+  `profiles/desktop-hyprland.nix`, `common/ssh.nix`, `features/nix-ld.nix`
+- systemd-boot (uefi), networkmanager
+- **`hosts/Work-Laptop/hardware-configuration.nix` is a placeholder** —
+  regenerate it with `nixos-generate-config --show-hardware-config` on
+  the real machine
+- home side: `home/profiles/desktop-hyprland.nix` only
+
 ## what's shared vs. host-specific, at a glance
 
-| | pine | index | apthos | charlie-laptop | nico |
-|---|---|---|---|---|---|
-| desktop | hyprland | hyprland + gnome | gnome | — | — |
-| kmonad | yes | yes | no | no | no |
-| steam | yes | yes | no (sunshine streams it instead) | no | no |
-| tailscale | yes | yes | yes | no | no |
-| syncthing | no | yes | yes | yes | no |
-| docker | dev-docker | dev-docker | dev-docker | wsl docker-desktop | wsl docker-desktop |
-| second user | no | kiddo | no | no | no |
-| theme | oneshot | oneshot | oneshot | kanagawa | oneshot |
+| | pine | index | apthos | charlie-laptop | nico | work-laptop |
+|---|---|---|---|---|---|---|
+| desktop | hyprland | hyprland + gnome | gnome | — | — | hyprland |
+| kmonad | yes | yes | no | no | no | no |
+| steam | yes | yes | no (sunshine streams it instead) | no | no | no |
+| tailscale | yes | yes | yes | no | no | no |
+| syncthing | no | yes | yes | yes | no | no |
+| docker | dev-docker | dev-docker | dev-docker | wsl docker-desktop | wsl docker-desktop | dev-docker |
+| second user | no | kiddo | no | no | no | no |
+| theme | oneshot | oneshot | oneshot | kanagawa | oneshot | oneshot |
