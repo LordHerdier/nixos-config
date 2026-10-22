@@ -36,6 +36,7 @@
     ../../modules/common/fonts.nix
     ../../modules/features/syncthing.nix
     ../../modules/features/zram.nix
+    ../../modules/features/framework-kmod-fix.nix
   ];
 
   system.stateVersion = "25.11";
