@@ -150,11 +150,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786833771,
-        "narHash": "sha256-rO4s9ly15D8Mf9zyvG6MeZhkDVdvf9gK6Zo6WFlwzSY=",
+        "lastModified": 1792688617,
+        "narHash": "sha256-4JDs7PBwvxUAp5uFpGGIg2fTxox94FtNfaghPpQsJy0=",
         "ref": "refs/heads/main",
-        "rev": "5f4eedef4c27cdabfdb7b5890353f9c2d4907929",
-        "revCount": 4,
+        "rev": "dab50b52ac84a5c7943c87f9b929eb99560ae506",
+        "revCount": 5,
         "type": "git",
         "url": "https://git.lorscapa.com/LordHerdier/hacky-tts.git"
       },
