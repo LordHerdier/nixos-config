@@ -31,6 +31,7 @@
     ../../modules/features/cifs-mounts.nix
     ../../modules/features/games-mount.nix
     ../../modules/features/usbmuxd.nix
+    ../../modules/features/librepods.nix
     ../../modules/features/nix-ld.nix
     ../../modules/common/fonts.nix
     ../../modules/features/syncthing.nix
