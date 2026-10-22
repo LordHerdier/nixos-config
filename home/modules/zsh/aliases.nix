@@ -84,6 +84,6 @@
 
     # Workflow
     nmapc = "nmap -p 1-1000,41794,41795,41796 -Pn -T4";
-    exo64 = "qemu-system-x86_64 -m 256M -cdrom build/exodoom.iso -no-reboot -serial stdio -enable-kvm -audiodev pipewire,id=snd0 -machine pcspk-audiodev=snd0 -display sdl,grab-mod=lctrl-lalt";
+    exo64 = "sudo -E qemu-system-x86_64 -m 256M -cdrom build/exodoom.iso -drive 'file=build/exodoom_disk.img,format=raw,if=ide' -device intel-hda -device hda-output,audiodev=snd0 -audiodev pipewire,id=snd0 -machine pcspk-audiodev=snd0 -no-reboot -serial stdio -enable-kvm";
   };
 }
