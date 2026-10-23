@@ -8,6 +8,7 @@
     ./profile.nix
 
     ./init/00-guard.nix
+    ./init/05-keybinds.nix
     ./init/10-paths-xdg-editor.nix
     ./init/20-zoxide.nix
     ./init/30-oh-my-posh.nix
