@@ -47,6 +47,11 @@
             function()
               hl.exec_cmd("noctalia")
               hl.exec_cmd("hyprpolkitagent")
+              -- The setcap wrapper (modules/features/librepods.nix), not
+              -- the plain store binary: it needs cap_net_admin. librepods-ctl
+              -- only works while this is running. --hide keeps the window
+              -- closed (tray only) at startup.
+              hl.exec_cmd("/run/wrappers/bin/librepods --hide")
               -- gnome-keyring is started by PAM at login via
               -- services.gnome.gnome-keyring.enable (system config).
 
