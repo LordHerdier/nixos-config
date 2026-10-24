@@ -94,6 +94,9 @@ hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(ipc .. "bar-toggle"))
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd(ipc .. "theme-mode-toggle"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(ipc .. "nightlight-toggle"))
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(ipc .. "caffeine-toggle"))
+
+-- Noctalia plugins
+hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd(ipc .. "plugin harveywuk/airpods:service all cycle-noise"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(ipc .. "plugin noctalia/screen_recorder:service all toggle"))
 
 -- Display filters
