@@ -16,6 +16,22 @@
         "type": "github"
       }
     },
+    "easyeffects-presets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786957943,
+        "narHash": "sha256-dk9Zedj1bFBGRjvDC5gKPDOOr//3HfHsq0+NdCQQCxA=",
+        "owner": "Soab42",
+        "repo": "easyeffects-presets",
+        "rev": "d924b4e6630a634b2f3384375ecceffca765caef",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Soab42",
+        "repo": "easyeffects-presets",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -368,6 +384,7 @@
     "root": {
       "inputs": {
         "dotfiles": "dotfiles",
+        "easyeffects-presets": "easyeffects-presets",
         "flake-parts": "flake-parts",
         "forgejo-cli": "forgejo-cli",
         "hacky-launcher": "hacky-launcher",

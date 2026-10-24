@@ -26,6 +26,9 @@
     noctalia.url = "github:noctalia-dev/noctalia";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
 
+    easyeffects-presets.url = "github:Soab42/easyeffects-presets";
+    easyeffects-presets.flake = false;
+
     hacky-tts.url = "git+https://git.lorscapa.com/LordHerdier/hacky-tts.git";
     hacky-tts.inputs.nixpkgs.follows = "nixpkgs";
 
