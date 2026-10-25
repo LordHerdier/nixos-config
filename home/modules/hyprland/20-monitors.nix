@@ -8,7 +8,7 @@
     # fields now; `scale = "auto"` and `mode = "preferred"` are the
     # strings that stand in for the old `auto`/`preferred` keywords.
     monitor = [
-      # { output = "DP-2"; mode = "2560x1440@60"; position = "0x0"; scale = 1; }
+      # { output = "DP-4"; mode = "2560x1440@60"; position = "0x0"; scale = 1; }
       {
         output = "eDP-1";
         mode = "2880x1920@120";
@@ -17,7 +17,7 @@
       }
       # { output = "eDP-1"; mode = "1920x1080@120"; position = "auto"; scale = 1; }
       {
-        output = "DP-2";
+        output = "DP-4";
         mode = "2560x1440@165";
         position = "0x-1440";
         scale = 1;
@@ -32,7 +32,7 @@
     workspace_rule = [
       {
         workspace = "2";
-        monitor = "DP-2";
+        monitor = "DP-4";
       }
       {
         workspace = "1";
@@ -40,7 +40,7 @@
       }
       {
         workspace = "4";
-        monitor = "DP-2";
+        monitor = "DP-4";
       }
       {
         workspace = "3";
@@ -48,7 +48,7 @@
       }
       {
         workspace = "6";
-        monitor = "DP-2";
+        monitor = "DP-4";
       }
       {
         workspace = "5";
@@ -56,7 +56,7 @@
       }
       {
         workspace = "8";
-        monitor = "DP-2";
+        monitor = "DP-4";
       }
       {
         workspace = "7";
@@ -64,7 +64,7 @@
       }
       {
         workspace = "10";
-        monitor = "DP-2";
+        monitor = "DP-4";
       }
       {
         workspace = "11";
