@@ -13,6 +13,7 @@
     ../../modules/profiles/desktop-hyprland.nix
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
+    ../../modules/features/remote-builder.nix
     ../../modules/features/tailscale.nix
     ../../modules/features/systemd-boot-silent/default.nix
     ../../modules/common/ssh.nix

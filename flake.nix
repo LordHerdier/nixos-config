@@ -219,6 +219,14 @@
               ];
               extraHomeUsers.kiddo = [ ./home/kiddo.nix ];
             };
+
+            # Headless build server (LXC on twm) -- see hosts/Builder.
+            "Builder" = nixpkgs.lib.nixosSystem {
+              modules = [
+                { nixpkgs.hostPlatform = system; }
+                ./hosts/Builder/default.nix
+              ];
+            };
           };
         };
     };

@@ -84,6 +84,14 @@ gotcha each one's header comment exists to warn about. see
   cert, tailnet-only. the secret that signs session cookies is generated
   once into `/opt/open-webui/webui-secret.env`, outside the
   world-readable nix store.
+- **`remote-builder.nix`** — offloads builds to the `builder` CT on twm
+  (`10.0.10.8`, see [hosts.md](hosts.md#builder)) over `ssh-ng`, with
+  `builders-use-substitutes` so the builder fetches from the cache itself.
+  needs a root-only private key at `/etc/nix/builder_ed25519` on the client
+  (not in the repo; the public half is authorised in
+  `hosts/Builder/default.nix`). the builder's host key is pinned in
+  `programs.ssh.knownHosts`. if the builder is unreachable, nix builds
+  locally.
 
 ## desktop infrastructure
 

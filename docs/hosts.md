@@ -1,7 +1,7 @@
 # hosts
 
-six `nixosConfigurations`, built by the same `mkHost` function (see
-[architecture.md](architecture.md)). what follows is what each one
+seven `nixosConfigurations`; six are built by the same `mkHost` function (see
+[architecture.md](architecture.md)), the seventh (`Builder`) is standalone. what follows is what each one
 actually turns on — the feature/profile names below are all under
 `modules/` unless noted, and link to [features.md](features.md) for
 detail on any one of them.
@@ -126,6 +126,26 @@ machine. `hosts/Work-Laptop/default.nix`.
   regenerate it with `nixos-generate-config --show-hardware-config` on
   the real machine
 - home side: `home/profiles/desktop-hyprland.nix` only
+
+## builder
+
+**not a workstation** — a headless nixos LXC (CT 407) on the proxmox host
+twm, at `10.0.10.8` on the infra VLAN. 8 cores, 16 GiB, 80 GiB rootfs.
+`hosts/Builder/default.nix`. the only `nixosConfiguration` that doesn't go
+through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
+
+- pine and index offload builds to it via `features/remote-builder.nix`
+  (see [features.md](features.md#compute--ai))
+- unprivileged container with `nesting=1`, which is what lets the nix
+  build sandbox work inside it
+- ssh: root (key only, for `nixos-rebuild --target-host`) and `nixbuild`
+  (the user clients build as, a nix `trusted-user`)
+- `min-free`/`max-free` are set so it garbage-collects mid-build rather
+  than filling the 80 GiB disk
+- deploy changes with
+  `nixos-rebuild switch --flake /etc/nixos#Builder --target-host root@10.0.10.8`.
+  it exits 4 on a failed root `dbus-broker` user-unit reload — harmless in
+  an LXC; the system is switched
 
 ## what's shared vs. host-specific, at a glance
 
