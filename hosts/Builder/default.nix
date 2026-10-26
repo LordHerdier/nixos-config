@@ -19,6 +19,7 @@ in
   imports = [
     "${modulesPath}/virtualisation/proxmox-lxc.nix"
     ../../modules/common/nix.nix
+    ./ci.nix
   ];
 
   networking.hostName = "builder";

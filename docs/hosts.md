@@ -130,7 +130,7 @@ machine. `hosts/Work-Laptop/default.nix`.
 ## builder
 
 **not a workstation** — a headless nixos LXC (CT 407) on the proxmox host
-twm, at `10.0.10.8` on the infra VLAN. 8 cores, 16 GiB, 80 GiB rootfs.
+twm, at `10.0.10.8` on the infra VLAN. 8 cores, 16 GiB, 120 GiB rootfs.
 `hosts/Builder/default.nix`. the only `nixosConfiguration` that doesn't go
 through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
 
@@ -141,7 +141,15 @@ through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
 - ssh: root (key only, for `nixos-rebuild --target-host`) and `nixbuild`
   (the user clients build as, a nix `trusted-user`)
 - `min-free`/`max-free` are set so it garbage-collects mid-build rather
-  than filling the 80 GiB disk
+  than filling the 120 GiB disk
+- serves its store as a signed binary cache (harmonia, port 5000)
+- `hosts/Builder/ci.nix` + `ci-build.sh`: every 5 minutes it polls
+  github for `main` and open PRs of `LordHerdier/nixos-config` and builds
+  Index and Pine for any new commit (flake-lock bump PRs included). each
+  result is a gc root, so it stays in the cache: one per host for main,
+  one per host per *open* PR, dropped when the PR closes. a failed commit
+  is remembered and not retried until the branch moves. logs:
+  `journalctl -u nixos-ci` on the builder; state in `/var/lib/nixos-ci`
 - deploy changes with
   `nixos-rebuild switch --flake /etc/nixos#Builder --target-host root@10.0.10.8`.
   it exits 4 on a failed root `dbus-broker` user-unit reload — harmless in
