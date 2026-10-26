@@ -44,7 +44,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.timeout = 0;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.systemd.enable = true;
 
   # run HM asynchronously — don't block user sessions at boot
   systemd.services.home-manager-charlotte = {

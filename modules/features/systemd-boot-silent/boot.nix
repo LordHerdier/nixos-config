@@ -11,6 +11,4 @@
     "udev.log_priority=3"
   ];
   boot.consoleLogLevel = 0;
-  boot.initrd.verbose = false;
-  boot.initrd.systemd.enable = true;
 }
