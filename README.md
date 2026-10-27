@@ -3,6 +3,7 @@
 > nix flakes + home-manager configuration for five machines
 
 [![flake check](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml/badge.svg)](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml)
+[![host builds](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FLordHerdier%2Fnixos-config%2Fcommits%2Fmain%2Fstatus&query=%24.state&label=host%20builds&logo=nixos&logoColor=white)](https://github.com/LordHerdier/nixos-config/commits/main)
 [![nixpkgs](https://img.shields.io/badge/nixpkgs-unstable-blue?logo=nixos&logoColor=white)](https://github.com/NixOS/nixpkgs/tree/nixos-unstable)
 [![license](https://img.shields.io/badge/license-unlicense-lightgrey)](LICENSE)
 
