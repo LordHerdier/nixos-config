@@ -24,6 +24,7 @@
   services.atd.enable = true;
 
   programs = {
+    fuse.enable = true;
     zsh.enable = true;
     ssh.startAgent = false;
   };
