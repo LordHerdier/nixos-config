@@ -8,16 +8,8 @@
 
     is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf|lazygit)(diff)?$'"
 
-    bind-key -n 'C-n' if-shell "$is_vim" 'send-keys C-n'  'select-pane -L'
-    bind-key -n 'C-e' if-shell "$is_vim" 'send-keys C-e'  'select-pane -D'
-    bind-key -n 'C-u' if-shell "$is_vim" 'send-keys C-u'  'select-pane -U'
-    bind-key -n 'C-i' if-shell "$is_vim" 'send-keys C-i'  'select-pane -R'
     bind-key -n 'C-\' if-shell "$is_vim" 'send-keys C-\\'  'select-pane -l'
 
-    bind-key -T copy-mode-vi 'C-n' select-pane -L
-    bind-key -T copy-mode-vi 'C-e' select-pane -D
-    bind-key -T copy-mode-vi 'C-u' select-pane -U
-    bind-key -T copy-mode-vi 'C-i' select-pane -R
     bind-key -T copy-mode-vi 'C-\' select-pane -l
 
     # Smart scrolling - PageUp/PageDown only when not in vim
