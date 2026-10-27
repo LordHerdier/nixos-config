@@ -6,6 +6,7 @@
   networking.hostName = hostName;
   imports = [
     ./networking.nix
+    ../../modules/features/builder-cache.nix
     ../../modules/features/wsl-docker-desktop.nix
   ];
 

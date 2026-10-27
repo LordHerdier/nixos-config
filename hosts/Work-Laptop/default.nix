@@ -12,6 +12,7 @@
     ../../modules/profiles/dev-docker.nix
     ../../modules/profiles/desktop-hyprland.nix
     ../../modules/common/ssh.nix
+    ../../modules/features/builder-cache.nix
     ../../modules/features/nix-ld.nix
   ];
 

@@ -8,6 +8,7 @@
   imports = [
     ./networking.nix
     ../../modules/common/ssh.nix
+    ../../modules/features/builder-cache.nix
     ../../modules/features/wsl-docker-desktop.nix
     ../../modules/features/syncthing.nix
   ];

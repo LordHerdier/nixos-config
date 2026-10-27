@@ -84,9 +84,15 @@ gotcha each one's header comment exists to warn about. see
   cert, tailnet-only. the secret that signs session cookies is generated
   once into `/opt/open-webui/webui-secret.env`, outside the
   world-readable nix store.
-- **`remote-builder.nix`** — offloads builds to the `builder` CT on twm
-  (`10.0.10.8`, see [hosts.md](hosts.md#builder)) over `ssh-ng`, with
-  `builders-use-substitutes` so the builder fetches from the cache itself.
+- **`builder-cache.nix`** — uses the `builder` CT on twm
+  (`10.0.10.8:5000`, see [hosts.md](hosts.md#builder)) as a binary cache
+  ahead of cache.nixos.org, so anything the builder's ci has already
+  built is a download. on every host. `connect-timeout = 5` so a machine
+  that can't reach `10.0.10.0/24` (off the lan, wsl without a route) falls
+  through to cache.nixos.org quickly instead of hanging.
+- **`remote-builder.nix`** — imports the cache module and also offloads
+  builds to the builder over `ssh-ng`, with `builders-use-substitutes` so
+  the builder fetches from cache.nixos.org itself. only on pine and index.
   needs a root-only private key at `/etc/nix/builder_ed25519` on the client
   (not in the repo; the public half is authorised in
   `hosts/Builder/default.nix`). the builder's host key is pinned in

@@ -7,6 +7,9 @@
 { ... }:
 
 {
+  # The builder's binary cache comes with using it as a builder.
+  imports = [ ./builder-cache.nix ];
+
   nix.distributedBuilds = true;
 
   nix.buildMachines = [
@@ -28,11 +31,6 @@
   # Let the builder pull from cache.nixos.org itself instead of having this
   # machine upload every dependency.
   nix.settings.builders-use-substitutes = true;
-
-  # The builder also serves its store as a binary cache (harmonia), so
-  # machines using it fetch what it has already built.
-  nix.settings.substituters = [ "http://10.0.10.8:5000" ];
-  nix.settings.trusted-public-keys = [ "builder-1:MPHoCtlo1Bgo7IWe1JPW+lNiniH8jshy4rmbmFBRro4=" ];
 
   programs.ssh.knownHosts."10.0.10.8".publicKey =
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIELmPUH6WltNLjSoM26m9+ggSwh/GbyYxAAbapprKxvU";

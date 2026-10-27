@@ -11,6 +11,7 @@
     ../../modules/profiles/desktop-gnome.nix
     ../../modules/features/nix-ld.nix
     ../../modules/profiles/dev-docker.nix
+    ../../modules/features/builder-cache.nix
     ../../modules/features/cifs-mounts.nix
     ../../modules/features/nvidia.nix
     ../../modules/features/ollama-vulkan.nix

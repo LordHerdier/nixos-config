@@ -134,7 +134,8 @@ twm, at `10.0.10.8` on the infra VLAN. 8 cores, 16 GiB, 120 GiB rootfs.
 `hosts/Builder/default.nix`. the only `nixosConfiguration` that doesn't go
 through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
 
-- pine and index offload builds to it via `features/remote-builder.nix`
+- pine and index offload builds to it via `features/remote-builder.nix`;
+  all six hosts use it as a binary cache via `features/builder-cache.nix`
   (see [features.md](features.md#compute--ai))
 - unprivileged container with `nesting=1`, which is what lets the nix
   build sandbox work inside it
@@ -147,9 +148,9 @@ through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
   github for `main` and open PRs from this repo's own branches (never
   forks) of `LordHerdier/nixos-config` and builds all six hosts for
   any new commit (flake-lock bump PRs included), posting a
-  `nixos-ci/<host>` commit status for each. only index and pine actually
-  pull from the cache (`features/remote-builder.nix`); the rest are built
-  for the check and to warm it. each
+  `nixos-ci/<host>` commit status for each. every host
+  pulls from the cache (`features/builder-cache.nix`); only index and pine
+  also offload their own builds to it (`features/remote-builder.nix`). each
   result is a gc root, so it stays in the cache: one per host for main,
   one per host per *open* PR, dropped when the PR closes. a failed commit
   is remembered and not retried until the branch moves. logs:
