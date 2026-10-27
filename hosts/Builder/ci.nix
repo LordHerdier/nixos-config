@@ -27,6 +27,11 @@
       Type = "oneshot";
       User = "nixbuild";
       StateDirectory = "nixos-ci";
+      # The GitHub token is root-only on the CT (/var/lib/nixos-ci-token,
+      # never in the repo). Copy it where `nixbuild` can read it; the `-`
+      # makes a missing token a skipped step, not a failed unit.
+      RuntimeDirectory = "nixos-ci";
+      ExecStartPre = "-+${pkgs.coreutils}/bin/install -m 600 -o nixbuild -T /var/lib/nixos-ci-token %t/nixos-ci/github-token";
       TimeoutStartSec = "4h";
       Nice = 10;
     };
