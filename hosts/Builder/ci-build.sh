@@ -1,4 +1,5 @@
-# Build the hosts in $CI_HOSTS for main and for every open PR of $CI_REPO,
+# Build the hosts in $CI_HOSTS for main and for every open PR of $CI_REPO that
+# comes from a branch of that repo itself (never a fork),
 # skipping any commit that has already been tried. Results are kept as gc
 # roots under $STATE_DIRECTORY/roots, so harmonia keeps serving them.
 #
@@ -76,8 +77,13 @@ main_rev=$(git ls-remote "https://github.com/$repo.git" refs/heads/main | cut -f
 while read -r num sha; do
   want["pr-$num"]=$sha
 done < <(
+  # Only PRs from branches of this repo itself: the repo is public, and a
+  # fork's PR would otherwise get its code built here. (head.repo is null
+  # once a fork has been deleted, hence the fallback.)
   gh "https://api.github.com/repos/$repo/pulls?state=open&per_page=100" |
-    jq -r '.[] | "\(.number) \(.head.sha)"'
+    jq -r --arg repo "$repo" '.[]
+      | select((.head.repo.full_name // "" | ascii_downcase) == ($repo | ascii_downcase))
+      | "\(.number) \(.head.sha)"'
 )
 
 # A closed PR's roots and marker go; the next gc may then reclaim them.
