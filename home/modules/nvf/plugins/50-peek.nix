@@ -45,7 +45,7 @@ let
     '';
 
     outputHashMode = "recursive";
-    outputHash = "sha256-anfTFz1cJHGOmKfTLrmO69XYnhmAsQavAD4H++unoW4=";
+    outputHash = "sha256-N3KQEM82I6Lia3BN4vHCyYtG7cI0dC0Ihcn/8bT0oms=";
   };
 
   peekNvim = pkgs.vimPlugins.peek-nvim.overrideAttrs (old: {
