@@ -144,8 +144,12 @@ through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
   than filling the 120 GiB disk
 - serves its store as a signed binary cache (harmonia, port 5000)
 - `hosts/Builder/ci.nix` + `ci-build.sh`: every 5 minutes it polls
-  github for `main` and open PRs of `LordHerdier/nixos-config` and builds
-  Index and Pine for any new commit (flake-lock bump PRs included). each
+  github for `main` and open PRs from this repo's own branches (never
+  forks) of `LordHerdier/nixos-config` and builds all six hosts for
+  any new commit (flake-lock bump PRs included), posting a
+  `nixos-ci/<host>` commit status for each. only index and pine actually
+  pull from the cache (`features/remote-builder.nix`); the rest are built
+  for the check and to warm it. each
   result is a gc root, so it stays in the cache: one per host for main,
   one per host per *open* PR, dropped when the PR closes. a failed commit
   is remembered and not retried until the branch moves. logs:

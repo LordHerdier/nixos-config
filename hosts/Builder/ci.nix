@@ -20,7 +20,7 @@
     ];
     environment = {
       CI_REPO = "LordHerdier/nixos-config";
-      CI_HOSTS = "Index Pine";
+      CI_HOSTS = "Index Pine Apthos Charlie-Laptop Nico Work-Laptop";
     };
 
     serviceConfig = {
