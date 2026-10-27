@@ -48,7 +48,7 @@ for name in "${!want[@]}"; do
   for host in "${hosts[@]}"; do
     echo "-- $host"
     if ! nix build "github:$repo/$rev#nixosConfigurations.$host.config.system.build.toplevel" \
-      --out-link "$state/roots/$name-$host" --print-build-logs; then
+      --out-link "$state/roots/$name-$host" --print-build-logs --keep-going; then
       echo "FAILED: $name @ $rev ($host)"
       ok=0
       failed=1
