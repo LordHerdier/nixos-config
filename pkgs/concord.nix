@@ -6,18 +6,20 @@
   fetchurl,
   autoPatchelfHook,
   alsa-lib,
+  libva,
+  pipewire,
   opus,
 }:
 let
-  version = "2.2.11";
+  version = "2.6.3";
   assets = {
     "x86_64-linux" = {
       url = "https://github.com/chojs23/concord/releases/download/v${version}/concord-x86_64-unknown-linux-gnu.tar.xz";
-      sha256 = "7e7140f20eabfc58dcf589182df6de58a91c1ee6e90a3dd5065e0a75b63f2918";
+      sha256 = "678f0fe1a8ad52076a44df95514544c1f91c097fdddfc71d225a1dd739e3359f";
     };
     "aarch64-linux" = {
       url = "https://github.com/chojs23/concord/releases/download/v${version}/concord-aarch64-unknown-linux-gnu.tar.xz";
-      sha256 = "df4eaa28a27ebbbe29922c9e57f358c6746e4da389f235565c11d8a63d448c6c";
+      sha256 = "a4990dbb85c62c624db81226ef186cdbb0f02bb47582c523521c2b95a78f4884";
     };
   };
   asset =
@@ -34,6 +36,8 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ autoPatchelfHook ];
   buildInputs = [
     alsa-lib
+    libva
+    pipewire
     opusShared
     stdenv.cc.cc.lib
   ];
