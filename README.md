@@ -77,7 +77,8 @@ terminal tabs and a reference doc:
 
 ```
 .
-├── flake.nix
+├── flake.nix           # inputs + flake-parts wiring; the outputs live in parts/
+├── parts/              # flake-parts modules (hosts + mkHost, overlay, devshell)
 ├── secretspec.toml     # secret declarations, backed by `pass` (see docs/secrets.md)
 ├── pkgs/                # custom derivations (concord, the oneshot-* rice assets)
 ├── modules/
@@ -95,7 +96,7 @@ terminal tabs and a reference doc:
 ```
 
 each module handles one concern. profiles compose modules into roles. hosts stay
-small. full composition pattern (the `mkHost` function in `flake.nix`, extra
+small. full composition pattern (the `mkHost` function in `parts/hosts.nix`, extra
 home-manager users, how a host picks up its modules) is in
 [`docs/architecture.md`](docs/architecture.md).
 

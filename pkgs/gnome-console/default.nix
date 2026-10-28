@@ -10,7 +10,7 @@
 #
 # WHEN THIS BREAKS. A nixpkgs bump to a Console release that fixes this
 # upstream will make the patch fail to apply, which is the intended
-# failure mode -- drop this override and the overlay entry in flake.nix
+# failure mode -- drop this override and the overlay entry in parts/overlay.nix
 # at that point, and oneshot-console.nix keeps working unchanged.
 
 { gnome-console }:

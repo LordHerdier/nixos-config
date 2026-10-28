@@ -19,7 +19,7 @@ Apthos = { description = "...", providers = [ "local" ] }
 ```
 
 the actual values live in `pass` (the unix password manager), keyed as
-`syncthing/keys/<Host>`. `flake.nix`'s `devShells.default` carries both
+`syncthing/keys/<Host>`. `parts/dev.nix`'s `devShells.default` carries both
 `secretspec` and `pass` so `secretspec run -- <cmd>` can inject the
 declared secrets as env vars without them ever touching a file in this
 repo.

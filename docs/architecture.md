@@ -33,7 +33,11 @@ modules; `home/hosts/Charlie-Laptop.nix` forces `my.theme.default` to
 `kanagawa`, overriding the `oneshot` default `home/charlotte.nix` sets
 for everyone else).
 
-## `mkHost`, in `flake.nix`
+## `mkHost`, in `parts/hosts.nix`
+
+`flake.nix` only declares inputs and lists the flake-parts modules in
+`parts/` (`dev.nix` for the formatter and devshell, `hosts.nix` for hosts);
+the overlay `mkHost` registers lives in `parts/overlay.nix`.
 
 every `nixosConfigurations.<Name>` is built by one function,
 `mkHost { hostName, isWsl, hostPath, extraModules, extraHomeUsers }`.
@@ -66,7 +70,7 @@ what it does, in order:
 `home/modules/files.nix` can reach into the `dotfiles` flake input for
 `bin/`, oh-my-posh themes, and yazi config.
 
-the five `nixosConfigurations` entries at the bottom of `flake.nix` are
+the five `nixosConfigurations` entries at the bottom of `parts/hosts.nix` are
 each a short call to `mkHost` — that's the full list of hosts this flake
 knows about; see [hosts.md](hosts.md) for what each one turns on.
 
@@ -78,7 +82,7 @@ knows about; see [hosts.md](hosts.md) for what each one turns on.
    `modules/profiles/*.nix` the host needs.
 2. `home/hosts/<Name>.nix` — pick a desktop profile (or none, for a
    headless/WSL box) and add anything genuinely host-specific.
-3. a `mkHost { ... }` call in `flake.nix`'s `nixosConfigurations`.
+3. a `mkHost { ... }` call in `parts/hosts.nix`'s `nixosConfigurations`.
 
 that's it — `modules/common/*.nix` and `home/charlotte.nix` apply
 automatically; nothing else needs to know a new host exists.
