@@ -75,7 +75,7 @@ in
         font_family = "DejaVu Sans Condensed";
 
         # v4 general.avatarImage.
-        avatar_path = "/home/charlotte/.face";
+        avatar_path = "${config.home.homeDirectory}/.face";
 
         # v4 appLauncher.enableClipboardHistory = true.
         clipboard_enabled = true;
@@ -190,7 +190,7 @@ in
 
       wallpaper = {
         enabled = true;
-        directory = "/home/charlotte/Pictures/Wallpapers";
+        directory = "${config.home.homeDirectory}/Pictures/Wallpapers";
         fill_mode = "crop";
         transition_duration = 800;
         edge_smoothness = 0.05;

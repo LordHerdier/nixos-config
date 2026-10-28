@@ -19,6 +19,7 @@
     ../../modules/profiles/desktop-hyprland.nix
     ../../modules/profiles/desktop-gnome.nix
     ../../modules/users/kiddo.nix
+    ../../modules/users/rivian.nix
     ../../modules/features/parental-controls.nix
     ../../modules/common/kmonad/kmonad.nix
     ../../modules/features/steam.nix
@@ -48,6 +49,11 @@
 
   # run HM asynchronously — don't block user sessions at boot
   systemd.services.home-manager-charlotte = {
+    before = lib.mkForce [ ];
+    wantedBy = lib.mkForce [ "multi-user.target" ];
+  };
+
+  systemd.services.home-manager-rivian = {
     before = lib.mkForce [ ];
     wantedBy = lib.mkForce [ "multi-user.target" ];
   };

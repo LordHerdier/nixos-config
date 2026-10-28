@@ -20,7 +20,8 @@ let
       # Extra Home Manager users beyond charlotte, as
       # username -> list of HM modules. charlotte is always
       # configured from ./home/charlotte.nix + her per-host file;
-      # anyone here is configured purely from what's listed.
+      # anyone here is configured purely from what's listed
+      # (so a full-stack user lists their per-host file too).
       extraHomeUsers ? { },
     }:
     nixpkgs.lib.nixosSystem {
@@ -115,7 +116,13 @@ in
         qylock.nixosModules.default
         ../modules/features/qylock.nix
       ];
-      extraHomeUsers.kiddo = [ ../home/kiddo.nix ];
+      extraHomeUsers = {
+        kiddo = [ ../home/kiddo.nix ];
+        rivian = [
+          ../home/rivian.nix
+          ../home/hosts/Index.nix
+        ];
+      };
     };
 
     # Headless build server (LXC on twm) -- see hosts/Builder.
