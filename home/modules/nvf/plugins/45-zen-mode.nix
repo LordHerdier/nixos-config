@@ -25,11 +25,6 @@
       -- State stashed on open and put back on close.
       local saved = {}
 
-      local function word_count()
-        local wc = vim.fn.wordcount()
-        return (wc.visual_words or wc.words) .. " words"
-      end
-
       -- Quiet everything that would pop up or draw outside the text.
       local function hide_chrome(buf)
         saved.notify = vim.notify
@@ -41,26 +36,6 @@
         vim.cmd("silent! ScrollbarHide")
         pcall(function() require("ibl").setup_buffer(buf, { enabled = false }) end)
         pcall(function() require("illuminate").pause_buf() end)
-
-        -- zen-mode hides the statusline (laststatus=0); keep a bare one with
-        -- just the word count instead of lualine's usual sections.
-        saved.laststatus = vim.o.laststatus
-        vim.o.laststatus = 2
-        local ok, lualine = pcall(require, "lualine")
-        if ok then
-          saved.lualine = lualine.get_config()
-          local cfg = vim.deepcopy(saved.lualine)
-          -- lualine merges over its defaults, so empty sections must be explicit
-          cfg.sections = {
-            lualine_a = {}, lualine_b = {}, lualine_c = { word_count },
-            lualine_x = {}, lualine_y = {}, lualine_z = {},
-          }
-          cfg.inactive_sections = {
-            lualine_a = {}, lualine_b = {}, lualine_c = {},
-            lualine_x = {}, lualine_y = {}, lualine_z = {},
-          }
-          lualine.setup(cfg)
-        end
       end
 
       local function show_chrome(buf)
@@ -72,9 +47,6 @@
         pcall(function() require("ibl").setup_buffer(buf, { enabled = true }) end)
         pcall(function() require("illuminate").resume_buf() end)
 
-        if saved.lualine then require("lualine").setup(saved.lualine) end
-        -- lualine's setup resets laststatus, so restore it afterwards
-        if saved.laststatus then vim.o.laststatus = saved.laststatus end
         saved = {}
       end
 
