@@ -22,13 +22,14 @@ static uint32_t colors[][3]                = {
 };
 
 /* tagging */
-static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
 /* logging */
 static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
 	/* app_id             title       tags mask     isfloating   monitor */
+	{ "floatterm",        NULL,       0,            1,           -1 }, /* Super+T terminal */
 	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1 }, /* Start on currently visible tags floating, not tiled */
 	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
@@ -124,35 +125,110 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *termcmd[] = { "kitty", NULL };
-static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
+/* Placeholder for binds that used to call `noctalia msg <verb>` under
+ * Hyprland. Does nothing at runtime; grep NOCTALIA_STUB for every spot that
+ * still needs a real backend patched through, the argument being the old verb. */
+#define NOCTALIA_STUB(verb) SHCMD("true # TODO(noctalia): " verb)
 
+static const char *termcmd[]  = { "kitty", NULL };
+/* kitty only honours initial_window_* when remember_window_size is off. The
+ * app_id is matched by a floating rule above. */
+static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
+                                   "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
+
+#define SHIFT WLR_MODIFIER_SHIFT
+#define CTRL  WLR_MODIFIER_CTRL
+#define ALT   WLR_MODIFIER_ALT
+
+/* Ported from home/modules/hyprland/binds.lua. dwl has no directional focus,
+ * pseudotiling or pinning, so those are not carried over; focus n/u and i/e
+ * (the Colemak left/up and right/down) walk the stack instead. Master/layout
+ * binds are dwl-only and live on Ctrl, which Hyprland leaves free. */
 static const Key keys[] = {
 	/* modifier                  key                  function          argument */
-	{ MODKEY,                    XKB_KEY_p,           spawn,            {.v = menucmd} },
+	/* Essentials */
+	{ MODKEY,                    XKB_KEY_q,           killclient,       {0} },
+	{ MODKEY,                    XKB_KEY_l,           spawn,            SHCMD("qylock-lock") },
+	{ MODKEY|SHIFT,              XKB_KEY_l,           quit,             {0} },
+
+	/* Wallpapers */
+	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            NOCTALIA_STUB("wallpaper-next") },
+	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            NOCTALIA_STUB("wallpaper-previous") },
+	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            NOCTALIA_STUB("wallpaper-random") },
+
+	/* Launchers */
+	{ MODKEY,                    XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher") },
+	{ MODKEY,                    XKB_KEY_h,           spawn,            SHCMD("~/bin/binds-menu") },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
-	{ MODKEY,                    XKB_KEY_b,           togglebar,        {0} },
-	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_i,           incnmaster,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_d,           incnmaster,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_h,           setmfact,         {.f = -0.05f} },
-	{ MODKEY,                    XKB_KEY_l,           setmfact,         {.f = +0.05f} },
-	{ MODKEY,                    XKB_KEY_Return,      zoom,             {0} },
-	{ MODKEY,                    XKB_KEY_Tab,         view,             {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           killclient,       {0} },
-	{ MODKEY,                    XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
-	{ MODKEY,                    XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },
-	{ MODKEY,                    XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
-	{ MODKEY,                    XKB_KEY_space,       setlayout,        {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,       togglefloating,   {0} },
-	{ MODKEY,                    XKB_KEY_e,           togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_0,           view,             {.ui = ~0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_0,           tag,              {.ui = ~0} },
-	{ MODKEY,                    XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,       tagmon,           {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,      tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_t,           spawn,            {.v = floatterm} },
+	{ MODKEY|SHIFT,              XKB_KEY_t,           spawn,            SHCMD("hacky-tts-toggle") },
+	{ MODKEY,                    XKB_KEY_grave,       spawn,            SHCMD("hacky-launcher-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_s,           spawn,            SHCMD("hyprshot -z --mode region --output-folder ~/Pictures/Screenshots") },
+	{ MODKEY|SHIFT,              XKB_KEY_c,           spawn,            SHCMD("hyprpicker -qaf rgb") },
+	{ MODKEY|SHIFT,              XKB_KEY_w,           spawn,            SHCMD("moonlight stream 'nico' 'desktop'") },
+	{ MODKEY|SHIFT,              XKB_KEY_e,           spawn,            SHCMD("nautilus") },
+	{ MODKEY,                    XKB_KEY_c,           spawn,            SHCMD("kitty zsh -i -c nvim") },
+	{ MODKEY,                    XKB_KEY_b,           spawn,            SHCMD("zen-beta") },
+	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("spotify") },
+
+	/* Noctalia launchers */
+	{ MODKEY,                    XKB_KEY_v,           spawn,            NOCTALIA_STUB("panel-toggle clipboard") },
+	{ MODKEY,                    XKB_KEY_period,      spawn,            NOCTALIA_STUB("panel-toggle launcher \"/emo \"") },
+	{ MODKEY,                    XKB_KEY_Tab,         spawn,            NOCTALIA_STUB("window-switcher") },
+	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
+
+	/* Noctalia panels & menus */
+	{ MODKEY,                    XKB_KEY_a,           spawn,            NOCTALIA_STUB("panel-toggle control-center") },
+	{ MODKEY,                    XKB_KEY_o,           spawn,            NOCTALIA_STUB("panel-toggle session") },
+	{ MODKEY,                    XKB_KEY_w,           spawn,            NOCTALIA_STUB("panel-toggle control-center notifications") },
+	{ MODKEY|ALT,                XKB_KEY_w,           spawn,            NOCTALIA_STUB("notification-dnd-toggle") },
+	{ MODKEY,                    XKB_KEY_comma,       spawn,            NOCTALIA_STUB("settings-toggle") },
+	{ MODKEY,                    XKB_KEY_k,           spawn,            NOCTALIA_STUB("panel-toggle control-center calendar") },
+
+	/* Toggles. Shift+B is dwl's own bar, not Noctalia's. */
+	{ MODKEY|SHIFT,              XKB_KEY_b,           togglebar,        {0} },
+	{ MODKEY|SHIFT,              XKB_KEY_d,           spawn,            NOCTALIA_STUB("theme-mode-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            NOCTALIA_STUB("nightlight-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            NOCTALIA_STUB("caffeine-toggle") },
+
+	/* Noctalia plugins */
+	{ MODKEY|ALT,                XKB_KEY_s,           spawn,            NOCTALIA_STUB("plugin harveywuk/airpods:service all cycle-noise") },
+	{ MODKEY|SHIFT,              XKB_KEY_r,           spawn,            NOCTALIA_STUB("plugin noctalia/screen_recorder:service all toggle") },
+
+	/* Display filters */
+	{ MODKEY|SHIFT,              XKB_KEY_g,           spawn,            SHCMD("hyprcrt-toggle") },
+
+	/* Window management */
+	{ MODKEY,                    XKB_KEY_f,           togglefullscreen, {0} },
+	{ MODKEY|SHIFT,              XKB_KEY_f,           togglefloating,   {0} },
+
+	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland */
+	{ MODKEY,                    XKB_KEY_n,           focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_u,           focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_i,           focusstack,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_e,           focusstack,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_Left,        focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_Up,          focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_Right,       focusstack,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_Down,        focusstack,       {.i = +1} },
+
+	/* dwl-only: master area, layouts, monitors */
+	{ MODKEY|CTRL,               XKB_KEY_n,           setmfact,         {.f = -0.05f} },
+	{ MODKEY|CTRL,               XKB_KEY_i,           setmfact,         {.f = +0.05f} },
+	{ MODKEY|CTRL,               XKB_KEY_u,           incnmaster,       {.i = +1} },
+	{ MODKEY|CTRL,               XKB_KEY_e,           incnmaster,       {.i = -1} },
+	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },
+	{ MODKEY|CTRL,               XKB_KEY_Tab,         view,             {0} },
+	{ MODKEY|CTRL,               XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
+	{ MODKEY|CTRL,               XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },
+	{ MODKEY|CTRL,               XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
+	{ MODKEY|CTRL,               XKB_KEY_space,       setlayout,        {0} },
+	{ MODKEY|CTRL,               XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|CTRL,               XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_comma,       tagmon,           {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_period,      tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+
+	/* Workspaces: 1-9, and 0 for the tenth */
 	TAGKEYS(                     XKB_KEY_1,           0),
 	TAGKEYS(                     XKB_KEY_2,           1),
 	TAGKEYS(                     XKB_KEY_3,           2),
@@ -162,7 +238,19 @@ static const Key keys[] = {
 	TAGKEYS(                     XKB_KEY_7,           6),
 	TAGKEYS(                     XKB_KEY_8,           7),
 	TAGKEYS(                     XKB_KEY_9,           8),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           quit,             {0} },
+	TAGKEYS(                     XKB_KEY_0,           9),
+
+	/* Hardware keys */
+	{ 0, XKB_KEY_XF86AudioRaiseVolume,   spawn, NOCTALIA_STUB("volume-up 5") },
+	{ 0, XKB_KEY_XF86AudioLowerVolume,   spawn, NOCTALIA_STUB("volume-down 5") },
+	{ 0, XKB_KEY_XF86AudioMute,          spawn, NOCTALIA_STUB("volume-mute") },
+	{ 0, XKB_KEY_XF86AudioMicMute,       spawn, NOCTALIA_STUB("mic-mute") },
+	{ 0, XKB_KEY_XF86AudioPlay,          spawn, NOCTALIA_STUB("media toggle") },
+	{ 0, XKB_KEY_XF86AudioStop,          spawn, NOCTALIA_STUB("media stop") },
+	{ 0, XKB_KEY_XF86AudioPrev,          spawn, NOCTALIA_STUB("media previous") },
+	{ 0, XKB_KEY_XF86AudioNext,          spawn, NOCTALIA_STUB("media next") },
+	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, NOCTALIA_STUB("brightness-up 5") },
+	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, NOCTALIA_STUB("brightness-down 5") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
@@ -179,6 +267,7 @@ static const Button buttons[] = {
 	{ ClkLtSymbol, 0,      BTN_RIGHT,  setlayout,      {.v = &layouts[2]} },
 	{ ClkTitle,    0,      BTN_MIDDLE, zoom,           {0} },
 	{ ClkClient,   MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
+	{ ClkClient,   MODKEY|WLR_MODIFIER_SHIFT, BTN_LEFT, moveresize, {.ui = CurResize} },
 	{ ClkClient,   MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ ClkClient,   MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 	{ ClkTagBar,   0,      BTN_LEFT,   view,           {0} },
