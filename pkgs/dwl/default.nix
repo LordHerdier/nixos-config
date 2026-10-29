@@ -13,9 +13,19 @@
 # to apply, or leave ./config.h behind config.def.h. Diff against the new
 # config.def.h (`nix build nixpkgs#dwl.src`) and refresh the patch.
 
-{ dwl }:
+{
+  dwl,
+  fcft,
+  libdrm,
+}:
 
 (dwl.override { configH = ./config.h; }).overrideAttrs (old: {
+  # drwl.h (05-bar.patch) draws the bar with fcft and DRM fourcc formats.
+  buildInputs = (old.buildInputs or [ ]) ++ [
+    fcft
+    libdrm
+  ];
+
   patches =
     (old.patches or [ ])
     ++ (
