@@ -12,6 +12,7 @@ final: prev: {
   # dwl with our config.h and patch stack -- see pkgs/dwl.
   # `prev` for the same reason as gnome-console above.
   dwl = final.callPackage ../pkgs/dwl { inherit (prev) dwl; };
+  dwl-clangd = final.callPackage ../pkgs/dwl/clangd.nix { };
 
   oneshot-cursors = final.callPackage ../pkgs/oneshot-cursors { };
   oneshot-gtk-theme = final.callPackage ../pkgs/oneshot-gtk-theme { };
