@@ -1,0 +1,49 @@
+# modules/features/dwl.nix
+#
+# dwl as a selectable login session. The compositor itself comes from
+# pkgs/dwl (via the overlay in parts/overlay.nix), which is where patches
+# and config.h live.
+#
+# Shows up as "dwl" in tuigreet's session list (F3), next to Hyprland and
+# the gamescope Steam session. Needs the desktop-hyprland profile for the
+# kitty / wofi that config.h launches.
+
+{ pkgs, ... }:
+
+let
+  # Runs inside the compositor (dwl -s). dwl exits when this process does,
+  # so it must stay alive: `sleep infinity` holds the session open until
+  # Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
+  # above it with `&`.
+  startup = pkgs.writeShellScript "dwl-startup" ''
+    # Hand the compositor's environment to user services and D-Bus
+    # activated apps (portals, notification daemons, ...).
+    systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+    dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+    exec sleep infinity
+  '';
+
+  session = pkgs.writeShellScriptBin "dwl-session" ''
+    export XDG_CURRENT_DESKTOP=dwl
+    export XDG_SESSION_TYPE=wayland
+    exec ${pkgs.dwl}/bin/dwl -s ${startup}
+  '';
+
+  sessionEntry =
+    (pkgs.writeTextDir "share/wayland-sessions/dwl.desktop" ''
+      [Desktop Entry]
+      Name=dwl
+      Comment=Dynamic window manager for Wayland
+      Exec=${session}/bin/dwl-session
+      Type=Application
+    '').overrideAttrs
+      (_: {
+        passthru.providedSessions = [ "dwl" ];
+      });
+in
+{
+  services.displayManager.sessionPackages = [ sessionEntry ];
+
+  environment.systemPackages = [ pkgs.dwl ];
+}
