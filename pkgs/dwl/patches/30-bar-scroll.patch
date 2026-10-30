@@ -1,0 +1,63 @@
+diff --git a/dwl.c b/dwl.c
+index 3f8d908..1e14933 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -421,6 +421,7 @@ static void virtualpointer(struct wl_listener *listener, void *data);
+ static Monitor *xytomon(double x, double y);
+ static void xytonode(double x, double y, struct wlr_surface **psurface,
+ 		Client **pc, LayerSurface **pl, double *nx, double *ny);
++static void shiftview(const Arg *arg);
+ static void zoom(const Arg *arg);
+ 
+ /* variables */
+@@ -757,10 +758,28 @@ axisnotify(struct wl_listener *listener, void *data)
+ 	const Axis *a;
+ 	unsigned int adir;
+ 	struct wlr_keyboard *keyboard;
++	struct wlr_scene_node *node;
++	struct wlr_scene_buffer *buffer;
++	static double barscroll;
+ 	uint32_t mods;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
++	/* Scrolling over the bar cycles through tags (wrapping). */
++	if (!locked && !exclusive_focus && selmon &&
++		(node = wlr_scene_node_at(&layers[LyrBottom]->node, cursor->x, cursor->y, NULL, NULL)) &&
++		(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer) {
++		if (event->orientation == WL_POINTER_AXIS_VERTICAL_SCROLL) {
++			barscroll += event->delta;
++			if (barscroll >= 10 || barscroll <= -10) {
++				Arg arg = {.i = barscroll > 0 ? 1 : -1};
++				barscroll = 0;
++				shiftview(&arg);
++			}
++		}
++		return;
++	}
++
+ 	if (event->orientation == WL_POINTER_AXIS_VERTICAL_SCROLL)
+ 		adir = event->delta > 0 ? AxisDown : AxisUp;
+ 	else
+@@ -3651,6 +3670,21 @@ view(const Arg *arg)
+ 	drawbars();
+ }
+ 
++void
++shiftview(const Arg *arg)
++{
++	unsigned int n = LENGTH(tags), cur, shifted;
++
++	if (!selmon)
++		return;
++	cur = selmon->tagset[selmon->seltags] & TAGMASK;
++	if (arg->i > 0)
++		shifted = (cur << 1 | cur >> (n - 1)) & TAGMASK;
++	else
++		shifted = (cur >> 1 | cur << (n - 1)) & TAGMASK;
++	view(&(Arg){.ui = shifted});
++}
++
+ void
+ virtualkeyboard(struct wl_listener *listener, void *data)
+ {
