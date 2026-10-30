@@ -23,6 +23,8 @@ static uint32_t colors[][3]                = {
 	[SchemeUrg]  = { 0,          0,          0x6442a5ff },
 };
 
+static const float default_opacity = 0.9;
+
 /* tagging */
 static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
@@ -36,11 +38,11 @@ static const char *const autostart[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id             title       tags mask     isfloating   isterm   noswallow   monitor */
-	{ "kitty",            NULL,       0,            0,           1,       0,          -1 },
-	{ "floatterm",        NULL,       0,            1,           0,       1,          -1 }, /* Super+T terminal */
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          -1 }, /* Start on currently visible tags floating, not tiled */
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          -1 }, /* Start on ONLY tag "9" */
+	/* app_id             title       tags mask     isfloating   isterm   noswallow   alpha              monitor */
+	{ "kitty",            NULL,       0,            0,           1,       0,          default_opacity,   -1 },
+	{ "floatterm",        NULL,       0,            1,           0,       1,          default_opacity,   -1 }, /* Super+T terminal */
+	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          default_opacity,   -1 }, /* Start on currently visible tags floating, not tiled */
+	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          default_opacity,   -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
 };
 
@@ -182,6 +184,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_c,           spawn,            SHCMD("kitty zsh -i -c nvim") },
 	{ MODKEY,                    XKB_KEY_b,           spawn,            SHCMD("zen-beta") },
 	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("kitty zsh -i -c spotify_player") },
+	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD("kitty zsh -i -c concord") },
 
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            NOCTALIA_STUB("panel-toggle clipboard") },
@@ -229,6 +232,8 @@ static const Key keys[] = {
 	/* dwl-only: master area, layouts, monitors */
 	{ MODKEY|CTRL,               XKB_KEY_n,           setmfact,         {.f = -0.05f} },
 	{ MODKEY|CTRL,               XKB_KEY_i,           setmfact,         {.f = +0.05f} },
+	{ MODKEY|CTRL,               XKB_KEY_o,           setopacity,       {.f = +0.1f} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_O,           setopacity,       {.f = -0.1f} },
 	{ MODKEY|CTRL,               XKB_KEY_u,           incnmaster,       {.i = +1} },
 	{ MODKEY|CTRL,               XKB_KEY_e,           incnmaster,       {.i = -1} },
 	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },

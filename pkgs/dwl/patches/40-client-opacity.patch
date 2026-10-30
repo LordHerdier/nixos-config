@@ -1,0 +1,152 @@
+diff --git a/config.def.h b/config.def.h
+index fc32316..4c947d6 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -14,6 +14,7 @@ static const char *fonts[]                 = {"monospace:size=10"};
+ static const float rootcolor[]             = COLOR(0x000000ff);
+ /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
+ static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
++static const float default_opacity         = 0.9;
+ static int enableautoswallow = 1; /* enables autoswallowing newly spawned clients */
+ static float swallowborder = 1.0f; /* add this multiplied by borderpx to border when a client is swallowed */
+ 
+@@ -37,10 +38,10 @@ static const char *const autostart[] = {
+ };
+ 
+ static const Rule rules[] = {
+-	/* app_id             title       tags mask     isfloating   isterm   noswallow   monitor */
+-	{ "foot",             NULL,       0,            0,           1,       1,          -1 },
+-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          -1 }, /* Start on currently visible tags floating, not tiled */
+-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          -1 }, /* Start on ONLY tag "9" */
++	/* app_id             title       tags mask     isfloating   isterm   noswallow   alpha              monitor */
++	{ "foot",             NULL,       0,            0,           1,       1,          default_opacity,   -1 },
++	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          default_opacity,   -1 }, /* Start on currently visible tags floating, not tiled */
++	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          1.0,               -1 }, /* Start on ONLY tag "9" */
+     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
+ };
+ 
+@@ -146,6 +147,8 @@ static const Key keys[] = {
+ 	{ MODKEY,                    XKB_KEY_d,           incnmaster,       {.i = -1} },
+ 	{ MODKEY,                    XKB_KEY_h,           setmfact,         {.f = -0.05f} },
+ 	{ MODKEY,                    XKB_KEY_l,           setmfact,         {.f = +0.05f} },
++	{ MODKEY,                    XKB_KEY_o,           setopacity,       {.f = +0.1f} },
++	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,           setopacity,       {.f = -0.1f} },
+ 	{ MODKEY,                    XKB_KEY_Return,      zoom,             {0} },
+ 	{ MODKEY,                    XKB_KEY_Tab,         view,             {0} },
+ 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           killclient,       {0} },
+diff --git a/dwl.c b/dwl.c
+index 1e14933..eb39210 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -169,6 +169,7 @@ struct Client {
+ 	unsigned int bw;
+ 	uint32_t tags;
+ 	int isfloating, isurgent, isfullscreen;
++	float opacity;
+ 	int isterm, noswallow;
+ 	pid_t pid;
+ 	Client *swallowing;  /* client being hidden */
+@@ -280,6 +281,7 @@ typedef struct {
+ 	int isfloating;
+ 	int isterm;
+ 	int noswallow;
++	float opacity;
+ 	int monitor;
+ } Rule;
+ 
+@@ -383,6 +385,7 @@ static void requeststartdrag(struct wl_listener *listener, void *data);
+ static void requestmonstate(struct wl_listener *listener, void *data);
+ static void resize(Client *c, struct wlr_box geo, int interact);
+ static void run(char *startup_cmd);
++static void scenebuffersetopacity(struct wlr_scene_buffer *buffer, int sx, int sy, void *user_data);
+ static void setcursor(struct wl_listener *listener, void *data);
+ static void setcursorshape(struct wl_listener *listener, void *data);
+ static void setfloating(Client *c, int floating);
+@@ -390,6 +393,7 @@ static void setfullscreen(Client *c, int fullscreen);
+ static void setlayout(const Arg *arg);
+ static void setmfact(const Arg *arg);
+ static void setmon(Client *c, Monitor *m, uint32_t newtags);
++static void setopacity(const Arg *arg);
+ static void setpsel(struct wl_listener *listener, void *data);
+ static void setsel(struct wl_listener *listener, void *data);
+ static void setup(void);
+@@ -597,6 +601,7 @@ applyrules(Client *c)
+ 		if ((!r->title || strstr(title, r->title))
+ 				&& (!r->id || strstr(appid, r->id))) {
+ 			c->isfloating = r->isfloating;
++			c->opacity = r->opacity;
+ 			newtags |= r->tags;
+ 			c->isterm = r->isterm;
+ 			c->noswallow = r->noswallow;
+@@ -1471,6 +1476,7 @@ createnotify(struct wl_listener *listener, void *data)
+ 	c = toplevel->base->data = ecalloc(1, sizeof(*c));
+ 	c->surface.xdg = toplevel->base;
+ 	c->bw = borderpx;
++	c->opacity = default_opacity;
+ 
+ 	LISTEN(&toplevel->base->surface->events.commit, &c->commit, commitnotify);
+ 	LISTEN(&toplevel->base->surface->events.map, &c->map, mapnotify);
+@@ -2267,6 +2273,7 @@ mapnotify(struct wl_listener *listener, void *data)
+ 	} else {
+ 		applyrules(c);
+ 	}
++	wlr_scene_node_for_each_buffer(&c->scene_surface->node, scenebuffersetopacity, c);
+ 	drawbars();
+ 
+ unset_fullscreen:
+@@ -2757,6 +2764,15 @@ run(char *startup_cmd)
+ 	wl_display_run(dpy);
+ }
+ 
++void
++scenebuffersetopacity(struct wlr_scene_buffer *buffer, int sx, int sy, void *data)
++{
++	Client *c = data;
++	/* xdg-popups are children of Client.scene, we do not have to worry about
++	   messing with them. */
++	wlr_scene_buffer_set_opacity(buffer, c->isfullscreen ? 1 : c->opacity);
++}
++
+ void
+ setcursor(struct wl_listener *listener, void *data)
+ {
+@@ -2825,6 +2841,7 @@ setfullscreen(Client *c, int fullscreen)
+ 		 * client positions are set by the user and cannot be recalculated */
+ 		resize(c, c->prev, 0);
+ 	}
++	wlr_scene_node_for_each_buffer(&c->scene_surface->node, scenebuffersetopacity, c);
+ 	arrange(c->mon);
+ 	drawbars();
+ }
+@@ -2884,6 +2901,23 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 		setmon(c->swallowing, m, newtags);
+ }
+ 
++void
++setopacity(const Arg *arg)
++{
++	Client *sel = focustop(selmon);
++	if (!sel)
++		return;
++
++	sel->opacity += arg->f;
++	if (sel->opacity > 1.0)
++		sel->opacity = 1.0f;
++
++	if (sel->opacity < 0.1)
++		sel->opacity = 0.1f;
++
++	wlr_scene_node_for_each_buffer(&sel->scene_surface->node, scenebuffersetopacity, sel);
++}
++
+ void
+ setpsel(struct wl_listener *listener, void *data)
+ {
+@@ -3830,6 +3864,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
+ 	c->surface.xwayland = xsurface;
+ 	c->type = X11;
+ 	c->bw = client_is_unmanaged(c) ? 0 : borderpx;
++	c->opacity = default_opacity;
+ 
+ 	/* Listen to the various events it can emit */
+ 	LISTEN(&xsurface->events.associate, &c->associate, associatex11);
