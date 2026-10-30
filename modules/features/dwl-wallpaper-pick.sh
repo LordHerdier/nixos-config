@@ -44,6 +44,10 @@ done
 
 pending=$(mktemp -t dwl-wallpaper-pick.XXXXXX)
 trap 'rm -f "$pending"' EXIT
+# Pressing Super+Alt+4 again closes the kitty (dwl-modal), which hangs up
+# fzf. Outlive that hangup so the code below still puts back the original
+# wallpaper, the same as Esc.
+trap : HUP TERM
 
 # shellcheck disable=SC2016 # FZF_PREVIEW_* are expanded by fzf's preview shell
 sel=$(

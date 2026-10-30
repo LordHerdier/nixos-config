@@ -165,11 +165,11 @@ static const char *termcmd[]  = { "kitty", NULL };
  * app_id is matched by a floating rule above. */
 static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
                                    "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
-/* Floating kitty centred on the focused monitor (the "modal" rule above),
- * for control popups: COLS x ROWS cells, title, then the command to run. */
-#define MODAL(cols, rows, title, ...) { .v = (const char*[]){ "kitty", "--class", "modal", "--title", title, \
-	"-o", "remember_window_size=no", "-o", "initial_window_width=" #cols "c", \
-	"-o", "initial_window_height=" #rows "c", __VA_ARGS__, NULL } }
+/* Toggles a floating kitty centred on the focused monitor (the "modal" rule
+ * above), for control popups: COLS x ROWS cells, title, then the command to
+ * run. Pressing the same bind again closes it; see dwl-modal in
+ * modules/features/dwl.nix. */
+#define MODAL(cols, rows, title, ...) { .v = (const char*[]){ "dwl-modal", title, #cols, #rows, __VA_ARGS__, NULL } }
 #define MIXER MODAL(110, 30, "mixer", "wiremix")
 
 #define SHIFT WLR_MODIFIER_SHIFT

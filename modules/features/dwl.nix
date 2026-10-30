@@ -36,6 +36,17 @@ let
     text = builtins.readFile ./dwl-wallpaper-pick.sh;
   };
 
+  # Opens or closes a centred kitty popup; config.h's MODAL() binds call it.
+  modal = pkgs.writeShellApplication {
+    name = "dwl-modal";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.kitty
+      pkgs.procps
+    ];
+    text = builtins.readFile ./dwl-modal.sh;
+  };
+
   # Runs inside the compositor (dwl -s). dwl exits when this process does,
   # so it must stay alive: `sleep infinity` holds the session open until
   # Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
@@ -81,6 +92,7 @@ in
     session
     wallpaper
     wallpaperPick
+    modal
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
   ];

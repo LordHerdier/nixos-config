@@ -56,7 +56,8 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
 - **Rules**: `kitty` is a swallowing terminal; `floatterm` (Super+T) floats and
   never swallows; `modal` floats centred and never swallows. Control popups
   are kittys with that class, spawned through the `MODAL(cols, rows, title,
-  cmd...)` macro.
+  cmd...)` macro, which runs `dwl-modal`: pressing the same bind again closes
+  the popup.
 - **Monitors**: mirror `home/modules/hyprland/monitors.lua`. Docked, DP-4
   (2560x1440@165.08, scale 1) sits at `0,0` and eDP-1 (2880x1920@120, scale 1.33)
   to its right at `2560,0`. Rules apply as outputs appear, so there is no dock
