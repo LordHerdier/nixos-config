@@ -1,0 +1,42 @@
+diff --git a/dwl.c b/dwl.c
+--- a/dwl.c
++++ b/dwl.c
+@@ -765,7 +765,11 @@
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+-	/* Scrolling over the bar cycles through tags (wrapping). */
++	keyboard = wlr_seat_get_keyboard(seat);
++	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
++
++	/* Scrolling over the bar cycles through tags (wrapping); over the
++	 * status text it runs the matching statusaxes[] binding instead. */
+ 	if (!locked && !exclusive_focus && selmon &&
+ 		(node = wlr_scene_node_at(&layers[LyrBottom]->node, cursor->x, cursor->y, NULL, NULL)) &&
+ 		(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer) {
+@@ -773,8 +777,15 @@
+ 			barscroll += event->delta;
+ 			if (barscroll >= 10 || barscroll <= -10) {
+ 				Arg arg = {.i = barscroll > 0 ? 1 : -1};
++				adir = barscroll > 0 ? AxisDown : AxisUp;
+ 				barscroll = 0;
+-				shiftview(&arg);
++				if ((cursor->x - selmon->m.x) * selmon->wlr_output->scale
++						> selmon->b.width - (TEXTW(selmon, stext) - selmon->lrpad + 2)) {
++					for (a = statusaxes; a < END(statusaxes); a++)
++						if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func)
++							a->func(&a->arg);
++				} else
++					shiftview(&arg);
+ 			}
+ 		}
+ 		return;
+@@ -784,8 +795,6 @@
+ 		adir = event->delta > 0 ? AxisDown : AxisUp;
+ 	else
+ 		adir = event->delta > 0 ? AxisRight : AxisLeft;
+-	keyboard = wlr_seat_get_keyboard(seat);
+-	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
+ 	for (a = axes; a < END(axes); a++) {
+ 		if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func) {
+ 			a->func(&a->arg);

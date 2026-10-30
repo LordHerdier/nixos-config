@@ -325,3 +325,10 @@ static const Axis axes[] = {
 	{ MODKEY, AxisUp,   spawn, SHCMD(VOLCMD("1%+")) },
 	{ MODKEY, AxisDown, spawn, SHCMD(VOLCMD("1%-")) },
 };
+
+/* Scrolling over the bar's status text (35-bar-status-volume.patch); the
+ * rest of the bar cycles tags. */
+static const Axis statusaxes[] = {
+	{ 0, AxisUp,   spawn, SHCMD(VOLCMD("5%+")) },
+	{ 0, AxisDown, spawn, SHCMD(VOLCMD("5%-")) },
+};
