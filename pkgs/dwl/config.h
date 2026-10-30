@@ -11,14 +11,14 @@ static const unsigned int snap             = 32; /* snap pixel */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=10"};
-static const float rootcolor[]             = COLOR(0x222222ff);
+static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
 static uint32_t colors[][3]                = {
 	/*               fg          bg          border    */
-	[SchemeNorm] = { 0xbbbbbbff, 0x222222ff, 0x444444ff },
-	[SchemeSel]  = { 0xeeeeeeff, 0x005577ff, 0x005577ff },
-	[SchemeUrg]  = { 0,          0,          0xff0000ff },
+	[SchemeNorm] = { 0xcbb8ffff, 0x000000ff, 0x4a3d66ff },
+	[SchemeSel]  = { 0x000000ff, 0x9664ffff, 0x9664ffff },
+	[SchemeUrg]  = { 0,          0,          0x6442a5ff },
 };
 
 /* tagging */
@@ -73,7 +73,7 @@ static const int repeat_delay = 600;
 static const int tap_to_click = 1;
 static const int tap_and_drag = 1;
 static const int drag_lock = 1;
-static const int natural_scrolling = 0;
+static const int natural_scrolling = 1;
 static const int disable_while_typing = 1;
 static const int left_handed = 0;
 static const int middle_button_emulation = 0;
