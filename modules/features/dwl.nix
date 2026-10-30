@@ -24,6 +24,18 @@ let
     text = builtins.readFile ./dwl-wallpaper.sh;
   };
 
+  # Live-preview wallpaper menu (fzf in a floating kitty); Super+Alt+4.
+  wallpaperPick = pkgs.writeShellApplication {
+    name = "dwl-wallpaper-pick";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.kitty
+      wallpaper
+    ];
+    text = builtins.readFile ./dwl-wallpaper-pick.sh;
+  };
+
   # Runs inside the compositor (dwl -s). dwl exits when this process does,
   # so it must stay alive: `sleep infinity` holds the session open until
   # Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
@@ -68,5 +80,6 @@ in
     pkgs.dwl
     session
     wallpaper
+    wallpaperPick
   ];
 }

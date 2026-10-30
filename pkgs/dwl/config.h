@@ -164,6 +164,10 @@ static const char *termcmd[]  = { "kitty", NULL };
  * app_id is matched by a floating rule above. */
 static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
                                    "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
+/* Same floating rule, sized for the thumbnail preview. */
+static const char *wallpick[] = { "kitty", "--class", "floatterm", "--title", "wallpaper", "-o", "remember_window_size=no",
+                                  "-o", "initial_window_width=140c", "-o", "initial_window_height=35c",
+                                  "dwl-wallpaper-pick", NULL };
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL  WLR_MODIFIER_CTRL
@@ -184,6 +188,7 @@ static const Key keys[] = {
 	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            SHCMD("dwl-wallpaper next") },
 	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            SHCMD("dwl-wallpaper prev") },
 	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            SHCMD("dwl-wallpaper rand") },
+	{ MODKEY|ALT,                XKB_KEY_4,           spawn,            {.v = wallpick} },
 
 	/* Launchers */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            SHCMD("wofi --show drun") },

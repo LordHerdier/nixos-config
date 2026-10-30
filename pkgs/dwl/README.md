@@ -66,7 +66,9 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   (`home/modules/hyprland/binds.lua`). `Super` is the main modifier. Colemak
   `n/u` and `i/e` (and the arrows) walk the focus stack. dwl-only
   master/layout/monitor/opacity binds live on `Super+Ctrl`. Wallpaper cycling is
-  `Super+Alt+1/2/3` (`dwl-wallpaper next|prev|rand`).
+  `Super+Alt+1/2/3` (`dwl-wallpaper next|prev|rand`); `Super+Alt+4` opens
+  `dwl-wallpaper-pick`, an fzf menu in a floating kitty that previews each
+  wallpaper live as you move through it (Enter keeps, Esc reverts).
 - **`NOCTALIA_STUB(verb)`**: binds that used to call `noctalia msg <verb>`. They
   currently run `true` as a placeholder; grep `NOCTALIA_STUB` for what's still
   unported.

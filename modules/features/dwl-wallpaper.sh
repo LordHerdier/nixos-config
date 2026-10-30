@@ -1,9 +1,10 @@
-# dwl-wallpaper {next|prev|rand|restore}
+# dwl-wallpaper {next|prev|rand|restore|set FILE|list}
 #
 # Cycles through the images in ~/Pictures/Wallpapers (sorted by name) and shows
 # the current one with swaybg. The current file is remembered in
 # $XDG_STATE_HOME/dwl-wallpaper so `restore` (run at session start) and the
-# next/prev steps pick up where the last run left off.
+# next/prev steps pick up where the last run left off. `set` shows one given
+# file and `list` prints the images in cycle order (both for dwl-wallpaper-pick).
 
 dir="${DWL_WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/dwl-wallpaper"
@@ -19,6 +20,11 @@ if [ "$n" -eq 0 ]; then
   exit 1
 fi
 
+if [ "${1:-}" = list ]; then
+  printf '%s\n' "${files[@]}"
+  exit 0
+fi
+
 current=""
 [ -r "$state" ] && current=$(<"$state")
 
@@ -31,7 +37,15 @@ for i in "${!files[@]}"; do
   fi
 done
 
+pick=""
 case "${1:-}" in
+  set)
+    pick="${2:-}"
+    if [ ! -f "$pick" ]; then
+      echo "dwl-wallpaper: not a file: $pick" >&2
+      exit 2
+    fi
+    ;;
   next) idx=$(((idx + 1) % n)) ;;
   prev) idx=$(((idx - 1 + n) % n)) ;;
   rand)
@@ -45,12 +59,12 @@ case "${1:-}" in
     ;;
   restore) [ "$idx" -lt 0 ] && idx=0 ;;
   *)
-    echo "usage: dwl-wallpaper {next|prev|rand|restore}" >&2
+    echo "usage: dwl-wallpaper {next|prev|rand|restore|set FILE|list}" >&2
     exit 2
     ;;
 esac
 
-pick=${files[$idx]}
+[ -n "$pick" ] || pick=${files[$idx]}
 mkdir -p "$(dirname "$state")"
 printf '%s\n' "$pick" >"$state"
 
