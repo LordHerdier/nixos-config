@@ -17,6 +17,13 @@ let
       device = "/dev/input/by-path/platform-i8042-serio-0-event-kbd";
       layerKey = "rctl";
     };
+    # Generic 104-key USB board (SEM USB Keyboard). It has a real right ctrl,
+    # so it uses the same layer key as the builtin board. event-kbd is the
+    # typing interface; the other nodes are consumer/system control.
+    generic104 = {
+      device = "/dev/input/by-id/usb-SEM_USB_Keyboard-event-kbd";
+      layerKey = "rctl";
+    };
     keychronK6 = {
       device = "/dev/input/keychron-k6";
       layerKey = "ralt";
