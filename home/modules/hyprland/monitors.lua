@@ -52,9 +52,10 @@ local external = {
 }
 
 if is_docked then
-  -- External on top at the origin, laptop panel centred-left below it.
+  -- External at the origin, laptop panel to its right (2560 = DP-4 width),
+  -- top edges aligned.
   external.position = "0x0"
-  internal.position = "0x1440"
+  internal.position = "2560x0"
 else
   internal.position = "0x0"
   external.position = "0x-1440"
