@@ -169,7 +169,7 @@ static const Key keys[] = {
 	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            SHCMD("dwl-wallpaper rand") },
 
 	/* Launchers */
-	{ MODKEY,                    XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher") },
+	{ MODKEY,                    XKB_KEY_space,       spawn,            SHCMD("wofi --show drun") },
 	{ MODKEY,                    XKB_KEY_h,           spawn,            SHCMD("~/bin/binds-menu") },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_t,           spawn,            {.v = floatterm} },
@@ -181,7 +181,7 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_e,           spawn,            SHCMD("nautilus") },
 	{ MODKEY,                    XKB_KEY_c,           spawn,            SHCMD("kitty zsh -i -c nvim") },
 	{ MODKEY,                    XKB_KEY_b,           spawn,            SHCMD("zen-beta") },
-	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("spotify") },
+	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("kitty zsh -i -c spotify_player") },
 
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            NOCTALIA_STUB("panel-toggle clipboard") },

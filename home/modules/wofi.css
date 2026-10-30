@@ -1,0 +1,59 @@
+/* home/modules/wofi.css -- colors are substituted from my.theme by wofi.nix. */
+
+window {
+  margin: 0;
+  border: 2px solid @border@;
+  border-radius: 8px;
+  background-color: @surface@;
+  color: @fg@;
+}
+
+#outer-box {
+  margin: 0;
+  padding: 8px;
+}
+
+#input {
+  margin: 0 0 8px 0;
+  padding: 6px 10px;
+  border: 1px solid @surfaceAlt@;
+  border-radius: 6px;
+  background-color: @bg@;
+  color: @fg@;
+  box-shadow: none;
+}
+
+#input:focus {
+  border-color: @accent@;
+}
+
+#scroll {
+  margin: 0;
+}
+
+#inner-box,
+#entry {
+  background-color: transparent;
+}
+
+#entry {
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+#entry:selected {
+  background-color: @selectionBg@;
+  color: @selectionFg@;
+}
+
+#text {
+  color: inherit;
+}
+
+#text:selected {
+  color: @selectionFg@;
+}
+
+#img {
+  margin-right: 8px;
+}
