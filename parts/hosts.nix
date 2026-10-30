@@ -28,7 +28,7 @@ let
       modules = [
         {
           nixpkgs.hostPlatform = system;
-          nixpkgs.overlays = [ (import ./overlay.nix) ];
+          nixpkgs.overlays = [ (import ./overlay.nix inputs) ];
         }
         # Common system bits
         ../modules/common/packages.nix

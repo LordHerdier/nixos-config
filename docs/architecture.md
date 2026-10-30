@@ -44,8 +44,9 @@ every `nixosConfigurations.<Name>` is built by one function,
 what it does, in order:
 
 1. sets `nixpkgs.hostPlatform` and registers the `overlays` that add the
-   few custom packages (`concord`, `oneshot-cursors`, `oneshot-gtk-theme`,
-   `oneshot-icons`, `oneshot-wallpaper`) to `pkgs`, plus one *replacement*
+   few custom packages (`oneshot-cursors`, `oneshot-gtk-theme`,
+   `oneshot-icons`, `oneshot-wallpaper`) to `pkgs` (plus `concord`, taken from
+   its own flake), plus one *replacement*
    — `gnome-console`, patched for an upstream bug rather than customised,
    which is why it's the one overlay entry that reads `prev`.
 2. imports the five `modules/common/*.nix` files unconditionally.
