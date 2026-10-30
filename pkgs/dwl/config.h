@@ -139,6 +139,9 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
  * still needs a real backend patched through, the argument being the old verb. */
 #define NOCTALIA_STUB(verb) SHCMD("true # TODO(noctalia): " verb)
 
+/* Raise/lower the default sink (capped at 100%), then nudge slstatus to redraw. */
+#define VOLCMD(delta) "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ " delta "; pkill -USR1 slstatus"
+
 static const char *termcmd[]  = { "kitty", NULL };
 /* kitty only honours initial_window_* when remember_window_size is off. The
  * app_id is matched by a floating rule above. */
@@ -252,9 +255,9 @@ static const Key keys[] = {
 	TAGKEYS(                     XKB_KEY_0,           9),
 
 	/* Hardware keys */
-	{ 0, XKB_KEY_XF86AudioRaiseVolume,   spawn, NOCTALIA_STUB("volume-up 5") },
-	{ 0, XKB_KEY_XF86AudioLowerVolume,   spawn, NOCTALIA_STUB("volume-down 5") },
-	{ 0, XKB_KEY_XF86AudioMute,          spawn, NOCTALIA_STUB("volume-mute") },
+	{ 0, XKB_KEY_XF86AudioRaiseVolume,   spawn, SHCMD(VOLCMD("5%+")) },
+	{ 0, XKB_KEY_XF86AudioLowerVolume,   spawn, SHCMD(VOLCMD("5%-")) },
+	{ 0, XKB_KEY_XF86AudioMute,          spawn, SHCMD("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; pkill -USR1 slstatus") },
 	{ 0, XKB_KEY_XF86AudioMicMute,       spawn, NOCTALIA_STUB("mic-mute") },
 	{ 0, XKB_KEY_XF86AudioPlay,          spawn, NOCTALIA_STUB("media toggle") },
 	{ 0, XKB_KEY_XF86AudioStop,          spawn, NOCTALIA_STUB("media stop") },

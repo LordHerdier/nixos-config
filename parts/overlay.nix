@@ -14,6 +14,9 @@ final: prev: {
   dwl = final.callPackage ../pkgs/dwl { inherit (prev) dwl; };
   dwl-clangd = final.callPackage ../pkgs/dwl/clangd.nix { };
 
+  # slstatus feeding dwl's bar -- see pkgs/slstatus.
+  slstatus = final.callPackage ../pkgs/slstatus { inherit (prev) slstatus; };
+
   oneshot-cursors = final.callPackage ../pkgs/oneshot-cursors { };
   oneshot-gtk-theme = final.callPackage ../pkgs/oneshot-gtk-theme { };
   oneshot-icons = final.callPackage ../pkgs/oneshot-icons { };

@@ -27,7 +27,9 @@ let
   session = pkgs.writeShellScriptBin "dwl-session" ''
     export XDG_CURRENT_DESKTOP=dwl
     export XDG_SESSION_TYPE=wayland
-    exec ${pkgs.dwl}/bin/dwl -s ${startup}
+    # dwl's bar reads its status line from stdin, so slstatus is piped in
+    # (no exec: this is a pipeline; slstatus dies of SIGPIPE when dwl exits).
+    ${pkgs.slstatus}/bin/slstatus -s | ${pkgs.dwl}/bin/dwl -s ${startup}
   '';
 
   sessionEntry =
@@ -45,5 +47,10 @@ in
 {
   services.displayManager.sessionPackages = [ sessionEntry ];
 
-  environment.systemPackages = [ pkgs.dwl ];
+  # dwl-session on PATH so the slstatus pipeline also applies when launching
+  # from a TTY (plain `dwl` has no status input and shows the bar's default).
+  environment.systemPackages = [
+    pkgs.dwl
+    session
+  ];
 }
