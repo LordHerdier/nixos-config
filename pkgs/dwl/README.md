@@ -35,6 +35,9 @@ Applied in filename order; the number prefix is the order.
 | `25-swallow-0.9.patch`    | dwl-patches `swallow` (v0.9 version)       | Window swallowing: a terminal is hidden while a GUI app it launched runs. Adds `isterm`/`noswallow` rule columns, `enableautoswallow`, `swallowborder`, `toggleswallow`, `toggleautoswallow`                                                            |
 | `30-bar-scroll.patch`     | local, not from dwl-patches                | Scrolling over the bar cycles tags (wrapping) via a new `shiftview`; hooks `axisnotify`                                                                                                                                                                 |
 | `40-client-opacity.patch` | dwl-patches `client-opacity` + local edits | Per-window opacity: an `alpha` column in `rules`, `default_opacity`, and `setopacity` to adjust the focused window at runtime                                                                                                                           |
+| `45-monitorconfig-0.9.patch` | dwl-patches `monitorconfig` (0.9) + local edits | Adds `resx resy rate mode adaptive` columns to `monrules`. Locally changed to match `resx`/`resy`/`rate` (within 0.5Hz) against the output's real modes, not to build custom timings, and to fall back to the preferred mode when nothing matches. `mode = n` still picks the nth mode; `-1` is still a custom mode |
+| `50-tagmon.patch`         | local, not from dwl-patches                | `tagmons[]` maps each tag to an output name, like Hyprland workspace rules. `view`/`tag` move to that output when it is enabled, a new output starts on its first mapped tag and pulls in clients on its tags, and bar scrolling (`shiftview`) skips tags that live on another output |
+| `60-hide-vacant-tags.patch` | dwl-patches `hide_vacant_tags`           | The bar only draws tags that are selected or have clients, so each monitor shows just the tags in use there |
 
 `05-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops
@@ -51,8 +54,12 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   confs)
 - **Rules**: `kitty` is a swallowing terminal; `floatterm` (Super+T) floats and
   never swallows.
-- **Monitor**: `mfact` 0.55, scale 1.33, tile layout; layouts `[]=`, `><>`,
-  `[M]`.
+- **Monitors**: mirror `home/modules/hyprland/monitors.lua`. Docked, DP-4
+  (2560x1440@165.08, scale 1) sits at `0,0` and eDP-1 (2880x1920@120, scale 1.33)
+  to its right at `2560,0`. Rules apply as outputs appear, so there is no dock
+  detection and no reload. `tagmons[]` puts odd tags on DP-4 and even tags on
+  eDP-1; undocked, every tag is on eDP-1. `mfact` 0.55, tile layout; layouts
+  `[]=`, `><>`, `[M]`.
 - **Input**: Colemak (`us`/`colemak`), 25/s repeat after 600ms, natural
   scrolling and tap-to-click on trackpads.
 - **Keybinds**: ported from the old Hyprland binds

@@ -58,12 +58,27 @@ static const Layout layouts[] = {
 /* (x=-1, y=-1) is reserved as an "autoconfigure" monitor position indicator
  * WARNING: negative values other than (-1, -1) cause problems with Xwayland clients due to
  * https://gitlab.freedesktop.org/xorg/xserver/-/issues/899 */
+/* Mirrors home/modules/hyprland/monitors.lua. Docked, DP-4 (via the Anker hub)
+ * sits at the origin with the laptop panel to its right, tops aligned; rules
+ * apply as outputs appear, so no dock detection is needed. eDP-1 is pinned at
+ * x=2560 rather than auto so booting docked can't stack it on DP-4.
+ * resx/resy/rate pick from the output's own modes (45-monitorconfig); 0 means
+ * the preferred mode. DP-4 prefers 59.95Hz, hence the explicit 165.08. */
 static const MonitorRule monrules[] = {
-   /* name        mfact  nmaster scale layout       rotate/reflect                x    y
-    * example of a HiDPI laptop monitor:
-    { "eDP-1",    0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 }, */
-	{ NULL,       0.55f, 1,      1.33,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+	/* name     mfact  nmaster scale layout       rotate/reflect              x     y   resx  resy  rate     mode adaptive */
+	{ "eDP-1",  0.55f, 1,      1.33f, &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 2560, 0,  2880, 1920, 120.0f,  0,   0 },
+	{ "DP-4",   0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 0,    0,  2560, 1440, 165.08f, 0,   0 },
+	{ NULL,     0.55f, 1,      1.33f, &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, -1,   -1, 0,    0,    0.0f,    0,   0 },
 	/* default monitor rule: can be changed but cannot be eliminated; at least one monitor rule must exist */
+};
+
+/* Output each tag lives on (50-tagmon), as Hyprland's workspace rules: DP-4
+ * takes the odd tags, eDP-1 the even ones. Super+N / Super+Shift+N go to that
+ * output, and plugging DP-4 in pulls its tags' windows over. When DP-4 is
+ * absent every tag falls back to the focused monitor. */
+static const char *tagmons[] = {
+	"DP-4", "eDP-1", "DP-4", "eDP-1", "DP-4",
+	"eDP-1", "DP-4", "eDP-1", "DP-4", "eDP-1",
 };
 
 /* keyboard */
