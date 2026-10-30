@@ -11,7 +11,7 @@ index af32a55..2c178c5 100644
  	unsigned int click;
  	double cx;
  	Arg arg = {0};
-@@ -919,9 +919,16 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -919,9 +919,17 @@ buttonpress(struct wl_listener *listener, void *data)
  			(node = wlr_scene_node_at(&layers[LyrBottom]->node, cursor->x, cursor->y, NULL, NULL)) &&
  			(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer) {
  			cx = (cursor->x - selmon->m.x) * selmon->wlr_output->scale;
@@ -21,6 +21,7 @@ index af32a55..2c178c5 100644
 +					continue;
 +				occ |= c->tags == TAGMASK ? 0 : c->tags;
 +			}
++			c = NULL; /* loop leaves c pointing at the list head; focus code below reuses it */
 +			do {
 +				if (!(occ & 1 << i || selmon->tagset[selmon->seltags] & 1 << i))
 +					continue;
