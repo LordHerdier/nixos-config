@@ -1,5 +1,5 @@
-final: prev: {
-  concord = final.callPackage ../pkgs/concord.nix { };
+inputs: final: prev: {
+  concord = inputs.concord.packages.${final.stdenv.hostPlatform.system}.default;
 
   # Not a customised Console, just one with an
   # upstream bug fixed -- see pkgs/gnome-console.

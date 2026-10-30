@@ -80,7 +80,7 @@ terminal tabs and a reference doc:
 ├── flake.nix           # inputs + flake-parts wiring; the outputs live in parts/
 ├── parts/              # flake-parts modules (hosts + mkHost, overlay, devshell)
 ├── secretspec.toml     # secret declarations, backed by `pass` (see docs/secrets.md)
-├── pkgs/                # custom derivations (concord, the oneshot-* rice assets)
+├── pkgs/                # custom derivations (the oneshot-* rice assets, dwl, ...)
 ├── modules/
 │   ├── common/         # baseline (users, nix settings, packages, ssh, fonts, printing)
 │   ├── features/       # opt-in capabilities (steam, tailscale, sunshine, ollama, syncthing, parental-controls, ...)
