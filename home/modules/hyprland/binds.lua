@@ -101,6 +101,8 @@ hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(ipc .. "plugin noctalia/scree
 
 -- Display filters
 hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd("hyprcrt-toggle"))
+-- Colemak <-> QWERTY. The two layouts are declared in 30-input.nix.
+hl.bind(mainMod .. " + ALT + K", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 
 -- Window management
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())

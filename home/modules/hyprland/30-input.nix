@@ -8,8 +8,12 @@
   # call. See 40-design.nix for the rest of it.
   wayland.windowManager.hyprland.settings.config = {
     input = {
-      kb_layout = "us";
-      kb_variant = "colemak";
+      # Two layouts so the layout toggle in binds.lua can cycle between
+      # them with `hyprctl switchxkblayout`; Colemak first, so it is
+      # what you get at login. A single layout would leave nothing to
+      # switch to.
+      kb_layout = "us,us";
+      kb_variant = "colemak,";
       kb_rules = "";
       kb_model = "";
       follow_mouse = 1;
