@@ -24,7 +24,7 @@ let
     text = builtins.readFile ./dwl-wallpaper.sh;
   };
 
-  # Live-preview wallpaper menu (fzf in a floating kitty); Super+Alt+4.
+  # Live-preview wallpaper menu (fzf in a centred kitty popup); Super+Alt+4.
   wallpaperPick = pkgs.writeShellApplication {
     name = "dwl-wallpaper-pick";
     runtimeInputs = [
@@ -81,5 +81,7 @@ in
     session
     wallpaper
     wallpaperPick
+    # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
+    pkgs.wiremix
   ];
 }

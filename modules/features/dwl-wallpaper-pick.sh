@@ -1,6 +1,6 @@
 # dwl-wallpaper-pick
 #
-# fzf menu over the dwl-wallpaper images, run in a floating kitty (Super+Alt+4
+# fzf menu over the dwl-wallpaper images, run in a centred kitty popup (Super+Alt+4
 # in pkgs/dwl/config.h) so the preview pane can show thumbnails with kitty icat.
 # Each entry is applied as the cursor lands on it, but only once the cursor has
 # rested there for a moment: dwl-wallpaper starts a fresh swaybg per change, so

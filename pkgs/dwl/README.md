@@ -38,6 +38,7 @@ Applied in filename order; the number prefix is the order.
 | `45-monitorconfig-0.9.patch` | dwl-patches `monitorconfig` (0.9) + local edits | Adds `resx resy rate mode adaptive` columns to `monrules`. Locally changed to match `resx`/`resy`/`rate` (within 0.5Hz) against the output's real modes, not to build custom timings, and to fall back to the preferred mode when nothing matches. `mode = n` still picks the nth mode; `-1` is still a custom mode |
 | `50-tagmon.patch`         | local, not from dwl-patches                | `tagmons[]` maps each tag to an output name, like Hyprland workspace rules. `view`/`tag` move to that output when it is enabled, a new output starts on its first mapped tag and pulls in clients on its tags, and bar scrolling (`shiftview`) skips tags that live on another output |
 | `60-hide-vacant-tags.patch` | dwl-patches `hide_vacant_tags`           | The bar only draws tags that are selected or have clients, so each monitor shows just the tags in use there |
+| `70-center-rule.patch`      | local                                    | Adds an `iscentered` rule column: matching floating clients open centred on their monitor's usable area |
 
 `05-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops
@@ -53,7 +54,9 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
 - **Autostart**: a `kitty` running the `t` zsh function (loops over tmuninator
   confs)
 - **Rules**: `kitty` is a swallowing terminal; `floatterm` (Super+T) floats and
-  never swallows.
+  never swallows; `modal` floats centred and never swallows. Control popups
+  are kittys with that class, spawned through the `MODAL(cols, rows, title,
+  cmd...)` macro.
 - **Monitors**: mirror `home/modules/hyprland/monitors.lua`. Docked, DP-4
   (2560x1440@165.08, scale 1) sits at `0,0` and eDP-1 (2880x1920@120, scale 1.33)
   to its right at `2560,0`. Rules apply as outputs appear, so there is no dock
@@ -67,13 +70,14 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   `n/u` and `i/e` (and the arrows) walk the focus stack. dwl-only
   master/layout/monitor/opacity binds live on `Super+Ctrl`. Wallpaper cycling is
   `Super+Alt+1/2/3` (`dwl-wallpaper next|prev|rand`); `Super+Alt+4` opens
-  `dwl-wallpaper-pick`, an fzf menu in a floating kitty that previews each
+  `dwl-wallpaper-pick`, an fzf menu in a `MODAL` popup that previews each
   wallpaper live as you move through it (Enter keeps, Esc reverts).
 - **`NOCTALIA_STUB(verb)`**: binds that used to call `noctalia msg <verb>`. They
   currently run `true` as a placeholder; grep `NOCTALIA_STUB` for what's still
   unported.
 - **Volume** keys and `Super`+scroll use `wpctl` and then signal `slstatus` to
-  redraw the bar.
+  redraw the bar. `Super+A` or left-clicking the bar's status text opens
+  `wiremix` in a `MODAL` popup; right-clicking the status text toggles mute.
 
 ## Adding or updating a patch
 

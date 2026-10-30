@@ -38,11 +38,12 @@ static const char *const autostart[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id             title       tags mask     isfloating   isterm   noswallow   alpha              monitor */
-	{ "kitty",            NULL,       0,            0,           1,       0,          default_opacity,   -1 },
-	{ "floatterm",        NULL,       0,            1,           0,       1,          default_opacity,   -1 }, /* Super+T terminal */
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          default_opacity,   -1 }, /* Start on currently visible tags floating, not tiled */
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          default_opacity,   -1 }, /* Start on ONLY tag "9" */
+	/* app_id             title       tags mask     isfloating   iscentered   isterm   noswallow   alpha              monitor */
+	{ "kitty",            NULL,       0,            0,           0,           1,       0,          default_opacity,   -1 },
+	{ "floatterm",        NULL,       0,            1,           0,           0,       1,          default_opacity,   -1 }, /* Super+T terminal */
+	{ "modal",            NULL,       0,            1,           1,           0,       1,          default_opacity,   -1 }, /* kitty control popups (MODAL below) */
+	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,           0,       0,          default_opacity,   -1 }, /* Start on currently visible tags floating, not tiled */
+	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,           0,       0,          default_opacity,   -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
 };
 
@@ -164,10 +165,12 @@ static const char *termcmd[]  = { "kitty", NULL };
  * app_id is matched by a floating rule above. */
 static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
                                    "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
-/* Same floating rule, sized for the thumbnail preview. */
-static const char *wallpick[] = { "kitty", "--class", "floatterm", "--title", "wallpaper", "-o", "remember_window_size=no",
-                                  "-o", "initial_window_width=140c", "-o", "initial_window_height=35c",
-                                  "dwl-wallpaper-pick", NULL };
+/* Floating kitty centred on the focused monitor (the "modal" rule above),
+ * for control popups: COLS x ROWS cells, title, then the command to run. */
+#define MODAL(cols, rows, title, ...) { .v = (const char*[]){ "kitty", "--class", "modal", "--title", title, \
+	"-o", "remember_window_size=no", "-o", "initial_window_width=" #cols "c", \
+	"-o", "initial_window_height=" #rows "c", __VA_ARGS__, NULL } }
+#define MIXER MODAL(110, 30, "mixer", "wiremix")
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL  WLR_MODIFIER_CTRL
@@ -188,7 +191,7 @@ static const Key keys[] = {
 	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            SHCMD("dwl-wallpaper next") },
 	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            SHCMD("dwl-wallpaper prev") },
 	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            SHCMD("dwl-wallpaper rand") },
-	{ MODKEY|ALT,                XKB_KEY_4,           spawn,            {.v = wallpick} },
+	{ MODKEY|ALT,                XKB_KEY_4,           spawn,            MODAL(140, 35, "wallpaper", "dwl-wallpaper-pick") },
 
 	/* Launchers */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            SHCMD("wofi --show drun") },
@@ -213,7 +216,7 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
 
 	/* Noctalia panels & menus */
-	{ MODKEY,                    XKB_KEY_a,           spawn,            NOCTALIA_STUB("panel-toggle control-center") },
+	{ MODKEY,                    XKB_KEY_a,           spawn,            MIXER },
 	{ MODKEY,                    XKB_KEY_o,           spawn,            NOCTALIA_STUB("panel-toggle session") },
 	{ MODKEY,                    XKB_KEY_w,           spawn,            NOCTALIA_STUB("panel-toggle control-center notifications") },
 	{ MODKEY|ALT,                XKB_KEY_w,           spawn,            NOCTALIA_STUB("notification-dnd-toggle") },
@@ -305,6 +308,8 @@ static const Button buttons[] = {
 	{ ClkLtSymbol, 0,      BTN_LEFT,   setlayout,      {.v = &layouts[0]} },
 	{ ClkLtSymbol, 0,      BTN_RIGHT,  setlayout,      {.v = &layouts[2]} },
 	{ ClkTitle,    0,      BTN_MIDDLE, zoom,           {0} },
+	{ ClkStatus,   0,      BTN_LEFT,   spawn,          MIXER },
+	{ ClkStatus,   0,      BTN_RIGHT,  spawn,          SHCMD("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; pkill -USR1 slstatus") },
 	{ ClkClient,   MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ ClkClient,   MODKEY|WLR_MODIFIER_SHIFT, BTN_LEFT, moveresize, {.ui = CurResize} },
 	{ ClkClient,   MODKEY, BTN_MIDDLE, togglefloating, {0} },
