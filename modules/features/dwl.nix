@@ -119,7 +119,9 @@ let
     systemctl --user start dwl-session.target
 
     ${wallpaper}/bin/dwl-wallpaper restore || true
-    ${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent &
+    # Not hyprpolkitagent, which Hyprland uses: its hyprtoolkit renderer
+    # aborts under dwl ("Couldn't open a gbm fd").
+    ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
     ${pkgs.mako}/bin/mako --config ${makoConfig} &
 
     # Not exec: the shell has to outlive sleep for the trap to run.
