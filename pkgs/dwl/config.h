@@ -311,6 +311,6 @@ static const Button buttons[] = {
 };
 
 static const Axis axes[] = {
-	{ MODKEY, AxisUp,   spawn, SHCMD("volume-up_EXAMPLE") },
-	{ MODKEY, AxisDown, spawn, SHCMD("volume-down_EXAMPLE") },
+	{ MODKEY, AxisUp,   spawn, SHCMD(VOLCMD("1%+")) },
+	{ MODKEY, AxisDown, spawn, SHCMD(VOLCMD("1%-")) },
 };

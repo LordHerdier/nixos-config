@@ -70,7 +70,8 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
 - **`NOCTALIA_STUB(verb)`**: binds that used to call `noctalia msg <verb>`. They
   currently run `true` as a placeholder; grep `NOCTALIA_STUB` for what's still
   unported.
-- **Volume** keys use `wpctl` and then signal `slstatus` to redraw the bar.
+- **Volume** keys and `Super`+scroll use `wpctl` and then signal `slstatus` to
+  redraw the bar.
 
 ## Adding or updating a patch
 
