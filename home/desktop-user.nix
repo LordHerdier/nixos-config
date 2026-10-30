@@ -17,6 +17,7 @@
     ./modules/zsh
     ./modules/tmux
     ./modules/spotify-player.nix
+    ./modules/wiremix.nix
     ./modules/case-insensitive-dirs.nix
     ./modules/zen-browser
   ];
