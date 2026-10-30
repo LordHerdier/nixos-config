@@ -47,6 +47,23 @@ let
     text = builtins.readFile ./dwl-modal.sh;
   };
 
+  # Notifications, which Noctalia owns under Hyprland. Started from
+  # dwl-startup rather than put on PATH, so mako's D-Bus activation file
+  # can't grab org.freedesktop.Notifications in a Hyprland session.
+  # Colors follow colors[] in pkgs/dwl/config.h.
+  makoConfig = pkgs.writeText "dwl-mako-config" ''
+    font=monospace 12
+    background-color=#000000
+    text-color=#cbb8ff
+    border-color=#9664ff
+    border-size=1
+    default-timeout=5000
+
+    [urgency=high]
+    border-color=#6442a5
+    default-timeout=0
+  '';
+
   # Runs inside the compositor (dwl -s). dwl exits when this process does,
   # so it must stay alive: `sleep infinity` holds the session open until
   # Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
@@ -57,9 +74,31 @@ let
     systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
-    ${wallpaper}/bin/dwl-wallpaper restore || true
+    # The user manager outlives a logout, so portals started by a previous
+    # session (e.g. Hyprland) are still running with its WAYLAND_DISPLAY
+    # and XDG_CURRENT_DESKTOP, routing screencasts to that session's
+    # backend. Stopping them lets D-Bus activation restart them on first
+    # use with the environment imported above, which picks
+    # dwl-portals.conf. Done again on exit for whichever session is next.
+    stop_portals() {
+      systemctl --user stop 'xdg-desktop-portal*.service' || true
+    }
+    stop_portals
 
-    exec sleep infinity
+    # Brings up graphical-session.target (hypridle, easyeffects), as
+    # hyprland-session.target does under Hyprland. dwl SIGTERMs this
+    # script on exit, which the trap turns into stopping the target again.
+    trap 'systemctl --user stop dwl-session.target; stop_portals' EXIT
+    trap 'exit 0' TERM
+    systemctl --user start dwl-session.target
+
+    ${wallpaper}/bin/dwl-wallpaper restore || true
+    ${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent &
+    ${pkgs.mako}/bin/mako --config ${makoConfig} &
+
+    # Not exec: the shell has to outlive sleep for the trap to run.
+    sleep infinity &
+    wait
   '';
 
   session = pkgs.writeShellScriptBin "dwl-session" ''
@@ -85,6 +124,35 @@ in
 {
   services.displayManager.sessionPackages = [ sessionEntry ];
 
+  # Started and stopped by dwl-startup. graphical-session.target refuses
+  # a manual start, so this binds to it the way hyprland-session.target does.
+  systemd.user.targets.dwl-session = {
+    description = "dwl compositor session";
+    documentation = [ "man:systemd.special(7)" ];
+    bindsTo = [ "graphical-session.target" ];
+    wants = [ "graphical-session-pre.target" ];
+    after = [ "graphical-session-pre.target" ];
+  };
+
+  # Screen sharing and screenshots for portal clients (browsers, Discord).
+  # Hyprland ships its own hyprland-portals.conf; this is the dwl one,
+  # picked by XDG_CURRENT_DESKTOP=dwl, so the two never compete.
+  xdg.portal = {
+    wlr = {
+      enable = true;
+      settings.screencast = {
+        chooser_type = "simple";
+        chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      };
+    };
+    config.dwl = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
+      "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
+      "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+    };
+  };
+
   # dwl-session on PATH so the slstatus pipeline also applies when launching
   # from a TTY (plain `dwl` has no status input and shows the bar's default).
   environment.systemPackages = [
@@ -95,5 +163,10 @@ in
     modal
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
+    # Brightness and media keys in pkgs/dwl/config.h.
+    pkgs.brightnessctl
+    pkgs.playerctl
+    # notify-send, for scripts and testing mako.
+    pkgs.libnotify
   ];
 }
