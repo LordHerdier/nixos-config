@@ -1,7 +1,16 @@
 # home/modules/hyprland/hypridle.nix
 
-{ config, ... }:
+{ config, pkgs, ... }:
 
+let
+  # Screen power goes through wlr-output-power-management rather than
+  # `hyprctl dispatch dpms`: hypridle also runs under dwl (it hangs off
+  # graphical-session.target in both sessions), which hyprctl can't reach,
+  # and Hyprland implements the protocol too. wlopm talks to the compositor
+  # on hypridle's own WAYLAND_DISPLAY, so it can't be pointed at the wrong
+  # session by stale environment left in the shared user manager.
+  dpms = state: "${pkgs.wlopm}/bin/wlopm --${state} '*'";
+in
 {
   services.hypridle = {
     enable = true;
@@ -18,7 +27,7 @@
           "pidof mpvpaper || mpvpaper"
         ];
         before_sleep_cmd = "loginctl lock-session";
-        after_sleep_cmd = "hyprctl dispatch dpms on";
+        after_sleep_cmd = dpms "on";
       };
       listener = [
         {
@@ -32,8 +41,8 @@
         }
         {
           timeout = 330;
-          on-timeout = "hyprctl dispatch dpms off";
-          on-resume = "bash -c 'hyprctl dispatch dpms on; brightnessctl set $(cat /tmp/brightness_save)'";
+          on-timeout = dpms "off";
+          on-resume = "bash -c \"${dpms "on"}; brightnessctl set $(cat /tmp/brightness_save)\"";
         }
         {
           timeout = 1800;

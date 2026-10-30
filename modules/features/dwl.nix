@@ -47,6 +47,32 @@ let
     text = builtins.readFile ./dwl-modal.sh;
   };
 
+  # Region screenshot (Super+Shift+S); hyprshot needs hyprctl.
+  screenshot = pkgs.writeShellApplication {
+    name = "dwl-screenshot";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.grim
+      pkgs.hyprpicker
+      pkgs.libnotify
+      pkgs.slurp
+      pkgs.wl-clipboard
+    ];
+    text = builtins.readFile ./dwl-screenshot.sh;
+  };
+
+  # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
+  nightlight = pkgs.writeShellApplication {
+    name = "dwl-nightlight";
+    runtimeInputs = [
+      pkgs.libnotify
+      pkgs.procps
+      pkgs.util-linux
+      pkgs.wlsunset
+    ];
+    text = builtins.readFile ./dwl-nightlight.sh;
+  };
+
   # Notifications, which Noctalia owns under Hyprland. Started from
   # dwl-startup rather than put on PATH, so mako's D-Bus activation file
   # can't grab org.freedesktop.Notifications in a Hyprland session.
@@ -161,6 +187,8 @@ in
     wallpaper
     wallpaperPick
     modal
+    screenshot
+    nightlight
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.

@@ -200,7 +200,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_t,           spawn,            {.v = floatterm} },
 	{ MODKEY|SHIFT,              XKB_KEY_t,           spawn,            SHCMD("hacky-tts-toggle") },
 	{ MODKEY,                    XKB_KEY_grave,       spawn,            SHCMD("hacky-launcher-toggle") },
-	{ MODKEY|SHIFT,              XKB_KEY_s,           spawn,            SHCMD("hyprshot -z --mode region --output-folder ~/Pictures/Screenshots") },
+	{ MODKEY|SHIFT,              XKB_KEY_s,           spawn,            SHCMD("dwl-screenshot") },
 	{ MODKEY|SHIFT,              XKB_KEY_c,           spawn,            SHCMD("hyprpicker -qaf rgb") },
 	{ MODKEY|SHIFT,              XKB_KEY_w,           spawn,            SHCMD("moonlight stream 'nico' 'desktop'") },
 	{ MODKEY|SHIFT,              XKB_KEY_e,           spawn,            SHCMD("nautilus") },
@@ -227,7 +227,7 @@ static const Key keys[] = {
 	/* Toggles. Shift+B is dwl's own bar, not Noctalia's. */
 	{ MODKEY|SHIFT,              XKB_KEY_b,           togglebar,        {0} },
 	{ MODKEY|SHIFT,              XKB_KEY_d,           spawn,            NOCTALIA_STUB("theme-mode-toggle") },
-	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            NOCTALIA_STUB("nightlight-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            SHCMD("dwl-nightlight") },
 	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            NOCTALIA_STUB("caffeine-toggle") },
 
 	/* Noctalia plugins */
