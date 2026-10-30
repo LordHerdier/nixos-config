@@ -14,6 +14,8 @@ static const char *fonts[]                 = {"monospace:size=12"};
 static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
+static int enableautoswallow = 1; /* enables autoswallowing newly spawned clients */
+static float swallowborder = 1.0f; /* add this multiplied by borderpx to border when a client is swallowed */
 static uint32_t colors[][3]                = {
 	/*               fg          bg          border    */
 	[SchemeNorm] = { 0xcbb8ffff, 0x000000ff, 0x4a3d66ff },
@@ -28,10 +30,11 @@ static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
-	/* app_id             title       tags mask     isfloating   monitor */
-	{ "floatterm",        NULL,       0,            1,           -1 }, /* Super+T terminal */
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1 }, /* Start on currently visible tags floating, not tiled */
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1 }, /* Start on ONLY tag "9" */
+	/* app_id             title       tags mask     isfloating   isterm   noswallow   monitor */
+	{ "kitty",            NULL,       0,            0,           1,       0,          -1 },
+	{ "floatterm",        NULL,       0,            1,           0,       1,          -1 }, /* Super+T terminal */
+	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          -1 }, /* Start on currently visible tags floating, not tiled */
+	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
 };
 
@@ -201,6 +204,8 @@ static const Key keys[] = {
 	/* Window management */
 	{ MODKEY,                    XKB_KEY_f,           togglefullscreen, {0} },
 	{ MODKEY|SHIFT,              XKB_KEY_f,           togglefloating,   {0} },
+	{ MODKEY|SHIFT,              XKB_KEY_A,           toggleswallow,    {0} },
+	{ MODKEY|CTRL,               XKB_KEY_a,           toggleautoswallow,{0} },
 
 	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland */
 	{ MODKEY,                    XKB_KEY_n,           focusstack,       {.i = -1} },
