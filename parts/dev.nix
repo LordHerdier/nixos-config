@@ -1,10 +1,11 @@
+{ inputs, ... }:
 {
   # perSystem is where devShells/packages/checks/formatter go
   perSystem =
     { lib, pkgs, ... }:
     let
       # The flake's own pkgs has no overlay; dwl-clangd needs the patched dwl.
-      dwlPkgs = pkgs.extend (import ./overlay.nix);
+      dwlPkgs = pkgs.extend (import ./overlay.nix inputs);
     in
     {
       formatter = pkgs.nixfmt;
