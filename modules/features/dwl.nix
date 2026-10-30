@@ -11,6 +11,19 @@
 { pkgs, ... }:
 
 let
+  # Wallpaper cycling over swaybg; bound to Super+Alt+1/2/3 in pkgs/dwl/config.h.
+  # Lives on PATH (systemPackages below) because the binds are plain SHCMDs.
+  wallpaper = pkgs.writeShellApplication {
+    name = "dwl-wallpaper";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.findutils
+      pkgs.procps
+      pkgs.swaybg
+    ];
+    text = builtins.readFile ./dwl-wallpaper.sh;
+  };
+
   # Runs inside the compositor (dwl -s). dwl exits when this process does,
   # so it must stay alive: `sleep infinity` holds the session open until
   # Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
@@ -20,6 +33,8 @@ let
     # activated apps (portals, notification daemons, ...).
     systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
     dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+    ${wallpaper}/bin/dwl-wallpaper restore || true
 
     exec sleep infinity
   '';
@@ -52,5 +67,6 @@ in
   environment.systemPackages = [
     pkgs.dwl
     session
+    wallpaper
   ];
 }

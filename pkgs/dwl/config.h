@@ -164,9 +164,9 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_l,           quit,             {0} },
 
 	/* Wallpapers */
-	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            NOCTALIA_STUB("wallpaper-next") },
-	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            NOCTALIA_STUB("wallpaper-previous") },
-	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            NOCTALIA_STUB("wallpaper-random") },
+	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            SHCMD("dwl-wallpaper next") },
+	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            SHCMD("dwl-wallpaper prev") },
+	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            SHCMD("dwl-wallpaper rand") },
 
 	/* Launchers */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher") },
