@@ -22,6 +22,17 @@ in
       enable_streaming = if isWsl then "Never" else "Always";
       enable_media_control = true;
       enable_notify = false;
+
+      # Client id comes from `pass` at runtime so it never lands in the
+      # (world-readable) nix store. Populate with:
+      #   pass insert spotify-player/client_id
+      client_id_command = {
+        command = "${pkgs.pass}/bin/pass";
+        args = [
+          "show"
+          "spotify-player/client_id"
+        ];
+      };
       playback_window_position = "Bottom";
       copy_command = {
         command = "wl-copy";

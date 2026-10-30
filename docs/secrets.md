@@ -43,6 +43,17 @@ secretspec run -- curl -s -H "X-API-Key: $Index" 127.0.0.1:8384/rest/system/stat
 (run on the host in question, over `ssh` if remote — the GUI is
 localhost-only by design, see the feature module.)
 
+## spotify-player client id (`pass`, read at runtime)
+
+`home/modules/spotify-player.nix` sets `client_id_command` to
+`pass show spotify-player/client_id`, so spotify-player fetches its
+Spotify client id from the password store each launch instead of it
+being baked into `app.toml` in the nix store. populate it with:
+
+```sh
+pass insert spotify-player/client_id
+```
+
 ## root-only files outside the nix store
 
 the NAS SMB credentials (`modules/features/cifs-mounts.nix`) are a flat
