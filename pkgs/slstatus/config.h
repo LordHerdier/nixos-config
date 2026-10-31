@@ -9,13 +9,31 @@ static const char unknown_str[] = "n/a";
 /* maximum output string length */
 #define MAXLEN 2048
 
-/* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ is
- * substituted by default.nix with a script that prints the PipeWire sink
- * volume; dwl's volume keys send SIGUSR1 to redraw immediately. */
+/* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
+ * @battery@ are substituted by default.nix with scripts that print the
+ * PipeWire sink volume and BAT1's charge, coloured with ^fg(). dwl's volume
+ * keys send SIGUSR1 to redraw immediately.
+ *
+ * ^fg(...) colours and ^lm/^rm/^us/^ds(...) click/scroll regions are dwl's
+ * inline status commands (95-bar-status-commands.patch). A region command
+ * ends at the first ')', so none of these may contain one. */
+#define LABEL(text) "^fg(9664ff)" text "^fg()"
+#define SEP         "^fg(4a3d66) | ^fg()"
+#define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
+#define REDRAW      "; pkill -USR1 slstatus"
+
 static const struct arg args[] = {
 	/* function       format           argument */
-	{ run_command,    "vol %s | ",     "@volume@" },
-	{ battery_perc,   "bat %s%%",      "BAT1" },
-	{ battery_state,  " %s | ",        "BAT1" }, /* + charging, - discharging, o idle */
-	{ datetime,       "%s",            "%a %d %b %H:%M" },
+	/* volume: left click mixer, right click mute, scroll +-5% */
+	{ run_command,
+	  "^lm(dwl-modal mixer 110 30 wiremix)"
+	  "^rm(wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" REDRAW ")"
+	  "^us(" VOL "5%%+" REDRAW ")^ds(" VOL "5%%-" REDRAW ")"
+	  LABEL("vol ") "%s^lm()^rm()^us()^ds()" SEP,
+	  "@volume@" },
+	{ run_command,    LABEL("bat ") "%s" SEP, "@battery@" },
+	/* clock: left click toggles a three-month calendar */
+	{ datetime,
+	  "^lm(dwl-modal calendar 66 10 --hold cal -3)%s^lm()",
+	  "%a %d %b %H:%M" },
 };
