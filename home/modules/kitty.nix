@@ -27,8 +27,11 @@ in
 
     opacity = mkOption {
       type = types.float;
-      default = 0.8;
-      description = "Background opacity for kitty.";
+      default = 1.0;
+      description = ''
+        Background opacity for kitty. Defaults to opaque so the compositor
+        controls window transparency.
+      '';
     };
 
     palette = mkOption {
