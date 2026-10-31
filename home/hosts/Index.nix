@@ -8,7 +8,7 @@
     ../modules/easyeffects-presets.nix
   ];
 
-  my.theme.default = lib.mkForce "oneshot";
+  my.theme.default = lib.mkForce "halloween";
 
   my.easyeffects.enable = true;
   my.easyeffects.presets.enable = true;
