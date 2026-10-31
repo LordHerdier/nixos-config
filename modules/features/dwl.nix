@@ -90,6 +90,20 @@ let
     text = builtins.readFile ./dwl-screenshot.sh;
   };
 
+  # Clipboard history picker (Super+V), which Noctalia owns under Hyprland.
+  # The history comes from the cliphist watchers in dwl-startup.
+  clipboard = pkgs.writeShellApplication {
+    name = "dwl-clipboard";
+    runtimeInputs = [
+      pkgs.cliphist
+      pkgs.fzf
+      pkgs.kitty
+      pkgs.util-linux
+      pkgs.wl-clipboard
+    ];
+    text = builtins.readFile ./dwl-clipboard.sh;
+  };
+
   # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
   nightlight = pkgs.writeShellApplication {
     name = "dwl-nightlight";
@@ -167,6 +181,11 @@ let
     # aborts under dwl ("Couldn't open a gbm fd").
     ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
     ${pkgs.mako}/bin/mako --config ${makoConfig} &
+    # Clipboard history for dwl-clipboard (Super+V). Store paths rather
+    # than PATH, like mako: Noctalia keeps its own history under Hyprland.
+    # Both exit with the compositor when the Wayland connection drops.
+    ${pkgs.wl-clipboard}/bin/wl-paste --type text --watch ${pkgs.cliphist}/bin/cliphist store &
+    ${pkgs.wl-clipboard}/bin/wl-paste --type image --watch ${pkgs.cliphist}/bin/cliphist store &
     # The setcap wrapper (modules/features/librepods.nix), not the store
     # binary: it needs cap_net_admin. --hide starts it tray-only, which
     # shows up in the bar's systray.
@@ -238,6 +257,7 @@ in
     wallpaperPick
     modal
     screenshot
+    clipboard
     nightlight
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
