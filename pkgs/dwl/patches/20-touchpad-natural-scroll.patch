@@ -1,0 +1,14 @@
+diff --git a/dwl.c b/dwl.c
+--- a/dwl.c
++++ b/dwl.c
+@@ -1249,7 +1249,9 @@
+ 			libinput_device_config_tap_set_button_map(device, button_map);
+ 		}
+ 
+-		if (libinput_device_config_scroll_has_natural_scroll(device))
++		/* touchpads only: a tap finger count marks one, so mice keep normal scrolling */
++		if (libinput_device_config_tap_get_finger_count(device)
++				&& libinput_device_config_scroll_has_natural_scroll(device))
+ 			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
+ 
+ 		if (libinput_device_config_dwt_is_available(device))
