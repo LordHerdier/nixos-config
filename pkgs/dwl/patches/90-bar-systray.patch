@@ -346,7 +346,7 @@ index 0000000..b374b98
 +
 +#endif /* DWLDBUS_H */
 diff --git a/dwl.c b/dwl.c
-index 8f30d8e..4d7aa24 100644
+index 8f30d8e..367e8ab 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -2,6 +2,7 @@
@@ -384,17 +384,18 @@ index 8f30d8e..4d7aa24 100644
  	struct wlr_box w; /* window area, layout-relative */
  	struct wl_list layers[4]; /* LayerSurface.link */
  	const Layout *lt[2];
-@@ -421,6 +426,9 @@ static void toggleswallow(const Arg *arg);
+@@ -421,6 +426,10 @@ static void toggleswallow(const Arg *arg);
  static void toggleautoswallow(const Arg *arg);
  static void toggletag(const Arg *arg);
  static void toggleview(const Arg *arg);
 +static void trayactivate(const Arg *arg);
 +static void traymenu(const Arg *arg);
 +static void traynotify(void *data);
++static int traysepw(Monitor *m);
  static void unlocksession(struct wl_listener *listener, void *data);
  static void unmaplayersurfacenotify(struct wl_listener *listener, void *data);
  static void unmapnotify(struct wl_listener *listener, void *data);
-@@ -498,6 +506,10 @@ static int consumed[KEY_MAX + 1];
+@@ -498,6 +507,10 @@ static int consumed[KEY_MAX + 1];
  static char stext[256];
  static struct wl_event_source *status_event_source;
  
@@ -405,16 +406,16 @@ index 8f30d8e..4d7aa24 100644
  static const struct wlr_buffer_impl buffer_impl = {
      .destroy = bufdestroy,
      .begin_data_ptr_access = bufdatabegin,
-@@ -783,6 +795,8 @@ axisnotify(struct wl_listener *listener, void *data)
+@@ -783,6 +796,8 @@ axisnotify(struct wl_listener *listener, void *data)
  	struct wlr_scene_buffer *buffer;
  	static double barscroll;
  	uint32_t mods;
 +	double cx;
-+	int tw, traywidth;
++	int tw;
  
  	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
  
-@@ -800,8 +814,10 @@ axisnotify(struct wl_listener *listener, void *data)
+@@ -800,8 +815,9 @@ axisnotify(struct wl_listener *listener, void *data)
  				Arg arg = {.i = barscroll > 0 ? 1 : -1};
  				adir = barscroll > 0 ? AxisDown : AxisUp;
  				barscroll = 0;
@@ -422,8 +423,7 @@ index 8f30d8e..4d7aa24 100644
 -						> selmon->b.width - (TEXTW(selmon, stext) - selmon->lrpad + 2)) {
 +				cx = (cursor->x - selmon->m.x) * selmon->wlr_output->scale;
 +				tw = TEXTW(selmon, stext) - selmon->lrpad + 2;
-+				traywidth = tray_get_width(selmon->tray);
-+				if (cx > selmon->b.width - traywidth - tw && cx < selmon->b.width - traywidth) {
++				if (cx > selmon->b.width - tw - traysepw(selmon)) {
  					for (a = statusaxes; a < END(statusaxes); a++)
  						if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func)
  							a->func(&a->arg);
@@ -449,24 +449,25 @@ index 8f30d8e..4d7aa24 100644
  			wl_list_for_each(c, &clients, link) {
  				if (c->mon != selmon)
  					continue;
-@@ -953,7 +972,15 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -953,7 +972,16 @@ buttonpress(struct wl_listener *listener, void *data)
  				arg.ui = 1 << i;
  			} else if (cx < x + TEXTW(selmon, selmon->ltsymbol))
  				click = ClkLtSymbol;
 -			else if (cx > selmon->b.width - (TEXTW(selmon, stext) - selmon->lrpad + 2)) {
-+			else if (traywidth > 0 && cx >= selmon->b.width - traywidth) {
++			else if (traywidth > 0 && cx >= selmon->b.width - tw - traysepw(selmon) - traywidth
++					&& cx < selmon->b.width - tw - traysepw(selmon)) {
 +				unsigned int tray_n_items = watcher_get_n_items(&watcher);
-+				tx = selmon->b.width - traywidth;
++				tx = selmon->b.width - tw - traysepw(selmon) - traywidth;
 +				do
 +					tx += tray_n_items ? (int)(traywidth / tray_n_items) : 0;
 +				while (cx >= tx && ++ti < tray_n_items);
 +				click = ClkTray;
 +				arg.ui = ti;
-+			} else if (cx > selmon->b.width - traywidth - tw) {
++			} else if (cx > selmon->b.width - tw - traysepw(selmon)) {
  				click = ClkStatus;
  			} else
  				click = ClkTitle;
-@@ -973,7 +1000,12 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -973,7 +1001,12 @@ buttonpress(struct wl_listener *listener, void *data)
  		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
  		for (b = buttons; b < END(buttons); b++) {
  			if (CLEANMASK(mods) == CLEANMASK(b->mod) && event->button == b->button && click == b->click && b->func) {
@@ -480,7 +481,7 @@ index 8f30d8e..4d7aa24 100644
  				return;
  			}
  		}
-@@ -1071,6 +1103,14 @@ cleanup(void)
+@@ -1071,6 +1104,14 @@ cleanup(void)
  
  	destroykeyboardgroup(&kb_group->destroy, NULL);
  
@@ -495,7 +496,7 @@ index 8f30d8e..4d7aa24 100644
  	input_method_relay_finish(input_method_relay);
  	input_method_relay = NULL;
  
-@@ -1102,6 +1142,9 @@ cleanupmon(struct wl_listener *listener, void *data)
+@@ -1102,6 +1143,9 @@ cleanupmon(struct wl_listener *listener, void *data)
  	for (i = 0; i < LENGTH(m->pool); i++)
  		wlr_buffer_drop(&m->pool[i]->base);
  
@@ -505,58 +506,68 @@ index 8f30d8e..4d7aa24 100644
  	drwl_setimage(m->drw, NULL);
  	drwl_destroy(m->drw);
  
-@@ -1829,6 +1872,7 @@ dirtomon(enum wlr_direction dir)
+@@ -1829,6 +1873,7 @@ dirtomon(enum wlr_direction dir)
  void
  drawbar(Monitor *m)
  {
-+	int traywidth = 0;
++	int traywidth = 0, sepw;
  	int x, w, tw = 0;
  	int boxs = m->drw->font->height / 9;
  	int boxw = m->drw->font->height / 6 + 2;
-@@ -1841,11 +1885,13 @@ drawbar(Monitor *m)
+@@ -1841,6 +1886,9 @@ drawbar(Monitor *m)
  	if (!(buf = bufmon(m)))
  		return;
  
 +	traywidth = tray_get_width(m->tray);
++	sepw = traysepw(m);
 +
  	/* draw status first so it can be overdrawn by tags later */
  	if (m == selmon) { /* status is only drawn on selected monitor */
  		drwl_setscheme(m->drw, colors[SchemeNorm]);
- 		tw = TEXTW(m, stext) - m->lrpad + 2; /* 2px right padding */
--		drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0);
-+		drwl_text(m->drw, m->b.width - (tw + traywidth), 0, tw, m->b.height, 0, stext, 0);
- 	}
- 
- 	wl_list_for_each(c, &clients, link) {
-@@ -1869,7 +1915,7 @@ drawbar(Monitor *m)
+@@ -1869,7 +1917,7 @@ drawbar(Monitor *m)
  	drwl_setscheme(m->drw, colors[SchemeNorm]);
  	x = drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, m->ltsymbol, 0);
  
 -	if ((w = m->b.width - tw - x) > m->b.height) {
-+	if ((w = m->b.width - (tw + x + traywidth)) > m->b.height) {
++	if ((w = m->b.width - (tw + x + traywidth + sepw)) > m->b.height) {
  		if (c) {
  			drwl_setscheme(m->drw, colors[SchemeNorm]);
  			drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, client_get_title(c), 0);
-@@ -1881,6 +1927,15 @@ drawbar(Monitor *m)
+@@ -1881,6 +1929,20 @@ drawbar(Monitor *m)
  		}
  	}
  
++	if (sepw > 0) {
++		drwl_setscheme(m->drw, colors[SchemeNorm]);
++		drwl_text(m->drw, m->b.width - tw - sepw, 0, sepw, m->b.height, 0, " | ", 0);
++	}
++
 +	if (traywidth > 0) {
 +		pixman_image_composite32(PIXMAN_OP_SRC,
 +		                         m->tray->image, NULL, m->drw->image,
 +		                         0, 0,
 +		                         0, 0,
-+		                         m->b.width - traywidth, 0,
++		                         m->b.width - tw - sepw - traywidth, 0,
 +		                         traywidth, m->b.height);
 +	}
 +
  	wlr_scene_buffer_set_dest_size(m->scene_buffer,
  		m->b.real_width, m->b.real_height);
  	wlr_scene_node_set_position(&m->scene_buffer->node, m->m.x,
-@@ -1889,6 +1944,26 @@ drawbar(Monitor *m)
+@@ -1889,6 +1951,36 @@ drawbar(Monitor *m)
  	wlr_buffer_unlock(&buf->base);
  }
  
++/* width of the " | " between the tray and the status text; only the selected
++ * monitor draws status text, so only it has a separator */
++int
++traysepw(Monitor *m)
++{
++	if (m != selmon || tray_get_width(m->tray) <= 0)
++		return 0;
++	return TEXTW(m, " | ") - m->lrpad;
++}
++
 +void
 +traynotify(void *data)
 +{
@@ -580,7 +591,7 @@ index 8f30d8e..4d7aa24 100644
  void
  drawbars(void)
  {
-@@ -3244,6 +3319,15 @@ setup(void)
+@@ -3244,6 +3336,15 @@ setup(void)
  	status_event_source = wl_event_loop_add_fd(wl_display_get_event_loop(dpy),
  		STDIN_FILENO, WL_EVENT_READABLE, statusin, NULL);
  
@@ -596,7 +607,7 @@ index 8f30d8e..4d7aa24 100644
  	/* Make sure XWayland clients don't connect to the parent X server,
  	 * e.g when running in the x11 backend or the wayland backend and the
  	 * compositor has Xwayland support */
-@@ -3740,6 +3824,7 @@ updatebar(Monitor *m)
+@@ -3740,6 +3841,7 @@ updatebar(Monitor *m)
  	size_t i;
  	int rw, rh;
  	char fontattrs[12];
@@ -604,7 +615,7 @@ index 8f30d8e..4d7aa24 100644
  
  	wlr_output_transformed_resolution(m->wlr_output, &rw, &rh);
  	m->b.width = rw;
-@@ -3765,6 +3850,18 @@ updatebar(Monitor *m)
+@@ -3765,6 +3867,18 @@ updatebar(Monitor *m)
  	m->lrpad = m->drw->font->height;
  	m->b.height = m->drw->font->height + 2;
  	m->b.real_height = (int)((float)m->b.height / m->wlr_output->scale);
