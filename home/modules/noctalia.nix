@@ -59,6 +59,7 @@ in
     # real path hits its isPath branch and gets used as the source.
     customPalettes = {
       "Lilac AMOLED" = ./noctalia-palettes/lilac-amoled.json;
+      "Halloween" = ./noctalia-palettes/halloween.json;
       "Neon Surf" = ./noctalia-palettes/neon-surf.json;
       "Rosey AMOLED" = ./noctalia-palettes/rosey-amoled.json;
     };

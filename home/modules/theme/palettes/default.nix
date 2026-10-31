@@ -12,4 +12,5 @@
   catppuccin-mocha = import ./catppuccin-mocha.nix;
   gruvbox-nightfox = import ./gruvbox-nightfox.nix;
   oneshot = import ./oneshot.nix;
+  halloween = import ./halloween.nix;
 }
