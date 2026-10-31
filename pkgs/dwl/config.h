@@ -329,8 +329,6 @@ static const Button buttons[] = {
 	{ ClkLtSymbol, 0,      BTN_LEFT,   setlayout,      {.v = &layouts[0]} },
 	{ ClkLtSymbol, 0,      BTN_RIGHT,  setlayout,      {.v = &layouts[2]} },
 	{ ClkTitle,    0,      BTN_MIDDLE, zoom,           {0} },
-	{ ClkStatus,   0,      BTN_LEFT,   spawn,          MIXER },
-	{ ClkStatus,   0,      BTN_RIGHT,  spawn,          SHCMD("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; pkill -USR1 slstatus") },
 	{ ClkClient,   MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ ClkClient,   MODKEY|WLR_MODIFIER_SHIFT, BTN_LEFT, moveresize, {.ui = CurResize} },
 	{ ClkClient,   MODKEY, BTN_MIDDLE, togglefloating, {0} },
@@ -348,9 +346,11 @@ static const Axis axes[] = {
 	{ MODKEY, AxisDown, spawn, SHCMD(VOLCMD("1%-")) },
 };
 
-/* Scrolling over the bar's status text (35-bar-status-volume.patch); the
- * rest of the bar cycles tags. */
+/* Scrolling over the bar's status text outside a ^us()/^ds() region
+ * (35-bar-status-volume.patch); the rest of the bar cycles tags. Nothing
+ * bound: the volume section's regions in pkgs/slstatus/config.h handle
+ * volume. C forbids an empty array, so it holds one NULL-func entry, which
+ * the lookup skips. */
 static const Axis statusaxes[] = {
-	{ 0, AxisUp,   spawn, SHCMD(VOLCMD("5%+")) },
-	{ 0, AxisDown, spawn, SHCMD(VOLCMD("5%-")) },
+	{ 0, AxisUp, NULL, {0} },
 };

@@ -34,7 +34,7 @@ Applied in filename order; the number prefix is the order.
 | `05-bar.patch`            | dwl-patches `bar`                          | Built-in status bar (tags, layout symbol, title, status text) drawn with fcft via `drwl.h`. Adds `showbar`, `topbar`, `fonts[]`, `colors[][3]` (`SchemeNorm/Sel/Urg`), the `togglebar` function and `ClkTagBar`/`ClkLtSymbol`/`ClkTitle` button targets |
 | `25-swallow-0.9.patch`    | dwl-patches `swallow` (v0.9 version)       | Window swallowing: a terminal is hidden while a GUI app it launched runs. Adds `isterm`/`noswallow` rule columns, `enableautoswallow`, `swallowborder`, `toggleswallow`, `toggleautoswallow`                                                            |
 | `30-bar-scroll.patch`     | local, not from dwl-patches                | Scrolling over the bar cycles tags (wrapping) via a new `shiftview`; hooks `axisnotify`                                                                                                                                                                 |
-| `35-bar-status-volume.patch` | local                                  | Scrolling over the status text runs `statusaxes[]` from `config.h` (volume up/down) instead of cycling tags |
+| `35-bar-status-volume.patch` | local                                  | Scrolling over the status text runs `statusaxes[]` from `config.h` instead of cycling tags. Nothing is bound there now (volume moved to slstatus's `^us`/`^ds` region), so it just stops tag cycling over the status |
 | `40-client-opacity.patch` | dwl-patches `client-opacity` + local edits | Per-window opacity: an `alpha` column in `rules`, `default_opacity`, and `setopacity` to adjust the focused window at runtime                                                                                                                           |
 | `45-monitorconfig-0.9.patch` | dwl-patches `monitorconfig` (0.9) + local edits | Adds `resx resy rate mode adaptive` columns to `monrules`. Locally changed to match `resx`/`resy`/`rate` (within 0.5Hz) against the output's real modes, not to build custom timings, and to fall back to the preferred mode when nothing matches. `mode = n` still picks the nth mode; `-1` is still a custom mode |
 | `50-tagmon.patch`         | local, not from dwl-patches                | `tagmons[]` maps each tag to an output name, like Hyprland workspace rules. `view`/`tag` move to that output when it is enabled, a new output starts on its first mapped tag and pulls in clients on its tags, and bar scrolling (`shiftview`) skips tags that live on another output |
@@ -80,8 +80,12 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   currently run `true` as a placeholder; grep `NOCTALIA_STUB` for what's still
   unported.
 - **Volume** keys and `Super`+scroll use `wpctl` and then signal `slstatus` to
-  redraw the bar. `Super+A` or left-clicking the bar's status text opens
-  `wiremix` in a `MODAL` popup; right-clicking the status text toggles mute.
+  redraw the bar. `Super+A` opens `wiremix` in a `MODAL` popup. The bar's
+  status clicks and scrolls come from click regions in
+  `pkgs/slstatus/config.h` (95-bar-status-commands.patch), not from
+  `buttons[]`/`statusaxes[]`: on the volume, left click opens the mixer,
+  right click toggles mute and scrolling steps 5%; on the clock, left click
+  toggles a calendar.
 
 ## Adding or updating a patch
 
