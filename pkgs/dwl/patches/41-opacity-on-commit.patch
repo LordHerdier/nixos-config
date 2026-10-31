@@ -1,0 +1,50 @@
+--- a/dwl.c
++++ b/dwl.c
+@@ -170,6 +170,7 @@
+ 	uint32_t tags;
+ 	int isfloating, isurgent, isfullscreen;
+ 	float opacity;
++	struct wl_listener opacity_commit;
+ 	int isterm, noswallow;
+ 	pid_t pid;
+ 	Client *swallowing;  /* client being hidden */
+@@ -385,6 +386,7 @@
+ static void requestmonstate(struct wl_listener *listener, void *data);
+ static void resize(Client *c, struct wlr_box geo, int interact);
+ static void run(char *startup_cmd);
++static void opacitycommitnotify(struct wl_listener *listener, void *data);
+ static void scenebuffersetopacity(struct wlr_scene_buffer *buffer, int sx, int sy, void *user_data);
+ static void setcursor(struct wl_listener *listener, void *data);
+ static void setcursorshape(struct wl_listener *listener, void *data);
+@@ -2231,6 +2233,7 @@
+ 			? wlr_scene_xdg_surface_create(c->scene, c->surface.xdg)
+ 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
+ 	c->scene->node.data = c->scene_surface->node.data = c;
++	LISTEN(&client_surface(c)->events.commit, &c->opacity_commit, opacitycommitnotify);
+ 
+ 	client_get_geometry(c, &c->geom);
+ 
+@@ -2774,6 +2777,15 @@
+ }
+ 
+ void
++opacitycommitnotify(struct wl_listener *listener, void *data)
++{
++	Client *c = wl_container_of(listener, c, opacity_commit);
++	/* wlroots resets buffer opacity on every surface commit, so reapply it
++	 * from a listener registered after the scene surface's own. */
++	wlr_scene_node_for_each_buffer(&c->scene_surface->node, scenebuffersetopacity, c);
++}
++
++void
+ scenebuffersetopacity(struct wlr_scene_buffer *buffer, int sx, int sy, void *data)
+ {
+ 	Client *c = data;
+@@ -3480,6 +3492,7 @@
+ 	}
+ 	if (c == focused_client)
+ 		focused_client = NULL;
++	wl_list_remove(&c->opacity_commit.link);
+ 
+ 	if (c->swallowing) {
+ 		swallow(c, NULL);
