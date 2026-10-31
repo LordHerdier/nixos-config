@@ -13,16 +13,42 @@ static const int showsystray               = 1; /* 0 means no systray */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=12"};
-static const float rootcolor[]             = COLOR(0x000000ff);
+/* Colours come from my.theme via -D flags (pkgs/dwl/default.nix); the
+ * fallbacks are the OneShot palette, so this file still builds on its own. */
+#ifndef COL_BG
+#define COL_BG          0x000000ff
+#endif
+#ifndef COL_FG
+#define COL_FG          0xcbb8ffff
+#endif
+#ifndef COL_SURFACE
+#define COL_SURFACE     0x000000ff
+#endif
+#ifndef COL_BORDER_INACTIVE
+#define COL_BORDER_INACTIVE 0x4a3d66ff
+#endif
+#ifndef COL_ACCENT
+#define COL_ACCENT      0x9664ffff
+#endif
+#ifndef COL_ACCENT_FG
+#define COL_ACCENT_FG   0x000000ff
+#endif
+#ifndef COL_BORDER
+#define COL_BORDER      0x9664ffff
+#endif
+#ifndef COL_URGENT
+#define COL_URGENT      0x6442a5ff
+#endif
+static const float rootcolor[]             = COLOR(COL_BG);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
 static int enableautoswallow = 1; /* enables autoswallowing newly spawned clients */
 static float swallowborder = 1.0f; /* add this multiplied by borderpx to border when a client is swallowed */
 static uint32_t colors[][3]                = {
 	/*               fg          bg          border    */
-	[SchemeNorm] = { 0xcbb8ffff, 0x000000ff, 0x4a3d66ff },
-	[SchemeSel]  = { 0x000000ff, 0x9664ffff, 0x9664ffff },
-	[SchemeUrg]  = { 0,          0,          0x6442a5ff },
+	[SchemeNorm] = { COL_FG,        COL_SURFACE, COL_BORDER_INACTIVE },
+	[SchemeSel]  = { COL_ACCENT_FG, COL_ACCENT,  COL_BORDER },
+	[SchemeUrg]  = { 0,             0,           COL_URGENT },
 };
 
 static const float default_opacity = 0.9;

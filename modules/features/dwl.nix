@@ -7,10 +7,39 @@
 # Shows up as "dwl" in tuigreet's session list (F3), next to Hyprland and
 # the gamescope Steam session. Needs the desktop-hyprland profile for the
 # kitty / wofi that config.h launches.
+#
+# Colours (bar, borders, mako, slstatus) follow charlotte's
+# `my.theme.default`, the same palette her kitty/wofi/nvim get on this
+# host, so switching that one option recolours the whole session.
 
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
+  # The session user's resolved theme. Read across from Home Manager
+  # rather than duplicated as a system option, so the two cannot drift.
+  t = config.home-manager.users.charlotte.my.theme.active;
+
+  dwl = pkgs.dwl.override {
+    inherit (t.palette) bg fg;
+    inherit (t.roles)
+      surface
+      borderInactive
+      accent
+      accentFg
+      border
+      ;
+    urgent = t.roles.error;
+  };
+
+  slstatus = pkgs.slstatus.override {
+    inherit (t.roles)
+      accent
+      muted
+      error
+      success
+      ;
+  };
+
   # Wallpaper cycling over swaybg; bound to Super+Alt+1/2/3 in pkgs/dwl/config.h.
   # Lives on PATH (systemPackages below) because the binds are plain SHCMDs.
   wallpaper = pkgs.writeShellApplication {
@@ -76,17 +105,17 @@ let
   # Notifications, which Noctalia owns under Hyprland. Started from
   # dwl-startup rather than put on PATH, so mako's D-Bus activation file
   # can't grab org.freedesktop.Notifications in a Hyprland session.
-  # Colors follow colors[] in pkgs/dwl/config.h.
+  # Same roles as the bar's colors[] (see `dwl` above).
   makoConfig = pkgs.writeText "dwl-mako-config" ''
     font=monospace 12
-    background-color=#000000
-    text-color=#cbb8ff
-    border-color=#9664ff
+    background-color=${t.roles.surface}
+    text-color=${t.palette.fg}
+    border-color=${t.roles.border}
     border-size=1
     default-timeout=5000
 
     [urgency=high]
-    border-color=#6442a5
+    border-color=${t.roles.error}
     default-timeout=0
   '';
 
@@ -153,7 +182,7 @@ let
     export XDG_SESSION_TYPE=wayland
     # dwl's bar reads its status line from stdin, so slstatus is piped in
     # (no exec: this is a pipeline; slstatus dies of SIGPIPE when dwl exits).
-    ${pkgs.slstatus}/bin/slstatus -s | ${pkgs.dwl}/bin/dwl -s ${startup}
+    ${slstatus}/bin/slstatus -s | ${dwl}/bin/dwl -s ${startup}
   '';
 
   sessionEntry =
@@ -203,7 +232,7 @@ in
   # dwl-session on PATH so the slstatus pipeline also applies when launching
   # from a TTY (plain `dwl` has no status input and shows the bar's default).
   environment.systemPackages = [
-    pkgs.dwl
+    dwl
     session
     wallpaper
     wallpaperPick

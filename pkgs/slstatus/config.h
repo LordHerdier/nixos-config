@@ -14,11 +14,13 @@ static const char unknown_str[] = "n/a";
  * PipeWire sink volume and BAT1's charge, coloured with ^fg(). dwl's volume
  * keys send SIGUSR1 to redraw immediately.
  *
+ * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
+ *
  * ^fg(...) colours and ^lm/^rm/^us/^ds(...) click/scroll regions are dwl's
  * inline status commands (95-bar-status-commands.patch). A region command
  * ends at the first ')', so none of these may contain one. */
-#define LABEL(text) "^fg(9664ff)" text "^fg()"
-#define SEP         "^fg(4a3d66) | ^fg()"
+#define LABEL(text) "^fg(@accent@)" text "^fg()"
+#define SEP         "^fg(@muted@) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
 #define REDRAW      "; pkill -USR1 slstatus"
 

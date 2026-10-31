@@ -5,19 +5,28 @@
 # readout shells out to wpctl because slstatus's own vol_perc is OSS/ALSA only.
 # Both scripts print dwl's inline ^fg() colour commands
 # (95-bar-status-commands.patch) so their colour follows the state.
+#
+# Colours are #rrggbb parameters defaulting to the OneShot palette;
+# modules/features/dwl.nix overrides them from `my.theme`.
 
 {
+  lib,
   slstatus,
   replaceVars,
   writeShellScript,
   wireplumber,
   gawk,
+  accent ? "#9664ff",
+  muted ? "#4a3d66",
+  error ? "#6442a5",
+  success ? "#9664ff",
 }:
 
 let
-  # Colours as rrggbb, matching pkgs/dwl/config.h's purple scheme.
-  alert = "f38ba8";
-  good = "a6e3a1";
+  # dwl's ^fg() takes rrggbb without the #.
+  noHash = lib.removePrefix "#";
+  alert = noHash error;
+  good = noHash success;
 
   volume = writeShellScript "slstatus-volume" ''
     ${wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ \
@@ -46,6 +55,8 @@ in
 slstatus.override {
   conf = replaceVars ./config.h {
     inherit volume battery;
+    accent = noHash accent;
+    muted = noHash muted;
     # wpctl's own @DEFAULT_AUDIO_SINK@ in the click commands, not ours
     DEFAULT_AUDIO_SINK = null;
   };
