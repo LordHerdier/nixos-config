@@ -180,6 +180,21 @@ static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remem
  * pseudotiling or pinning, so those are not carried over; focus n/u and i/e
  * (the Colemak left/up and right/down) walk the stack instead. Master/layout
  * binds are dwl-only and live on Ctrl, which Hyprland leaves free. */
+/* The only binds that still fire while the session is locked
+ * (80-locked-keys.patch); the rest of `keys` stays dead behind the locker. */
+static const xkb_keysym_t lockedkeys[] = {
+	XKB_KEY_XF86AudioRaiseVolume,
+	XKB_KEY_XF86AudioLowerVolume,
+	XKB_KEY_XF86AudioMute,
+	XKB_KEY_XF86AudioMicMute,
+	XKB_KEY_XF86AudioPlay,
+	XKB_KEY_XF86AudioStop,
+	XKB_KEY_XF86AudioPrev,
+	XKB_KEY_XF86AudioNext,
+	XKB_KEY_XF86MonBrightnessUp,
+	XKB_KEY_XF86MonBrightnessDown,
+};
+
 static const Key keys[] = {
 	/* modifier                  key                  function          argument */
 	/* Essentials */

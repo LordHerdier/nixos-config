@@ -1,0 +1,45 @@
+--- a/dwl.c
++++ b/dwl.c
+@@ -366,6 +366,7 @@
+ static void inputdevice(struct wl_listener *listener, void *data);
+ static const Key *keybinding(uint32_t mods, xkb_keysym_t sym);
+ static void keypress(struct wl_listener *listener, void *data);
++static int lockedkey(xkb_keysym_t sym);
+ static void keypressmod(struct wl_listener *listener, void *data);
+ static int keyrepeat(void *data);
+ static void killclient(const Arg *arg);
+@@ -2142,6 +2143,17 @@
+ 	return NULL;
+ }
+ 
++int
++lockedkey(xkb_keysym_t sym)
++{
++	const xkb_keysym_t *k;
++	for (k = lockedkeys; k < END(lockedkeys); k++) {
++		if (sym == *k)
++			return 1;
++	}
++	return 0;
++}
++
+ void
+ keypress(struct wl_listener *listener, void *data)
+ {
+@@ -2164,11 +2176,13 @@
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+-	/* On _press_ if there is no active screen locker,
+-	 * attempt to process a compositor keybinding. */
+-	if (!locked && event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
++	/* On _press_ attempt to process a compositor keybinding. While a
++	 * screen locker is active only the keysyms in lockedkeys qualify. */
++	if (event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+ 		for (int i = 0; i < 2; i++) {
+ 			const Key *key = keybinding(group->mods, group->keysyms[i]);
++			if (key && locked && !lockedkey(key->keysym))
++				key = NULL;
+ 			if (key) {
+ 				consumed[event->keycode] = 1;
+ 				key->func(&key->arg);
