@@ -138,6 +138,10 @@ let
     # aborts under dwl ("Couldn't open a gbm fd").
     ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 &
     ${pkgs.mako}/bin/mako --config ${makoConfig} &
+    # The setcap wrapper (modules/features/librepods.nix), not the store
+    # binary: it needs cap_net_admin. --hide starts it tray-only, which
+    # shows up in the bar's systray.
+    /run/wrappers/bin/librepods --hide &
 
     # Not exec: the shell has to outlive sleep for the trap to run.
     sleep infinity &
