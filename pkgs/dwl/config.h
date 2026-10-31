@@ -276,8 +276,8 @@ static const Key keys[] = {
 	/* dwl-only: master area, layouts, monitors */
 	{ MODKEY|CTRL,               XKB_KEY_n,           setmfact,         {.f = -0.05f} },
 	{ MODKEY|CTRL,               XKB_KEY_i,           setmfact,         {.f = +0.05f} },
-	{ MODKEY|CTRL,               XKB_KEY_o,           setopacity,       {.f = +0.1f} },
-	{ MODKEY|CTRL|SHIFT,         XKB_KEY_O,           setopacity,       {.f = -0.1f} },
+	{ MODKEY|CTRL,               XKB_KEY_o,           setopacity,       {.f = +0.05f} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_O,           setopacity,       {.f = -0.05f} },
 	{ MODKEY|CTRL,               XKB_KEY_u,           incnmaster,       {.i = +1} },
 	{ MODKEY|CTRL,               XKB_KEY_e,           incnmaster,       {.i = -1} },
 	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },
