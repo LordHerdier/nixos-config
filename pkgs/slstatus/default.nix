@@ -31,15 +31,15 @@ let
     read -r cap < "$bat/capacity" || exit 1
     read -r state < "$bat/status"
     case $state in
-      Charging) printf '^fg(${good})%s%%+^fg()\n' "$cap" ;;
+      Charging) printf '^fg(${good})%s%% +^fg()\n' "$cap" ;;
       Discharging)
         if [ "$cap" -le 15 ]; then
-          printf '^fg(${alert})%s%%-^fg()\n' "$cap"
+          printf '^fg(${alert})%s%% -^fg()\n' "$cap"
         else
-          printf '%s%%-\n' "$cap"
+          printf '%s%% -\n' "$cap"
         fi
         ;;
-      *) printf '%s%%o\n' "$cap" ;;
+      *) printf '%s%% o\n' "$cap" ;;
     esac
   '';
 in
