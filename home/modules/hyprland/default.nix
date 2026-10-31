@@ -21,6 +21,8 @@
 
   home.packages = with pkgs; [
     hyprcursor
+    # Super+Shift+C colour picker, and the freeze hyprshot -z shells out to.
+    hyprpicker
     hyprshot
     mpvpaper
   ];

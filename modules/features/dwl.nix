@@ -196,6 +196,8 @@ in
     # Brightness and media keys in pkgs/dwl/config.h.
     pkgs.brightnessctl
     pkgs.playerctl
+    # Super+Shift+C colour picker (dwl-screenshot carries its own copy).
+    pkgs.hyprpicker
     # notify-send, for scripts and testing mako.
     pkgs.libnotify
   ];
