@@ -40,6 +40,7 @@ Applied in filename order; the number prefix is the order.
 | `50-tagmon.patch`         | local, not from dwl-patches                | `tagmons[]` maps each tag to an output name, like Hyprland workspace rules. `view`/`tag` move to that output when it is enabled, a new output starts on its first mapped tag and pulls in clients on its tags, and bar scrolling (`shiftview`) skips tags that live on another output |
 | `60-hide-vacant-tags.patch` | dwl-patches `hide_vacant_tags`           | The bar only draws tags that are selected or have clients, so each monitor shows just the tags in use there |
 | `70-center-rule.patch`      | local                                    | Adds an `iscentered` rule column: matching floating clients open centred on their monitor's usable area |
+| `90-bar-systray.patch`      | dwl-patches `bar-systray` (0.7, ported to 0.9) | StatusNotifierItem system tray at the right edge of the bar (libdbus). Left-click activates an icon, right-click shows its menu through `dmenucmd[]` (`wofi --dmenu`). Adds `showsystray`, `systrayspacing`, `ClkTray`. `dbus.c` carries its own `die`/`ecalloc` since 0.9's `util.h` can only be included once. Status-text and tray hit areas are computed separately, including for `shiftview`/`statusaxes` scrolling |
 
 `05-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops

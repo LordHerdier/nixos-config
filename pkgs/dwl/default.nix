@@ -16,12 +16,15 @@
 {
   dwl,
   fcft,
+  dbus,
   libdrm,
 }:
 
 (dwl.override { configH = ./config.h; }).overrideAttrs (old: {
-  # drwl.h (05-bar.patch) draws the bar with fcft and DRM fourcc formats.
+  # drwl.h (05-bar.patch) draws the bar with fcft and DRM fourcc formats;
+  # 90-bar-systray.patch talks StatusNotifierItem over libdbus.
   buildInputs = (old.buildInputs or [ ]) ++ [
+    dbus
     fcft
     libdrm
   ];
