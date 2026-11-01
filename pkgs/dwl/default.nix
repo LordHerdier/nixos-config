@@ -18,6 +18,11 @@
 # modules/features/dwl overrides them from the session user's
 # `my.theme`. They reach config.h as -D flags rather than substituted
 # placeholders so config.h stays valid C for clangd.nix.
+#
+# SCREEN SHADER. `screenShader` is the path of the fragment shader that
+# 99-screen-shader.patch runs over each output (Super+Shift+G), passed the
+# same way; null leaves config.h's fallback. The overlay points it at
+# hyprCRT's crt.frag. dwl reads the file each time the shader is turned on.
 
 {
   lib,
@@ -25,6 +30,8 @@
   fcft,
   dbus,
   libdrm,
+  libGL,
+  screenShader ? null,
   bg ? "#000000",
   fg ? "#cbb8ff",
   surface ? "#000000",
@@ -42,26 +49,32 @@ let
 in
 (dwl.override { configH = ./config.h; }).overrideAttrs (old: {
   env = (old.env or { }) // {
-    NIX_CFLAGS_COMPILE = toString [
-      (old.env.NIX_CFLAGS_COMPILE or "")
-      (define "BG" bg)
-      (define "FG" fg)
-      (define "SURFACE" surface)
-      (define "BORDER_INACTIVE" borderInactive)
-      (define "MUTED" muted)
-      (define "ACCENT" accent)
-      (define "ACCENT_FG" accentFg)
-      (define "BORDER" border)
-      (define "URGENT" urgent)
-    ];
+    NIX_CFLAGS_COMPILE =
+      toString [
+        (old.env.NIX_CFLAGS_COMPILE or "")
+        (define "BG" bg)
+        (define "FG" fg)
+        (define "SURFACE" surface)
+        (define "BORDER_INACTIVE" borderInactive)
+        (define "MUTED" muted)
+        (define "ACCENT" accent)
+        (define "ACCENT_FG" accentFg)
+        (define "BORDER" border)
+        (define "URGENT" urgent)
+      ]
+      # The quotes reach the compiler as-is (NIX_CFLAGS_COMPILE is split on
+      # whitespace, not shell-parsed), making the macro a string literal.
+      + lib.optionalString (screenShader != null) " -DSCREEN_SHADER=\"${screenShader}\"";
   };
 
   # drwl.h (05-bar.patch) draws the bar with fcft and DRM fourcc formats;
-  # 90-bar-systray.patch talks StatusNotifierItem over libdbus.
+  # 90-bar-systray.patch talks StatusNotifierItem over libdbus;
+  # 99-screen-shader.patch draws with GLES2 (libglvnd's glesv2).
   buildInputs = (old.buildInputs or [ ]) ++ [
     dbus
     fcft
     libdrm
+    libGL
   ];
 
   patches =

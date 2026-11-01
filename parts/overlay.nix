@@ -11,7 +11,14 @@ inputs: final: prev: {
 
   # dwl with our config.h and patch stack -- see pkgs/dwl.
   # `prev` for the same reason as gnome-console above.
-  dwl = final.callPackage ../pkgs/dwl { inherit (prev) dwl; };
+  # The screen shader (99-screen-shader.patch) is hyprCRT's, the same
+  # one the Hyprland session uses.
+  dwl = final.callPackage ../pkgs/dwl {
+    inherit (prev) dwl;
+    screenShader = "${
+      inputs.hyprCRT-shader.packages.${final.stdenv.hostPlatform.system}.default
+    }/share/hyprCRT/crt.frag";
+  };
   dwl-clangd = final.callPackage ../pkgs/dwl/clangd.nix { };
 
   # slstatus feeding dwl's bar -- see pkgs/slstatus.

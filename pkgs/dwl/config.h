@@ -58,6 +58,14 @@ static uint32_t sepcolors[3]               = { COL_MUTED, COL_SURFACE, COL_BORDE
 
 static const float default_opacity = 0.9f;
 
+/* Fragment shader run over each output's final frame while
+ * togglescreenshader is on (99-screen-shader). SCREEN_SHADER comes from
+ * pkgs/dwl/default.nix; the fallback is where Home Manager installs it. */
+#ifndef SCREEN_SHADER
+#define SCREEN_SHADER "/etc/profiles/per-user/charlotte/share/hyprCRT/crt.frag"
+#endif
+static const char *screenshader = SCREEN_SHADER;
+
 /* tagging */
 static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
@@ -293,7 +301,7 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_r,           spawnfocused,     SHCMD("dwl-record") },
 
 	/* Display filters */
-	{ MODKEY|SHIFT,              XKB_KEY_g,           spawn,            SHCMD("hyprcrt-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_g,           togglescreenshader, {0} },
 
 	/* Window management */
 	{ MODKEY,                    XKB_KEY_f,           togglefullscreen, {0} },
