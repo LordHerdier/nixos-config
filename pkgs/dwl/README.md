@@ -48,6 +48,7 @@ Applied in filename order; the number prefix is the order.
 | `95-bar-status-commands.patch` | local, syntax from dwlb                | Inline status-text commands: `^fg(rrggbb[aa])`/`^bg(...)` colour what follows (empty argument reverts), `^lm(cmd)`/`^mm`/`^rm`/`^us`/`^ds` open a click/scroll region closed by the same command with no argument, `^^` is a literal `^`. Region commands run via `sh -c` and end at the first `)`. Unmodified clicks/scrolls outside a region (or with no command for that button) fall back to `ClkStatus` bindings and `statusaxes[]`. Status input grows from 256 to 1024 bytes |
 | `96-bar-status-centre.patch` | local | `^ct()` status command: toggles drawing the following status text in the middle of the bar instead of at the right edge. The window title stops short of it, and centred blocks keep their colours and click/scroll regions. Used for slstatus's clock |
 | `97-spawn-focused.patch` | local | `spawnfocused`: `spawn`, but with `DWL_FOCUS_GEOM="x,y wxh"` (slurp's format, layout coordinates, borders included) set to the focused client's box. Lets `dwl-record` (Super+Shift+R) record just that window before its picker popup takes focus |
+| `98-bar-unfocused-clock.patch` | local | Unfocused monitors hide the system tray and right-hand status but still draw `^ct()` centred blocks (the clock) |
 
 `05-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops
