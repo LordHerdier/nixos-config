@@ -90,7 +90,9 @@ let
 
   # The Wi-Fi network (or "eth" on a wired link), red "off" with the radio
   # disabled and "none" when disconnected, then an accent "bt" label
-  # followed, in the normal colour, by the first connected Bluetooth device's name (and +N for more).
+  # followed, in the normal colour, by the first connected Bluetooth device's
+  # name (and +N for more). Each half is its own right-click region (toggling
+  # Wi-Fi or Bluetooth).
   network = writeShellScript "slstatus-network" ''
     name=
     while IFS=: read -r type state conn; do
@@ -101,6 +103,7 @@ let
     done < <(${networkmanager}/bin/nmcli -t -f TYPE,STATE,CONNECTION device)
     name=''${name//\\:/:}
     name=''${name//^/}
+    printf '^rm(dwl-network --toggle-wifi)'
     if [ -n "$name" ]; then
       printf '%s' "''${name:0:14}"
     elif [ "$(${networkmanager}/bin/nmcli radio wifi)" = disabled ]; then
@@ -108,14 +111,24 @@ let
     else
       printf '^fg(${alert})none^fg()'
     fi
-    bt=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl devices Connected \
-      | ${gnused}/bin/sed 's/\x1b\[[0-9;]*m//g')
-    if [ -n "$bt" ]; then
-      read -r _ _ dev <<<"$(${coreutils}/bin/head -n1 <<<"$bt")"
-      dev=''${dev//^/}
-      printf ' ^fg(${noHash accent})bt^fg() %s' "''${dev:0:14}"
-      n=$(${coreutils}/bin/wc -l <<<"$bt")
-      [ "$n" -le 1 ] || printf ' +%s' "$((n - 1))"
+    printf '^rm()'
+    # Right click toggles Bluetooth, so the entry stays up whenever there is
+    # an adapter: "bt off" in red, a bare "bt" with nothing connected.
+    bt=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl show 2>/dev/null)
+    if [[ $bt == *"Powered: yes"* ]]; then
+      bt=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl devices Connected \
+        | ${gnused}/bin/sed 's/\x1b\[[0-9;]*m//g')
+      printf ' ^rm(dwl-network --toggle-bluetooth)^fg(${noHash accent})bt^fg()'
+      if [ -n "$bt" ]; then
+        read -r _ _ dev <<<"$(${coreutils}/bin/head -n1 <<<"$bt")"
+        dev=''${dev//^/}
+        printf ' %s' "''${dev:0:14}"
+        n=$(${coreutils}/bin/wc -l <<<"$bt")
+        [ "$n" -le 1 ] || printf ' +%s' "$((n - 1))"
+      fi
+      printf '^rm()'
+    elif [[ $bt == *Powered:* ]]; then
+      printf ' ^rm(dwl-network --toggle-bluetooth)^fg(${alert})bt off^fg()^rm()'
     fi
     echo
   '';

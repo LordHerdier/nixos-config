@@ -7,8 +7,8 @@
 # bluetoothctl and the profile through powerprofilesctl. Escape goes back a
 # level, then closes; connecting to something closes the popup.
 #
-# The flags are for the bar block: right click toggles Wi-Fi, middle click
-# Bluetooth, without opening the popup.
+# The flags are for the bar block: right clicking the Wi-Fi name or the Bluetooth
+# entry toggles that one without opening the popup.
 
 refresh() { pkill -USR1 -x slstatus || true; }
 

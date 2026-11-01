@@ -43,12 +43,11 @@ static const struct arg args[] = {
 	  "@notifications@" },
 	/* keyboard layout, switched with Super+Alt+K */
 	{ run_command,    LABEL("kb ") "%s" SEP, "@keyboard@" },
-	/* network: left click dwl-network (Super+Alt+A), right click toggles
-	 * Wi-Fi, middle click Bluetooth */
+	/* network: left click dwl-network (Super+Alt+A); the script adds the
+	 * right-click regions that toggle Wi-Fi and Bluetooth */
 	{ run_command,
 	  "^lm(dwl-modal network 90 24 dwl-network)"
-	  "^rm(dwl-network --toggle-wifi)^mm(dwl-network --toggle-bluetooth)"
-	  LABEL("net ") "%s^lm()^rm()^mm()" SEP,
+	  LABEL("net ") "%s^lm()" SEP,
 	  "@network@" },
 	/* brightness: left click night light (Super+Shift+N), right click
 	 * caffeine (Super+Shift+I), scroll +-5% */
