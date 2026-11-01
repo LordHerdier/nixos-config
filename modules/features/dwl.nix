@@ -51,7 +51,7 @@ let
       pkgs.procps
       pkgs.swaybg
     ];
-    text = builtins.readFile ./dwl-wallpaper.sh;
+    text = builtins.readFile ./dwl/dwl-wallpaper.sh;
   };
 
   # Live-preview wallpaper menu (fzf in a centred kitty popup); Super+Alt+4.
@@ -63,7 +63,7 @@ let
       pkgs.kitty
       wallpaper
     ];
-    text = builtins.readFile ./dwl-wallpaper-pick.sh;
+    text = builtins.readFile ./dwl/dwl-wallpaper-pick.sh;
   };
 
   # Opens or closes a centred kitty popup; config.h's MODAL() binds call it.
@@ -74,7 +74,7 @@ let
       pkgs.kitty
       pkgs.procps
     ];
-    text = builtins.readFile ./dwl-modal.sh;
+    text = builtins.readFile ./dwl/dwl-modal.sh;
   };
 
   # Region screenshot (Super+Shift+S); hyprshot needs hyprctl.
@@ -88,7 +88,7 @@ let
       pkgs.slurp
       pkgs.wl-clipboard
     ];
-    text = builtins.readFile ./dwl-screenshot.sh;
+    text = builtins.readFile ./dwl/dwl-screenshot.sh;
   };
 
   # Clipboard history picker (Super+V), which Noctalia owns under Hyprland.
@@ -102,7 +102,7 @@ let
       pkgs.util-linux
       pkgs.wl-clipboard
     ];
-    text = builtins.readFile ./dwl-clipboard.sh;
+    text = builtins.readFile ./dwl/dwl-clipboard.sh;
   };
 
   # Notification centre (Super+W) and Do Not Disturb (Super+Alt+W), which
@@ -118,7 +118,7 @@ let
       pkgs.mako
       dnd
     ];
-    text = builtins.readFile ./dwl-notifications.sh;
+    text = builtins.readFile ./dwl/dwl-notifications.sh;
   };
 
   dnd = pkgs.writeShellApplication {
@@ -127,7 +127,7 @@ let
       pkgs.mako
       pkgs.procps
     ];
-    text = builtins.readFile ./dwl-dnd.sh;
+    text = builtins.readFile ./dwl/dwl-dnd.sh;
   };
 
   # Session / power menu (Super+O), which Noctalia owns under Hyprland.
@@ -141,7 +141,7 @@ let
       pkgs.systemd
       pkgs.util-linux
     ];
-    text = builtins.readFile ./dwl-session-menu.sh;
+    text = builtins.readFile ./dwl/dwl-session-menu.sh;
   };
 
   # Window switcher (Super+Alt+Tab), which Noctalia owns under Hyprland. Needs
@@ -153,7 +153,7 @@ let
       pkgs.gnugrep
       pkgs.wlrctl
     ];
-    text = builtins.readFile ./dwl-windows.sh;
+    text = builtins.readFile ./dwl/dwl-windows.sh;
   };
 
   # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
@@ -165,7 +165,7 @@ let
       pkgs.util-linux
       pkgs.wlsunset
     ];
-    text = builtins.readFile ./dwl-nightlight.sh;
+    text = builtins.readFile ./dwl/dwl-nightlight.sh;
   };
 
   # Emoji picker (Super+.), which Noctalia's launcher does under Hyprland.
@@ -187,7 +187,7 @@ let
       pkgs.wl-clipboard
     ];
     runtimeEnv.DWL_EMOJI_LIST = emojiList;
-    text = builtins.readFile ./dwl-emoji.sh;
+    text = builtins.readFile ./dwl/dwl-emoji.sh;
   };
 
   # Calendar (Super+K, and the bar's clock), which Noctalia owns under Hyprland.
@@ -197,7 +197,7 @@ let
       pkgs.coreutils
       pkgs.util-linux
     ];
-    text = builtins.readFile ./dwl-calendar.sh;
+    text = builtins.readFile ./dwl/dwl-calendar.sh;
   };
 
   # Keep-awake toggle (Super+Shift+I), which Noctalia owns under Hyprland.
@@ -210,7 +210,7 @@ let
       pkgs.systemd
       pkgs.util-linux
     ];
-    text = builtins.readFile ./dwl-caffeine.sh;
+    text = builtins.readFile ./dwl/dwl-caffeine.sh;
   };
 
   # Wi-Fi / Bluetooth / power-profile menu (Super+Alt+A, or clicking the bar's
@@ -228,7 +228,7 @@ let
       pkgs.procps
       pkgs.util-linux
     ];
-    text = builtins.readFile ./dwl-network.sh;
+    text = builtins.readFile ./dwl/dwl-network.sh;
   };
 
   # Screen recording toggle and picker (Super+Shift+R), which Noctalia's
@@ -248,7 +248,7 @@ let
       pkgs.wlr-randr
       modal
     ];
-    text = builtins.readFile ./dwl-record.sh;
+    text = builtins.readFile ./dwl/dwl-record.sh;
   };
 
   # AirPods noise control cycling (Super+Alt+S), which the harveywuk/airpods
@@ -260,7 +260,7 @@ let
       pkgs.libnotify
       pkgs.librepods
     ];
-    text = builtins.readFile ./dwl-airpods.sh;
+    text = builtins.readFile ./dwl/dwl-airpods.sh;
   };
 
   # Notifications, which Noctalia owns under Hyprland. Started from
