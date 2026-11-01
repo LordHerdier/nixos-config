@@ -259,7 +259,7 @@ static const Key keys[] = {
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL(120, 30, "clipboard", "dwl-clipboard") },
 	{ MODKEY,                    XKB_KEY_period,      spawn,            NOCTALIA_STUB("panel-toggle launcher \"/emo \"") },
-	{ MODKEY,                    XKB_KEY_Tab,         spawn,            MODAL(100, 20, "windows", "dwl-windows") },
+	{ MODKEY|ALT,                XKB_KEY_Tab,         spawn,            MODAL(100, 20, "windows", "dwl-windows") },
 	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
 
 	/* Noctalia panels & menus */
@@ -307,6 +307,10 @@ static const Key keys[] = {
 	{ MODKEY|CTRL,               XKB_KEY_u,           incnmaster,       {.i = +1} },
 	{ MODKEY|CTRL,               XKB_KEY_e,           incnmaster,       {.i = -1} },
 	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },
+	/* Alt+Tab-style: hold Super, Tab steps through windows in recently used
+	 * order, releasing Super keeps the one shown, Escape goes back */
+	{ MODKEY,                    XKB_KEY_Tab,         mrucycle,         {.i = +1} },
+	{ MODKEY|SHIFT,              XKB_KEY_Tab,         mrucycle,         {.i = -1} },
 	{ MODKEY|CTRL,               XKB_KEY_Tab,         view,             {0} },
 	{ MODKEY|CTRL,               XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
 	{ MODKEY|CTRL,               XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },

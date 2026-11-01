@@ -143,7 +143,7 @@ let
     text = builtins.readFile ./dwl-session-menu.sh;
   };
 
-  # Window switcher (Super+Tab), which Noctalia owns under Hyprland. Needs
+  # Window switcher (Super+Alt+Tab), which Noctalia owns under Hyprland. Needs
   # dwl's 85-foreign-toplevel-management.patch for wlrctl to activate windows.
   windows = pkgs.writeShellApplication {
     name = "dwl-windows";

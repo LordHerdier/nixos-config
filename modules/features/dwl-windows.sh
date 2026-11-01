@@ -1,9 +1,10 @@
 # dwl-windows
 #
-# fzf window switcher, run in a centred kitty popup (Super+Tab in
+# fzf window switcher, run in a centred kitty popup (Super+Alt+Tab in
 # pkgs/dwl/config.h), standing in for Noctalia's window switcher. Enter goes
 # to the window: dwl switches its monitor to the window's tags and focuses it
-# (85-foreign-toplevel-management.patch); Ctrl+D closes it.
+# (85-foreign-toplevel-management.patch); Ctrl+D closes it. Super+Tab is the
+# Alt+Tab-style recent-window cycle in dwl itself (87-alt-tab.patch).
 #
 # wlrctl matches windows by exact app_id and title, and the protocol has no
 # stable IDs, so two windows with the same app_id and title can't be told
