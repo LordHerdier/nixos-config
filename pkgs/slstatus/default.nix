@@ -19,6 +19,7 @@
   gnugrep,
   mako,
   procps,
+  brightnessctl,
   accent ? "#9664ff",
   muted ? "#4a3d66",
   error ? "#6442a5",
@@ -71,6 +72,18 @@ let
     fi
   '';
 
+  # Backlight percentage, in the accent colour while dwl-nightlight's
+  # wlsunset tint is on.
+  brightness = writeShellScript "slstatus-brightness" ''
+    pct=$(${brightnessctl}/bin/brightnessctl -m -c backlight | ${gawk}/bin/awk -F, '{ print $4; exit }')
+    [ -n "$pct" ] || exit 1
+    if ${procps}/bin/pgrep -u "$(id -u)" -x wlsunset >/dev/null; then
+      printf '^fg(${noHash accent})%s^fg()\n' "$pct"
+    else
+      echo "$pct"
+    fi
+  '';
+
   # The active keyboard layout, which dwl writes on every change
   # (89-xkb-layout.patch): Colemak plain, anything else in the accent colour
   # so typing in QWERTY by mistake stands out.
@@ -90,6 +103,7 @@ slstatus.override {
       battery
       notifications
       keyboard
+      brightness
       ;
     accent = noHash accent;
     muted = noHash muted;

@@ -13,9 +13,10 @@ static const char unknown_str[] = "n/a";
  * @battery@ are substituted by default.nix with scripts that print the
  * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
- * while dwl-caffeine is on, and @keyboard@ with the active keyboard layout.
- * dwl's volume keys and layout switch, dwl-dnd and dwl-caffeine send SIGUSR1
- * to redraw immediately.
+ * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
+ * @brightness@ with the backlight level (accent while dwl-nightlight is on).
+ * dwl's volume and brightness keys and layout switch, dwl-dnd, dwl-caffeine
+ * and dwl-nightlight send SIGUSR1 to redraw immediately.
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
@@ -26,6 +27,7 @@ static const char unknown_str[] = "n/a";
 #define LABEL(text) "^fg(@accent@)" text "^fg()"
 #define SEP         "^fg(@muted@) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
+#define BRI         "brightnessctl -q -c backlight set "
 #define REDRAW      "; pkill -USR1 slstatus"
 
 static const struct arg args[] = {
@@ -39,6 +41,13 @@ static const struct arg args[] = {
 	  "@notifications@" },
 	/* keyboard layout, switched with Super+Alt+K */
 	{ run_command,    LABEL("kb ") "%s" SEP, "@keyboard@" },
+	/* brightness: left click night light (Super+Shift+N), right click
+	 * caffeine (Super+Shift+I), scroll +-5% */
+	{ run_command,
+	  "^lm(dwl-nightlight)^rm(dwl-caffeine)"
+	  "^us(" BRI "5%%+" REDRAW ")^ds(" BRI "5%%-" REDRAW ")"
+	  LABEL("bri ") "%s^lm()^rm()^us()^ds()" SEP,
+	  "@brightness@" },
 	/* volume: left click mixer, right click mute, scroll +-5% */
 	{ run_command,
 	  "^lm(dwl-modal mixer 110 30 wiremix)"

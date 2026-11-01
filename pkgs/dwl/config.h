@@ -351,8 +351,8 @@ static const Key keys[] = {
 	{ 0, XKB_KEY_XF86AudioStop,          spawn, SHCMD("playerctl stop") },
 	{ 0, XKB_KEY_XF86AudioPrev,          spawn, SHCMD("playerctl previous") },
 	{ 0, XKB_KEY_XF86AudioNext,          spawn, SHCMD("playerctl next") },
-	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, SHCMD("brightnessctl set 5%+") },
-	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, SHCMD("brightnessctl set 5%-") },
+	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, SHCMD("brightnessctl set 5%+; pkill -USR1 slstatus") },
+	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, SHCMD("brightnessctl set 5%-; pkill -USR1 slstatus") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },

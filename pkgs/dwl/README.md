@@ -91,8 +91,10 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   status clicks and scrolls come from click regions in
   `pkgs/slstatus/config.h` (95-bar-status-commands.patch), not from
   `buttons[]`/`statusaxes[]`: on the volume, left click opens the mixer,
-  right click toggles mute and scrolling steps 5%; on the clock, left click
-  toggles a calendar.
+  right click toggles mute and scrolling steps 5%; on the brightness, left
+  click toggles night light, right click caffeine and scrolling steps 5%
+  (shown in the accent colour while night light is on); on the clock, left
+  click toggles a calendar.
 
 ## Adding or updating a patch
 
