@@ -13,8 +13,9 @@ static const char unknown_str[] = "n/a";
  * @battery@ are substituted by default.nix with scripts that print the
  * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
- * while dwl-caffeine is on. dwl's volume keys, dwl-dnd and dwl-caffeine send
- * SIGUSR1 to redraw immediately.
+ * while dwl-caffeine is on, and @keyboard@ with the active keyboard layout.
+ * dwl's volume keys and layout switch, dwl-dnd and dwl-caffeine send SIGUSR1
+ * to redraw immediately.
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
@@ -35,6 +36,8 @@ static const struct arg args[] = {
 	  "^mm(dwl-notifications --clear)^rm(dwl-dnd)"
 	  "%s^lm()^mm()^rm()" SEP,
 	  "@notifications@" },
+	/* keyboard layout, switched with Super+Alt+K */
+	{ run_command,    LABEL("kb ") "%s" SEP, "@keyboard@" },
 	/* volume: left click mixer, right click mute, scroll +-5% */
 	{ run_command,
 	  "^lm(dwl-modal mixer 110 30 wiremix)"

@@ -116,10 +116,16 @@ static const struct xkb_rule_names xkb_rules = {
 	/* example:
 	.options = "ctrl:nocaps",
 	*/
-	.layout = "us",
-	.variant = "colemak",
+	/* Colemak and QWERTY, Colemak first so it's what you get at login, as in
+	 * home/modules/hyprland/30-input.nix. Super+Alt+K switches. */
+	.layout = "us,us",
+	.variant = "colemak,",
 	.options = NULL,
 };
+
+/* Run when the active layout changes (89-xkb-layout), after dwl has written
+ * its name to $XDG_RUNTIME_DIR/dwl-xkb-layout, so the bar redraws at once */
+static const char *const xkblayoutcmd[] = { "pkill", "-USR1", "-x", "slstatus", NULL };
 
 static const int repeat_rate = 25;
 static const int repeat_delay = 600;
@@ -274,6 +280,8 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_d,           spawn,            NOCTALIA_STUB("theme-mode-toggle") },
 	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            SHCMD("dwl-nightlight") },
 	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            SHCMD("dwl-caffeine") },
+	/* Colemak <-> QWERTY (89-xkb-layout) */
+	{ MODKEY|ALT,                XKB_KEY_k,           switchxkblayout,  {.i = +1} },
 
 	/* Noctalia plugins */
 	{ MODKEY|ALT,                XKB_KEY_s,           spawn,            SHCMD("dwl-airpods") },

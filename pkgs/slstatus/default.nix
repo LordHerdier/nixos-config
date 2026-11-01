@@ -70,10 +70,27 @@ let
       printf '^fg(${noHash accent})\uf0f3 ^fg()\n'
     fi
   '';
+
+  # The active keyboard layout, which dwl writes on every change
+  # (89-xkb-layout.patch): Colemak plain, anything else in the accent colour
+  # so typing in QWERTY by mistake stands out.
+  keyboard = writeShellScript "slstatus-keyboard" ''
+    read -r name < "$XDG_RUNTIME_DIR/dwl-xkb-layout" || exit 1
+    case $name in
+      *Colemak*) echo cmk ;;
+      "English (US)") echo '^fg(${noHash accent})qwerty^fg()' ;;
+      *) printf '^fg(${noHash accent})%s^fg()\n' "$name" ;;
+    esac
+  '';
 in
 slstatus.override {
   conf = replaceVars ./config.h {
-    inherit volume battery notifications;
+    inherit
+      volume
+      battery
+      notifications
+      keyboard
+      ;
     accent = noHash accent;
     muted = noHash muted;
     # wpctl's own @DEFAULT_AUDIO_SINK@ in the click commands, not ours
