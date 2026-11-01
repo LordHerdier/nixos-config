@@ -23,6 +23,7 @@
   networkmanager,
   bluez,
   coreutils,
+  gnused,
   accent ? "#9664ff",
   muted ? "#4a3d66",
   error ? "#6442a5",
@@ -88,8 +89,8 @@ let
   '';
 
   # The Wi-Fi network (or "eth" on a wired link), red "off" with the radio
-  # disabled and "none" when disconnected, then a "bt" in the accent colour
-  # while a Bluetooth device is connected (count after it from two up).
+  # disabled and "none" when disconnected, then an accent "bt" label
+  # followed, in the normal colour, by the first connected Bluetooth device's name (and +N for more).
   network = writeShellScript "slstatus-network" ''
     name=
     while IFS=: read -r type state conn; do
@@ -107,11 +108,14 @@ let
     else
       printf '^fg(${alert})none^fg()'
     fi
-    n=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl devices Connected | ${coreutils}/bin/wc -l)
-    if [ "$n" -gt 1 ]; then
-      printf ' ^fg(${noHash accent})bt %s^fg()' "$n"
-    elif [ "$n" -eq 1 ]; then
-      printf ' ^fg(${noHash accent})bt^fg()'
+    bt=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl devices Connected \
+      | ${gnused}/bin/sed 's/\x1b\[[0-9;]*m//g')
+    if [ -n "$bt" ]; then
+      read -r _ _ dev <<<"$(${coreutils}/bin/head -n1 <<<"$bt")"
+      dev=''${dev//^/}
+      printf ' ^fg(${noHash accent})bt^fg() %s' "''${dev:0:14}"
+      n=$(${coreutils}/bin/wc -l <<<"$bt")
+      [ "$n" -le 1 ] || printf ' +%s' "$((n - 1))"
     fi
     echo
   '';
