@@ -12,7 +12,7 @@ index 617e1ca..f8b3d1c 100644
  LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
  
 diff --git a/dwl.c b/dwl.c
-index a0df0f4..86a5f7f 100644
+index a0df0f4..42635ef 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -1,6 +1,7 @@
@@ -47,18 +47,19 @@ index a0df0f4..86a5f7f 100644
  };
  
  typedef struct {
-@@ -450,6 +461,10 @@ static void setpsel(struct wl_listener *listener, void *data);
+@@ -450,6 +461,11 @@ static void setpsel(struct wl_listener *listener, void *data);
  static void setsel(struct wl_listener *listener, void *data);
  static void setup(void);
  static void setstatus(const char *s);
 +static int shaderapply(Monitor *m, struct wlr_output_state *state);
 +static GLuint shadercompile(GLenum type, const char *src);
++static void shaderfree(Monitor *m);
 +static void shaderload(void);
 +static void shaderset(int on);
  static void spawn(const Arg *arg);
  static void spawnfocused(const Arg *arg);
  static void spawnstatuscmd(const StatusBlock *b, int cmd);
-@@ -465,6 +480,7 @@ static void tile(Monitor *m);
+@@ -465,6 +481,7 @@ static void tile(Monitor *m);
  static void togglebar(const Arg *arg);
  static void togglefloating(const Arg *arg);
  static void togglefullscreen(const Arg *arg);
@@ -66,7 +67,7 @@ index a0df0f4..86a5f7f 100644
  static void toggleswallow(const Arg *arg);
  static void toggleautoswallow(const Arg *arg);
  static void toggletag(const Arg *arg);
-@@ -512,6 +528,11 @@ static struct wlr_scene_tree *drag_icon;
+@@ -512,6 +529,11 @@ static struct wlr_scene_tree *drag_icon;
  static const int layermap[] = { LyrBg, LyrBottom, LyrTop, LyrOverlay };
  static struct wlr_renderer *drw;
  static struct wlr_allocator *alloc;
@@ -78,17 +79,15 @@ index a0df0f4..86a5f7f 100644
  static struct wlr_compositor *compositor;
  static struct wlr_session *session;
  
-@@ -1233,6 +1254,9 @@ cleanupmon(struct wl_listener *listener, void *data)
+@@ -1233,6 +1255,7 @@ cleanupmon(struct wl_listener *listener, void *data)
  	m->wlr_output->data = NULL;
  	wlr_output_layout_remove(output_layout, m->wlr_output);
  	wlr_scene_output_destroy(m->scene_output);
-+	if (m->shader_swapchain)
-+		wlr_swapchain_destroy(m->shader_swapchain);
-+	wlr_drm_syncobj_timeline_unref(m->shader_timeline);
++	shaderfree(m);
  
  	closemon(m);
  	wlr_scene_node_destroy(&m->fullscreen_bg->node);
-@@ -2467,6 +2491,19 @@ gpureset(struct wl_listener *listener, void *data)
+@@ -2467,6 +2490,19 @@ gpureset(struct wl_listener *listener, void *data)
  		wlr_output_init_render(m->wlr_output, alloc, drw);
  	}
  
@@ -97,18 +96,18 @@ index a0df0f4..86a5f7f 100644
 +	shader_prog = 0;
 +	shader_reload = shader_on;
 +	wl_list_for_each(m, &mons, link) {
-+		if (m->shader_swapchain)
-+			wlr_swapchain_destroy(m->shader_swapchain);
-+		m->shader_swapchain = NULL;
-+		wlr_drm_syncobj_timeline_unref(m->shader_timeline);
-+		m->shader_timeline = NULL;
++		shaderfree(m);
 +		m->shader_dirty = 1;
 +	}
++	/* shaderset() won't turn it on without GLES2, and the new renderer
++	 * need not be the same kind as the old one */
++	if (shader_on && !wlr_renderer_is_gles2(drw))
++		shaderset(0);
 +
  	wlr_allocator_destroy(old_alloc);
  	wlr_renderer_destroy(old_drw);
  }
-@@ -3263,13 +3300,43 @@ rendermon(struct wl_listener *listener, void *data)
+@@ -3263,13 +3299,53 @@ rendermon(struct wl_listener *listener, void *data)
  	/* This function is called every time an output is ready to display a frame,
  	 * generally at the output's refresh rate (e.g. 60Hz). */
  	Monitor *m = wl_container_of(listener, m, frame);
@@ -123,6 +122,16 @@ index a0df0f4..86a5f7f 100644
 +		m->shader_locked = shader_on;
 +		wlr_output_lock_software_cursors(m->wlr_output, shader_on);
 +		wlr_output_lock_attach_render(m->wlr_output, shader_on);
++		/* wlroots only goes back to a hardware cursor when the image
++		 * changes, and setting the same one again is a no-op: clear it
++		 * and let it be set afresh, as buttonpress does after a grab. Not
++		 * mid-grab, where that would drop the grab's image or end the
++		 * client's implicit grab; the next image change catches up */
++		if (!shader_on && cursor_mode == CurNormal) {
++			wlr_cursor_unset_image(cursor);
++			wlr_seat_pointer_clear_focus(seat);
++			motionnotify(0, NULL, 0, 0, 0, 0);
++		}
 +	}
  
 -	if (!wlr_scene_output_needs_frame(m->scene_output)) {
@@ -154,7 +163,7 @@ index a0df0f4..86a5f7f 100644
  	clock_gettime(CLOCK_MONOTONIC, &now);
  	wlr_scene_output_send_frame_done(m->scene_output, &now);
  }
-@@ -3916,6 +3983,239 @@ setstatus(const char *s)
+@@ -3916,6 +3992,258 @@ setstatus(const char *s)
  	nsblocks = b - sblocks + 1;
  }
  
@@ -219,11 +228,17 @@ index a0df0f4..86a5f7f 100644
 +
 +	if (shader_reload)
 +		shaderload();
-+	if (shader_prog) {
++	/* The swapchain's format should rule out GL_TEXTURE_EXTERNAL_OES,
++	 * but sampling one as a 2D texture would give a black screen */
++	wlr_gles2_texture_get_attribs(tex, &attribs);
++	if (shader_prog && attribs.target != GL_TEXTURE_2D) {
++		wlr_log(WLR_ERROR, "screen shader: %s's buffer isn't a 2D texture", o->name);
++		shaderset(0);
++	}
++	if (shader_prog && shader_on) {
 +		/* begin_buffer_pass has bound buf and set the viewport; wlroots
 +		 * sets the rest of its GL state per draw, but expects no buffer
 +		 * bound to GL_ARRAY_BUFFER, so the quad stays a client array */
-+		wlr_gles2_texture_get_attribs(tex, &attribs);
 +		glUseProgram(shader_prog);
 +		glDisable(GL_BLEND);
 +		glActiveTexture(GL_TEXTURE0);
@@ -241,8 +256,8 @@ index a0df0f4..86a5f7f 100644
 +		glBindTexture(GL_TEXTURE_2D, 0);
 +		glUseProgram(0);
 +	} else {
-+		/* It failed to load and shaderload() turned it off: show this
-+		 * one frame unfiltered rather than not at all */
++		/* It failed to load or can't sample this buffer, and has turned
++		 * itself off: show this one frame unfiltered, not nothing */
 +		wlr_render_pass_add_texture(pass, &(struct wlr_render_texture_options){
 +			.texture = tex,
 +			.blend_mode = WLR_RENDER_BLEND_MODE_NONE,
@@ -287,13 +302,23 @@ index a0df0f4..86a5f7f 100644
 +}
 +
 +void
++shaderfree(Monitor *m)
++{
++	wlr_swapchain_destroy(m->shader_swapchain);
++	m->shader_swapchain = NULL;
++	wlr_drm_syncobj_timeline_unref(m->shader_timeline);
++	m->shader_timeline = NULL;
++}
++
++void
 +shaderload(void)
 +{
 +	/* The same contract as Hyprland's decoration:screen_shader: the
 +	 * fragment shader samples `tex` at `v_texcoord`, and gets the output's
 +	 * size in pixels as `fullSize`. The vertex shader has to be the same
 +	 * GLSL version, so it borrows a 3xx shader's #version line; anything
-+	 * else gets GLSL 100 */
++	 * else gets GLSL 100. Comments and blank lines may come before
++	 * #version, so it is the first line that starts with it */
 +	static const char vert3[] =
 +		"in vec2 pos;\n"
 +		"out vec2 v_texcoord;\n"
@@ -308,7 +333,7 @@ index a0df0f4..86a5f7f 100644
 +		"	v_texcoord = pos;\n"
 +		"	gl_Position = vec4(pos * 2.0 - 1.0, 0.0, 1.0);\n"
 +		"}\n";
-+	char vsrc[512], log[1024], *src = NULL;
++	char vsrc[512], log[1024], *src = NULL, *ver;
 +	GLuint vs = 0, fs = 0, prog;
 +	size_t verlen;
 +	long len;
@@ -337,9 +362,12 @@ index a0df0f4..86a5f7f 100644
 +	}
 +	fclose(f);
 +
-+	if (!strncmp(src, "#version 3", 10)) {
-+		verlen = strcspn(src, "\n");
-+		snprintf(vsrc, sizeof(vsrc), "%.*s\n%s", (int)verlen, src, vert3);
++	for (ver = src; ver && strncmp(ver + strspn(ver, " \t"), "#version", 8);
++			ver = (ver = strchr(ver, '\n')) ? ver + 1 : NULL)
++		;
++	if (ver && strtol(ver + strspn(ver, " \t") + 8, NULL, 10) >= 300) {
++		verlen = strcspn(ver, "\r\n");
++		snprintf(vsrc, sizeof(vsrc), "%.*s\n%s", (int)verlen, ver, vert3);
 +	} else {
 +		snprintf(vsrc, sizeof(vsrc), "%s", vert1);
 +	}
@@ -394,7 +422,7 @@ index a0df0f4..86a5f7f 100644
  void
  spawnstatuscmd(const StatusBlock *b, int cmd)
  {
-@@ -4190,6 +4490,12 @@ togglefullscreen(const Arg *arg)
+@@ -4190,6 +4518,12 @@ togglefullscreen(const Arg *arg)
  		setfullscreen(sel, !sel->isfullscreen);
  }
  
