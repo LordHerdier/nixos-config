@@ -78,7 +78,7 @@ case "${1:-}" in
   --preview)
     { makoctl list -j; makoctl history -j; } | jq -rs --argjson id "$2" '
       add | map(select(.id == $id)) | first // empty |
-      "\(.app_name) · \(.urgency)\n\n\(.summary)\n\n\(.body | gsub("<[^>]*>"; ""))"'
+      "\(.app_name) · \(.urgency)\n\n\(.summary)\n\n\(.body // "" | gsub("<[^>]*>"; ""))"'
     exit 0
     ;;
 esac
