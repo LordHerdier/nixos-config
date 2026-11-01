@@ -285,7 +285,7 @@ static const Key keys[] = {
 
 	/* Noctalia plugins */
 	{ MODKEY|ALT,                XKB_KEY_s,           spawn,            SHCMD("dwl-airpods") },
-	{ MODKEY|SHIFT,              XKB_KEY_r,           spawn,            NOCTALIA_STUB("plugin noctalia/screen_recorder:service all toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_r,           spawnfocused,     SHCMD("dwl-record") },
 
 	/* Display filters */
 	{ MODKEY|SHIFT,              XKB_KEY_g,           spawn,            SHCMD("hyprcrt-toggle") },

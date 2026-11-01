@@ -212,6 +212,25 @@ let
     text = builtins.readFile ./dwl-caffeine.sh;
   };
 
+  # Screen recording toggle and picker (Super+Shift+R), which Noctalia's
+  # screen_recorder plugin does under Hyprland.
+  record = pkgs.writeShellApplication {
+    name = "dwl-record";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.jq
+      pkgs.libnotify
+      pkgs.procps
+      pkgs.slurp
+      pkgs.util-linux
+      pkgs.wf-recorder
+      pkgs.wlr-randr
+      modal
+    ];
+    text = builtins.readFile ./dwl-record.sh;
+  };
+
   # AirPods noise control cycling (Super+Alt+S), which the harveywuk/airpods
   # Noctalia plugin does under Hyprland. Talks to the librepods dwl-startup runs.
   airpods = pkgs.writeShellApplication {
@@ -384,6 +403,7 @@ in
     calendar
     airpods
     emoji
+    record
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.
