@@ -123,6 +123,8 @@ menu. it's a patched dwl 0.9 with a slstatus bar, kitty popups standing in for
 noctalia's panels, qylock as the lock screen, and the same CRT shader on
 Super+Shift+G. the session itself is `modules/features/dwl/`.
 
+![dwl with the CRT shader on](screenshots/index-dwl-crt.webp)
+
 <details>
 <summary>deep dive: lua config + lock screen colors</summary>
 
