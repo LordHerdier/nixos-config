@@ -7,8 +7,9 @@
 # vol_perc is OSS/ALSA only. The scripts print dwl's inline ^fg() colour
 # commands (95-bar-status-commands.patch) so their colour follows the state.
 #
-# Colours are #rrggbb parameters defaulting to the OneShot palette;
-# modules/features/dwl overrides them from `my.theme`.
+# No colours are baked in: the scripts and config.h print dwl's theme colour
+# names (^fg(accent), ^fg(alert), ...), which dwl resolves when it draws, so
+# a dwl-theme switch recolours the blocks (99-theme-colours.patch).
 
 {
   lib,
@@ -25,27 +26,20 @@
   networkmanager,
   procps,
   wireplumber,
-  accent ? "#9664ff",
-  muted ? "#4a3d66",
-  error ? "#6442a5",
-  success ? "#9664ff",
 }:
 
 let
-  # dwl's ^fg() takes rrggbb without the #.
-  noHash = lib.removePrefix "#";
-
-  # ./scripts/slstatus-NAME.sh as `slstatus-NAME`, with the colours it may
-  # print as SLSTATUS_ACCENT / _ALERT / _GOOD.
+  # ./scripts/slstatus-NAME.sh as `slstatus-NAME`, with the dwl colour
+  # names it may print as SLSTATUS_ACCENT / _ALERT / _GOOD.
   mkScript =
     name: deps:
     writeShellApplication {
       name = "slstatus-${name}";
       runtimeInputs = deps;
       runtimeEnv = {
-        SLSTATUS_ACCENT = noHash accent;
-        SLSTATUS_ALERT = noHash error;
-        SLSTATUS_GOOD = noHash success;
+        SLSTATUS_ACCENT = "accent";
+        SLSTATUS_ALERT = "alert";
+        SLSTATUS_GOOD = "good";
       };
       text = builtins.readFile ./scripts/slstatus-${name}.sh;
     };
@@ -81,8 +75,6 @@ slstatus.override {
   conf = replaceVars ./config.h (
     lib.mapAttrs (_: lib.getExe) scripts
     // {
-      accent = noHash accent;
-      muted = noHash muted;
       # wpctl's own @DEFAULT_AUDIO_SINK@ in the click commands, not ours
       DEFAULT_AUDIO_SINK = null;
     }

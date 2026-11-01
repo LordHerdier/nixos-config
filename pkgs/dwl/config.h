@@ -43,6 +43,9 @@ static const char *fonts[]                 = {"monospace:size=12"};
 #ifndef COL_BORDER
 #define COL_BORDER      0x9664ffff
 #endif
+#ifndef COL_SUCCESS
+#define COL_SUCCESS     0x9664ffff
+#endif
 #ifndef COL_URGENT
 #define COL_URGENT      0x6442a5ff
 #endif
@@ -59,6 +62,8 @@ static uint32_t colors[][3]                = {
 };
 /* the " | " between the tray and the status text, matching slstatus's SEP */
 static uint32_t sepcolors[3]               = { COL_MUTED, COL_SURFACE, COL_BORDER_INACTIVE };
+/* ^fg(good) in the status line */
+static uint32_t successcolor               = COL_SUCCESS;
 
 static const float default_opacity = 0.9f;
 

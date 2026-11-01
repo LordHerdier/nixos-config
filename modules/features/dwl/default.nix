@@ -54,6 +54,7 @@ let
       accent_fg=${theme.roles.accentFg}
       border=${theme.roles.border}
       urgent=${theme.roles.error}
+      success=${theme.roles.success}
     '';
 
   themes = pkgs.linkFarm "dwl-themes" (
@@ -63,14 +64,7 @@ let
     }) hm.my.theme.palettes
   );
 
-  slstatus = pkgs.slstatus.override {
-    inherit (t.roles)
-      accent
-      muted
-      error
-      success
-      ;
-  };
+  slstatus = pkgs.slstatus;
 
   scripts = import ./scripts.nix {
     inherit

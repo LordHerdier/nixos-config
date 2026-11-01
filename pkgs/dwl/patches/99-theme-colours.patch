@@ -1,17 +1,39 @@
 diff --git a/dwl.c b/dwl.c
-index 42635ef..7df6a7a 100644
+index 42635ef..ea7d1ea 100644
 --- a/dwl.c
 +++ b/dwl.c
-@@ -411,6 +411,8 @@ static void ftlfullscreennotify(struct wl_listener *listener, void *data);
+@@ -139,6 +139,7 @@ enum { StBtnLeft, StBtnMiddle, StBtnRight, StScrollUp, StScrollDown, StCmdLast }
+ typedef struct {
+ 	const char *text;
+ 	uint32_t fg, bg;
++	unsigned char fgrole, bgrole; /* 1 + a statuscolor() role; 0 uses fg/bg */
+ 	const char *cmd[StCmdLast];
+ 	int centre; /* drawn in the middle of the bar, not at the right */
+ } StatusBlock;
+@@ -411,6 +412,9 @@ static void ftlfullscreennotify(struct wl_listener *listener, void *data);
  static void fullscreennotify(struct wl_listener *listener, void *data);
  static void gpureset(struct wl_listener *listener, void *data);
  static void handlesig(int signo);
 +static int loadcolors(void);
++static uint32_t statuscolor(int role);
 +static int sigcolors(int signo, void *data);
  static void incnmaster(const Arg *arg);
  static void inputdevice(struct wl_listener *listener, void *data);
  static const Key *keybinding(uint32_t mods, xkb_keysym_t sym);
-@@ -2531,6 +2533,99 @@ handlesig(int signo)
+@@ -2028,8 +2032,10 @@ drawbar(Monitor *m)
+ 				continue;
+ 			if (!(w = drwl_font_getwidth(m->drw, sblocks[i].text)))
+ 				continue;
+-			scm[ColFg] = sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
+-			scm[ColBg] = sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
++			scm[ColFg] = sblocks[i].fgrole ? statuscolor(sblocks[i].fgrole)
++				: sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
++			scm[ColBg] = sblocks[i].bgrole ? statuscolor(sblocks[i].bgrole)
++				: sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
+ 			scm[ColBorder] = colors[SchemeNorm][ColBorder];
+ 			drwl_setscheme(m->drw, scm);
+ 			if (sblocks[i].centre) {
+@@ -2531,6 +2537,114 @@ handlesig(int signo)
  	}
  }
  
@@ -50,6 +72,7 @@ index 42635ef..7df6a7a 100644
 +		{ "accent_fg",       { &colors[SchemeSel][ColFg] } },
 +		{ "border",          { &colors[SchemeSel][ColBorder] } },
 +		{ "urgent",          { &colors[SchemeUrg][ColBorder] } },
++		{ "success",         { &successcolor } },
 +	};
 +	char path[PATH_MAX], line[128], key[32], hex[16];
 +	unsigned int rgb;
@@ -100,6 +123,20 @@ index 42635ef..7df6a7a 100644
 +	return 0;
 +}
 +
++/* The colours a status line can name, as ^fg(accent) rather than a hex
++ * value, so they follow loadcolors. 1-based, matching setstatus's names. */
++uint32_t
++statuscolor(int role)
++{
++	switch (role) {
++	case 1: return colors[SchemeSel][ColBg];     /* accent */
++	case 2: return sepcolors[ColFg];             /* muted */
++	case 3: return colors[SchemeUrg][ColBorder]; /* alert */
++	case 4: return successcolor;                 /* good */
++	}
++	return 0;
++}
++
 +int
 +sigcolors(int signo, void *data)
 +{
@@ -111,7 +148,7 @@ index 42635ef..7df6a7a 100644
  void
  incnmaster(const Arg *arg)
  {
-@@ -3683,7 +3778,9 @@ setup(void)
+@@ -3683,7 +3797,9 @@ setup(void)
  
  	/* Initialize the scene graph used to lay out windows */
  	scene = wlr_scene_create();
@@ -121,3 +158,57 @@ index 42635ef..7df6a7a 100644
  	for (i = 0; i < NUM_LAYERS; i++)
  		layers[i] = wlr_scene_tree_create(&scene->tree);
  	drag_icon = wlr_scene_tree_create(&scene->tree);
+@@ -3914,6 +4030,8 @@ setup(void)
+ /* Parse a status line into sblocks. Inline commands, as in dwlb:
+  *   ^fg(rrggbb[aa]) ^bg(rrggbb[aa])     colour the following text; empty
+  *                                       argument reverts to SchemeNorm
++ *   ^fg(accent|muted|alert|good)        the same, with a theme colour that
++ *                                       follows loadcolors
+  *   ^lm(cmd) ^mm(cmd) ^rm(cmd)          left/middle/right click region
+  *   ^us(cmd) ^ds(cmd)                   scroll up/down region
+  *   ^ct()                               toggle drawing the following text
+@@ -3926,11 +4044,14 @@ void
+ setstatus(const char *s)
+ {
+ 	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds", "ct" };
++	/* in statuscolor() order */
++	static const char *const roles[] = { "accent", "muted", "alert", "good" };
+ 	char *p = stextbuf, *end = stextbuf + sizeof(stextbuf) - 1, hex[9], *e;
+ 	const char *arg, *close;
+ 	StatusBlock *b = sblocks;
+ 	unsigned long v;
+-	size_t i, n;
++	unsigned char role;
++	size_t i, n, r;
+ 
+ 	memset(b, 0, sizeof(*b));
+ 	b->text = p;
+@@ -3961,6 +4082,12 @@ setstatus(const char *s)
+ 		}
+ 		if (i < 2) {
+ 			v = 0;
++			role = 0;
++			for (r = 0; r < LENGTH(roles); r++)
++				if (strlen(roles[r]) == n && !strncmp(arg, roles[r], n))
++					role = r + 1;
++			if (role)
++				n = 0;
+ 			if (n && *arg == '#')
+ 				arg++, n--;
+ 			if (n == 6 || n == 8) {
+@@ -3972,10 +4099,13 @@ setstatus(const char *s)
+ 				else if (n == 6)
+ 					v = v << 8 | 0xff;
+ 			}
+-			if (i == 0)
++			if (i == 0) {
+ 				b->fg = v;
+-			else
++				b->fgrole = role;
++			} else {
+ 				b->bg = v;
++				b->bgrole = role;
++			}
+ 		} else if (i == LENGTH(names) - 1) {
+ 			b->centre = !b->centre;
+ 		} else if (n && p + n < end) {

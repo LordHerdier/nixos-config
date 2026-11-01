@@ -21,14 +21,15 @@ static const char unknown_str[] = "n/a";
  * switch, dwl-dnd, dwl-caffeine and dwl-nightlight run dwl-bar-refresh to
  * redraw immediately, as REDRAW below does.
  *
- * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
+ * accent and muted are dwl's theme colour names (99-theme-colours.patch), so
+ * the bar's colours follow dwl-theme without slstatus being rebuilt.
  *
  * ^fg(...) colours, ^lm/^rm/^us/^ds(...) click/scroll regions and ^ct()
  * centring are dwl's inline status commands (95-bar-status-commands.patch,
  * 96-bar-status-centre.patch). A region command ends at the first ')', so
  * none of these may contain one. */
-#define LABEL(text) "^fg(@accent@)" text "^fg()"
-#define SEP         "^fg(@muted@) | ^fg()"
+#define LABEL(text) "^fg(accent)" text "^fg()"
+#define SEP         "^fg(muted) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
 #define BRI         "brightnessctl -q -c backlight set "
 #define REDRAW      "; dwl-bar-refresh"
