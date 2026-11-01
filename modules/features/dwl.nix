@@ -143,6 +143,18 @@ let
     text = builtins.readFile ./dwl-session-menu.sh;
   };
 
+  # Window switcher (Super+Tab), which Noctalia owns under Hyprland. Needs
+  # dwl's 85-foreign-toplevel-management.patch for wlrctl to activate windows.
+  windows = pkgs.writeShellApplication {
+    name = "dwl-windows";
+    runtimeInputs = [
+      pkgs.fzf
+      pkgs.gnugrep
+      pkgs.wlrctl
+    ];
+    text = builtins.readFile ./dwl-windows.sh;
+  };
+
   # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
   nightlight = pkgs.writeShellApplication {
     name = "dwl-nightlight";
@@ -306,6 +318,7 @@ in
     notifications
     dnd
     sessionMenu
+    windows
     nightlight
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix

@@ -259,7 +259,7 @@ static const Key keys[] = {
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL(120, 30, "clipboard", "dwl-clipboard") },
 	{ MODKEY,                    XKB_KEY_period,      spawn,            NOCTALIA_STUB("panel-toggle launcher \"/emo \"") },
-	{ MODKEY,                    XKB_KEY_Tab,         spawn,            NOCTALIA_STUB("window-switcher") },
+	{ MODKEY,                    XKB_KEY_Tab,         spawn,            MODAL(100, 20, "windows", "dwl-windows") },
 	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
 
 	/* Noctalia panels & menus */
