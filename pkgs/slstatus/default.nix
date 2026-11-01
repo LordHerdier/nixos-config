@@ -18,6 +18,7 @@
   gawk,
   gnugrep,
   mako,
+  procps,
   accent ? "#9664ff",
   muted ? "#4a3d66",
   error ? "#6442a5",
@@ -55,10 +56,14 @@ let
   '';
 
   # Nerd Font bell, crossed out while mako's do-not-disturb mode is on
-  # (dwl-dnd). Nerd Font icons draw past their one-cell advance (the bell to
-  # about 1.4 cells, the crossed-out one nearly 2), and dwl's bar clips each
-  # block to its advance, so the trailing space gives them room.
+  # (dwl-dnd), after a coffee cup while dwl-caffeine's idle inhibitor runs.
+  # Nerd Font icons draw past their one-cell advance (the bell to about 1.4
+  # cells, the crossed-out one nearly 2), and dwl's bar clips each block to
+  # its advance, so the trailing spaces give them room.
   notifications = writeShellScript "slstatus-notifications" ''
+    if ${procps}/bin/pgrep -u "$(id -u)" -f -- '--who=dwl-caffeine' >/dev/null; then
+      printf '^fg(${noHash accent})\uf0f4 ^fg()'
+    fi
     if ${mako}/bin/makoctl mode | ${gnugrep}/bin/grep -qx do-not-disturb; then
       printf '^fg(${alert})\uf1f6 ^fg()\n'
     else

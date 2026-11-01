@@ -207,10 +207,9 @@ static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remem
 #define CTRL  WLR_MODIFIER_CTRL
 #define ALT   WLR_MODIFIER_ALT
 
-/* Ported from home/modules/hyprland/binds.lua. dwl has no directional focus,
- * pseudotiling or pinning, so those are not carried over; focus n/u and i/e
- * (the Colemak left/up and right/down) walk the stack instead. Master/layout
- * binds are dwl-only and live on Ctrl, which Hyprland leaves free. */
+/* Ported from home/modules/hyprland/binds.lua. dwl has no pseudotiling or
+ * pinning, so those are not carried over. Master/layout binds are dwl-only
+ * and live on Ctrl, which Hyprland leaves free. */
 /* The only binds that still fire while the session is locked
  * (80-locked-keys.patch); the rest of `keys` stays dead behind the locker. */
 static const xkb_keysym_t lockedkeys[] = {
@@ -258,7 +257,7 @@ static const Key keys[] = {
 
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL(120, 30, "clipboard", "dwl-clipboard") },
-	{ MODKEY,                    XKB_KEY_period,      spawn,            NOCTALIA_STUB("panel-toggle launcher \"/emo \"") },
+	{ MODKEY,                    XKB_KEY_period,      spawn,            MODAL(80, 24, "emoji", "dwl-emoji") },
 	{ MODKEY|ALT,                XKB_KEY_Tab,         spawn,            MODAL(100, 20, "windows", "dwl-windows") },
 	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
 
@@ -268,16 +267,16 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_w,           spawn,            MODAL(120, 30, "notifications", "dwl-notifications") },
 	{ MODKEY|ALT,                XKB_KEY_w,           spawn,            SHCMD("dwl-dnd") },
 	{ MODKEY,                    XKB_KEY_comma,       spawn,            NOCTALIA_STUB("settings-toggle") },
-	{ MODKEY,                    XKB_KEY_k,           spawn,            NOCTALIA_STUB("panel-toggle control-center calendar") },
+	{ MODKEY,                    XKB_KEY_k,           spawn,            MODAL(66, 11, "calendar", "dwl-calendar") },
 
 	/* Toggles. Shift+B is dwl's own bar, not Noctalia's. */
 	{ MODKEY|SHIFT,              XKB_KEY_b,           togglebar,        {0} },
 	{ MODKEY|SHIFT,              XKB_KEY_d,           spawn,            NOCTALIA_STUB("theme-mode-toggle") },
 	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            SHCMD("dwl-nightlight") },
-	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            NOCTALIA_STUB("caffeine-toggle") },
+	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            SHCMD("dwl-caffeine") },
 
 	/* Noctalia plugins */
-	{ MODKEY|ALT,                XKB_KEY_s,           spawn,            NOCTALIA_STUB("plugin harveywuk/airpods:service all cycle-noise") },
+	{ MODKEY|ALT,                XKB_KEY_s,           spawn,            SHCMD("dwl-airpods") },
 	{ MODKEY|SHIFT,              XKB_KEY_r,           spawn,            NOCTALIA_STUB("plugin noctalia/screen_recorder:service all toggle") },
 
 	/* Display filters */

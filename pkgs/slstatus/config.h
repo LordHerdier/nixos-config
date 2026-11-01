@@ -12,8 +12,9 @@ static const char unknown_str[] = "n/a";
 /* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
  * @battery@ are substituted by default.nix with scripts that print the
  * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
- * @notifications@ with a bell that shows mako's Do Not Disturb. dwl's volume
- * keys and dwl-dnd send SIGUSR1 to redraw immediately.
+ * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
+ * while dwl-caffeine is on. dwl's volume keys, dwl-dnd and dwl-caffeine send
+ * SIGUSR1 to redraw immediately.
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
@@ -42,8 +43,8 @@ static const struct arg args[] = {
 	  LABEL("vol ") "%s^lm()^rm()^us()^ds()" SEP,
 	  "@volume@" },
 	{ run_command,    LABEL("bat ") "%s" SEP, "@battery@" },
-	/* clock: left click toggles a three-month calendar */
+	/* clock: left click toggles dwl-calendar (Super+K) */
 	{ datetime,
-	  "^lm(dwl-modal calendar 66 10 --hold cal -3)%s^lm()",
+	  "^lm(dwl-modal calendar 66 11 dwl-calendar)%s^lm()",
 	  "%a %d %b %H:%M" },
 };

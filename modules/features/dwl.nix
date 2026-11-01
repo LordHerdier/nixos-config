@@ -167,6 +167,63 @@ let
     text = builtins.readFile ./dwl-nightlight.sh;
   };
 
+  # Emoji picker (Super+.), which Noctalia's launcher does under Hyprland.
+  # "emoji<TAB>name" for every fully-qualified emoji in Unicode's test file,
+  # less the skin-tone variants, built once here rather than parsed per run.
+  emojiList = pkgs.runCommand "dwl-emoji-list" { } ''
+    sed -n 's/^[^#]*; fully-qualified *# \([^ ]*\) E[0-9.]* \(.*\)$/\1\t\2/p' \
+      ${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt \
+      | grep -v 'skin tone' > $out
+  '';
+  emoji = pkgs.writeShellApplication {
+    name = "dwl-emoji";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.gawk
+      pkgs.gnugrep
+      pkgs.util-linux
+      pkgs.wl-clipboard
+    ];
+    runtimeEnv.DWL_EMOJI_LIST = emojiList;
+    text = builtins.readFile ./dwl-emoji.sh;
+  };
+
+  # Calendar (Super+K, and the bar's clock), which Noctalia owns under Hyprland.
+  calendar = pkgs.writeShellApplication {
+    name = "dwl-calendar";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
+    text = builtins.readFile ./dwl-calendar.sh;
+  };
+
+  # Keep-awake toggle (Super+Shift+I), which Noctalia owns under Hyprland.
+  caffeine = pkgs.writeShellApplication {
+    name = "dwl-caffeine";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.libnotify
+      pkgs.procps
+      pkgs.systemd
+      pkgs.util-linux
+    ];
+    text = builtins.readFile ./dwl-caffeine.sh;
+  };
+
+  # AirPods noise control cycling (Super+Alt+S), which the harveywuk/airpods
+  # Noctalia plugin does under Hyprland. Talks to the librepods dwl-startup runs.
+  airpods = pkgs.writeShellApplication {
+    name = "dwl-airpods";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.libnotify
+      pkgs.librepods
+    ];
+    text = builtins.readFile ./dwl-airpods.sh;
+  };
+
   # Notifications, which Noctalia owns under Hyprland. Started from
   # dwl-startup rather than put on PATH, so mako's D-Bus activation file
   # can't grab org.freedesktop.Notifications in a Hyprland session.
@@ -228,8 +285,11 @@ let
       # Brings up graphical-session.target (hypridle, easyeffects), as
       # hyprland-session.target does under Hyprland. dwl SIGTERMs this
       # script on exit, which the trap turns into stopping the target again.
-      trap 'systemctl --user stop dwl-session.target; stop_portals' EXIT
+      trap '${caffeine}/bin/dwl-caffeine --off; systemctl --user stop dwl-session.target; stop_portals' EXIT
       systemctl --user start dwl-session.target
+    else
+      # Caffeine's idle inhibitor would otherwise keep the next session awake.
+      trap '${caffeine}/bin/dwl-caffeine --off' EXIT
     fi
     trap 'exit 0' TERM
 
@@ -320,6 +380,10 @@ in
     sessionMenu
     windows
     nightlight
+    caffeine
+    calendar
+    airpods
+    emoji
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.
