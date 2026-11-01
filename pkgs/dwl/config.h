@@ -289,15 +289,17 @@ static const Key keys[] = {
 	{ MODKEY|CTRL|SHIFT,         XKB_KEY_A,           toggleswallow,    {0} },
 	{ MODKEY|CTRL,               XKB_KEY_a,           toggleautoswallow,{0} },
 
-	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland */
-	{ MODKEY,                    XKB_KEY_n,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_u,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_i,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_e,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_Left,        focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_Up,          focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_Right,       focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_Down,        focusstack,       {.i = +1} },
+	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland. Directional
+	 * (88-focusdir), crossing to the next output at the edge and wrapping
+	 * around; monocle steps the stack instead */
+	{ MODKEY,                    XKB_KEY_n,           focusdir,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    XKB_KEY_i,           focusdir,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_u,           focusdir,         {.i = WLR_DIRECTION_UP} },
+	{ MODKEY,                    XKB_KEY_e,           focusdir,         {.i = WLR_DIRECTION_DOWN} },
+	{ MODKEY,                    XKB_KEY_Left,        focusdir,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    XKB_KEY_Right,       focusdir,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_Up,          focusdir,         {.i = WLR_DIRECTION_UP} },
+	{ MODKEY,                    XKB_KEY_Down,        focusdir,         {.i = WLR_DIRECTION_DOWN} },
 
 	/* dwl-only: master area, layouts, monitors */
 	{ MODKEY|CTRL,               XKB_KEY_n,           setmfact,         {.f = -0.05f} },
