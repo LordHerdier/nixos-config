@@ -3,7 +3,7 @@
 # slstatus with this repo's config.h, feeding dwl's built-in bar (dwl reads the
 # status line from its stdin; see modules/features/dwl.nix). The volume
 # readout shells out to wpctl because slstatus's own vol_perc is OSS/ALSA only.
-# Both scripts print dwl's inline ^fg() colour commands
+# The scripts print dwl's inline ^fg() colour commands
 # (95-bar-status-commands.patch) so their colour follows the state.
 #
 # Colours are #rrggbb parameters defaulting to the OneShot palette;
@@ -16,6 +16,8 @@
   writeShellScript,
   wireplumber,
   gawk,
+  gnugrep,
+  mako,
   accent ? "#9664ff",
   muted ? "#4a3d66",
   error ? "#6442a5",
@@ -51,10 +53,22 @@ let
       *) printf '%s%% o\n' "$cap" ;;
     esac
   '';
+
+  # Nerd Font bell, crossed out while mako's do-not-disturb mode is on
+  # (dwl-dnd). Nerd Font icons draw past their one-cell advance (the bell to
+  # about 1.4 cells, the crossed-out one nearly 2), and dwl's bar clips each
+  # block to its advance, so the trailing space gives them room.
+  notifications = writeShellScript "slstatus-notifications" ''
+    if ${mako}/bin/makoctl mode | ${gnugrep}/bin/grep -qx do-not-disturb; then
+      printf '^fg(${alert})\uf1f6 ^fg()\n'
+    else
+      printf '^fg(${noHash accent})\uf0f3 ^fg()\n'
+    fi
+  '';
 in
 slstatus.override {
   conf = replaceVars ./config.h {
-    inherit volume battery;
+    inherit volume battery notifications;
     accent = noHash accent;
     muted = noHash muted;
     # wpctl's own @DEFAULT_AUDIO_SINK@ in the click commands, not ours

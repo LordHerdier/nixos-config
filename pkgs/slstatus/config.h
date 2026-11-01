@@ -11,8 +11,9 @@ static const char unknown_str[] = "n/a";
 
 /* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
  * @battery@ are substituted by default.nix with scripts that print the
- * PipeWire sink volume and BAT1's charge, coloured with ^fg(). dwl's volume
- * keys send SIGUSR1 to redraw immediately.
+ * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
+ * @notifications@ with a bell that shows mako's Do Not Disturb. dwl's volume
+ * keys and dwl-dnd send SIGUSR1 to redraw immediately.
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
@@ -26,6 +27,13 @@ static const char unknown_str[] = "n/a";
 
 static const struct arg args[] = {
 	/* function       format           argument */
+	/* notifications bell: left click centre, middle click clear all,
+	 * right click toggles do not disturb */
+	{ run_command,
+	  "^lm(dwl-modal notifications 120 30 dwl-notifications)"
+	  "^mm(dwl-notifications --clear)^rm(dwl-dnd)"
+	  "%s^lm()^mm()^rm()" SEP,
+	  "@notifications@" },
 	/* volume: left click mixer, right click mute, scroll +-5% */
 	{ run_command,
 	  "^lm(dwl-modal mixer 110 30 wiremix)"

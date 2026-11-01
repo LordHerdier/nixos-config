@@ -104,6 +104,31 @@ let
     text = builtins.readFile ./dwl-clipboard.sh;
   };
 
+  # Notification centre (Super+W) and Do Not Disturb (Super+Alt+W), which
+  # Noctalia owns under Hyprland. mako itself is a runtime input rather than
+  # on PATH, for the reason given at makoConfig below.
+  notifications = pkgs.writeShellApplication {
+    name = "dwl-notifications";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.gnugrep
+      pkgs.jq
+      pkgs.mako
+      dnd
+    ];
+    text = builtins.readFile ./dwl-notifications.sh;
+  };
+
+  dnd = pkgs.writeShellApplication {
+    name = "dwl-dnd";
+    runtimeInputs = [
+      pkgs.mako
+      pkgs.procps
+    ];
+    text = builtins.readFile ./dwl-dnd.sh;
+  };
+
   # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
   nightlight = pkgs.writeShellApplication {
     name = "dwl-nightlight";
@@ -127,10 +152,16 @@ let
     border-color=${t.roles.border}
     border-size=1
     default-timeout=5000
+    # What dwl-notifications lists; mako's default keeps only 5.
+    max-history=50
 
     [urgency=high]
     border-color=${t.roles.error}
     default-timeout=0
+
+    # Toggled by dwl-dnd. Last, so it wins over the sections above.
+    [mode=do-not-disturb]
+    invisible=1
   '';
 
   # Runs inside the compositor (dwl -s). dwl exits when this process does,
@@ -258,6 +289,8 @@ in
     modal
     screenshot
     clipboard
+    notifications
+    dnd
     nightlight
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
