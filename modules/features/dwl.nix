@@ -213,6 +213,24 @@ let
     text = builtins.readFile ./dwl-caffeine.sh;
   };
 
+  # Wi-Fi / Bluetooth / power-profile menu (Super+Alt+A, or clicking the bar's
+  # net block), the control centre pages Noctalia owns under Hyprland.
+  network = pkgs.writeShellApplication {
+    name = "dwl-network";
+    runtimeInputs = [
+      pkgs.bluez
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.gnugrep
+      pkgs.gnused
+      pkgs.networkmanager
+      pkgs.power-profiles-daemon
+      pkgs.procps
+      pkgs.util-linux
+    ];
+    text = builtins.readFile ./dwl-network.sh;
+  };
+
   # Screen recording toggle and picker (Super+Shift+R), which Noctalia's
   # screen_recorder plugin does under Hyprland.
   record = pkgs.writeShellApplication {
@@ -403,6 +421,7 @@ in
     nightlight
     caffeine
     calendar
+    network
     airpods
     emoji
     record

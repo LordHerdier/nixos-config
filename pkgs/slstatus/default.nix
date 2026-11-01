@@ -20,6 +20,9 @@
   mako,
   procps,
   brightnessctl,
+  networkmanager,
+  bluez,
+  coreutils,
   accent ? "#9664ff",
   muted ? "#4a3d66",
   error ? "#6442a5",
@@ -84,6 +87,35 @@ let
     fi
   '';
 
+  # The Wi-Fi network (or "eth" on a wired link), red "off" with the radio
+  # disabled and "none" when disconnected, then a "bt" in the accent colour
+  # while a Bluetooth device is connected (count after it from two up).
+  network = writeShellScript "slstatus-network" ''
+    name=
+    while IFS=: read -r type state conn; do
+      case $type:$state in
+        wifi:connected) name=$conn ;;
+        ethernet:connected) [ -n "$name" ] || name=eth ;;
+      esac
+    done < <(${networkmanager}/bin/nmcli -t -f TYPE,STATE,CONNECTION device)
+    name=''${name//\\:/:}
+    name=''${name//^/}
+    if [ -n "$name" ]; then
+      printf '%s' "''${name:0:14}"
+    elif [ "$(${networkmanager}/bin/nmcli radio wifi)" = disabled ]; then
+      printf '^fg(${alert})off^fg()'
+    else
+      printf '^fg(${alert})none^fg()'
+    fi
+    n=$(${coreutils}/bin/timeout 2 ${bluez}/bin/bluetoothctl devices Connected | ${coreutils}/bin/wc -l)
+    if [ "$n" -gt 1 ]; then
+      printf ' ^fg(${noHash accent})bt %s^fg()' "$n"
+    elif [ "$n" -eq 1 ]; then
+      printf ' ^fg(${noHash accent})bt^fg()'
+    fi
+    echo
+  '';
+
   # The active keyboard layout, which dwl writes on every change
   # (89-xkb-layout.patch): Colemak plain, anything else in the accent colour
   # so typing in QWERTY by mistake stands out.
@@ -104,6 +136,7 @@ slstatus.override {
       notifications
       keyboard
       brightness
+      network
       ;
     accent = noHash accent;
     muted = noHash muted;

@@ -7,14 +7,16 @@ const unsigned int interval = 5000;
 static const char unknown_str[] = "n/a";
 
 /* maximum output string length */
-#define MAXLEN 2048
+#define MAXLEN 4096
 
 /* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
  * @battery@ are substituted by default.nix with scripts that print the
  * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
  * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
- * @brightness@ with the backlight level (accent while dwl-nightlight is on).
+ * @brightness@ with the backlight level (accent while dwl-nightlight is on),
+ * and @network@ with the Wi-Fi name and a bt marker for connected Bluetooth
+ * devices.
  * dwl's volume and brightness keys and layout switch, dwl-dnd, dwl-caffeine
  * and dwl-nightlight send SIGUSR1 to redraw immediately.
  *
@@ -41,6 +43,13 @@ static const struct arg args[] = {
 	  "@notifications@" },
 	/* keyboard layout, switched with Super+Alt+K */
 	{ run_command,    LABEL("kb ") "%s" SEP, "@keyboard@" },
+	/* network: left click dwl-network (Super+Alt+A), right click toggles
+	 * Wi-Fi, middle click Bluetooth */
+	{ run_command,
+	  "^lm(dwl-modal network 90 24 dwl-network)"
+	  "^rm(dwl-network --toggle-wifi)^mm(dwl-network --toggle-bluetooth)"
+	  LABEL("net ") "%s^lm()^rm()^mm()" SEP,
+	  "@network@" },
 	/* brightness: left click night light (Super+Shift+N), right click
 	 * caffeine (Super+Shift+I), scroll +-5% */
 	{ run_command,

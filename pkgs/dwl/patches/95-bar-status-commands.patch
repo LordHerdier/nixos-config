@@ -43,7 +43,7 @@ index 37574e3..647cd47 100644
  static int consumed[KEY_MAX + 1];
  
 -static char stext[256];
-+static char stextbuf[1024]; /* block texts and region commands, NUL-separated */
++static char stextbuf[4096]; /* block texts and region commands, NUL-separated */
 +static StatusBlock sblocks[64];
 +static int nsblocks;
  static struct wl_event_source *status_event_source;
@@ -283,7 +283,7 @@ index 37574e3..647cd47 100644
  statusin(int fd, unsigned int mask, void *data)
  {
 -	char status[256];
-+	char status[1024];
++	char status[4096];
  	ssize_t n;
  
  	if (mask & WL_EVENT_ERROR)
