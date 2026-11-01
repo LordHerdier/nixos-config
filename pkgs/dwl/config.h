@@ -130,7 +130,7 @@ static const struct xkb_rule_names xkb_rules = {
 
 /* Run when the active layout changes (89-xkb-layout), after dwl has written
  * its name to $XDG_RUNTIME_DIR/dwl-xkb-layout, so the bar redraws at once */
-static const char *const xkblayoutcmd[] = { "pkill", "-USR1", "-x", "slstatus", NULL };
+static const char *const xkblayoutcmd[] = { "dwl-bar-refresh", NULL };
 
 static const int repeat_rate = 25;
 static const int repeat_delay = 600;
@@ -199,8 +199,8 @@ static const char *dmenucmd[] = { "wofi", "--dmenu", NULL };
  * still needs a real backend patched through, the argument being the old verb. */
 #define NOCTALIA_STUB(verb) SHCMD("true # TODO(noctalia): " verb)
 
-/* Raise/lower the default sink (capped at 100%), then nudge slstatus to redraw. */
-#define VOLCMD(delta) "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ " delta "; pkill -USR1 slstatus"
+/* Raise/lower the default sink (capped at 100%), then redraw the bar. */
+#define VOLCMD(delta) "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ " delta "; dwl-bar-refresh"
 
 static const char *termcmd[]  = { "kitty", NULL };
 /* kitty only honours initial_window_* when remember_window_size is off. The
@@ -208,11 +208,10 @@ static const char *termcmd[]  = { "kitty", NULL };
 static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
                                    "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
 /* Toggles a floating kitty centred on the focused monitor (the "modal" rule
- * above), for control popups: COLS x ROWS cells, title, then the command to
- * run. Pressing the same bind again closes it; see dwl-modal in
- * modules/features/dwl.nix. */
-#define MODAL(cols, rows, title, ...) { .v = (const char*[]){ "dwl-modal", title, #cols, #rows, __VA_ARGS__, NULL } }
-#define MIXER MODAL(110, 30, "mixer", "wiremix")
+ * above), for control popups. Each popup's size and command are set by name
+ * in modules/features/dwl/scripts/dwl-modal.sh, which the bar's click
+ * regions use too. Pressing the same bind again closes it. */
+#define MODAL(name) { .v = (const char*[]){ "dwl-modal", name, NULL } }
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL  WLR_MODIFIER_CTRL
@@ -247,7 +246,7 @@ static const Key keys[] = {
 	{ MODKEY|ALT,                XKB_KEY_1,           spawn,            SHCMD("dwl-wallpaper next") },
 	{ MODKEY|ALT,                XKB_KEY_2,           spawn,            SHCMD("dwl-wallpaper prev") },
 	{ MODKEY|ALT,                XKB_KEY_3,           spawn,            SHCMD("dwl-wallpaper rand") },
-	{ MODKEY|ALT,                XKB_KEY_4,           spawn,            MODAL(140, 35, "wallpaper", "dwl-wallpaper-pick") },
+	{ MODKEY|ALT,                XKB_KEY_4,           spawn,            MODAL("wallpaper") },
 
 	/* Launchers */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            SHCMD("wofi --show drun") },
@@ -267,19 +266,19 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD("kitty zsh -i -c concord") },
 
 	/* Noctalia launchers */
-	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL(120, 30, "clipboard", "dwl-clipboard") },
-	{ MODKEY,                    XKB_KEY_period,      spawn,            MODAL(80, 24, "emoji", "dwl-emoji") },
-	{ MODKEY|ALT,                XKB_KEY_Tab,         spawn,            MODAL(100, 20, "windows", "dwl-windows") },
+	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL("clipboard") },
+	{ MODKEY,                    XKB_KEY_period,      spawn,            MODAL("emoji") },
+	{ MODKEY|ALT,                XKB_KEY_Tab,         spawn,            MODAL("windows") },
 	{ MODKEY|SHIFT,              XKB_KEY_space,       spawn,            NOCTALIA_STUB("panel-toggle launcher \"/pan \"") },
 
 	/* Noctalia panels & menus */
-	{ MODKEY,                    XKB_KEY_a,           spawn,            MIXER },
-	{ MODKEY|ALT,                XKB_KEY_a,           spawn,            MODAL(90, 24, "network", "dwl-network") },
-	{ MODKEY,                    XKB_KEY_o,           spawn,            MODAL(60, 12, "session", "dwl-session-menu") },
-	{ MODKEY,                    XKB_KEY_w,           spawn,            MODAL(120, 30, "notifications", "dwl-notifications") },
+	{ MODKEY,                    XKB_KEY_a,           spawn,            MODAL("mixer") },
+	{ MODKEY|ALT,                XKB_KEY_a,           spawn,            MODAL("network") },
+	{ MODKEY,                    XKB_KEY_o,           spawn,            MODAL("session") },
+	{ MODKEY,                    XKB_KEY_w,           spawn,            MODAL("notifications") },
 	{ MODKEY|ALT,                XKB_KEY_w,           spawn,            SHCMD("dwl-dnd") },
 	{ MODKEY,                    XKB_KEY_comma,       spawn,            NOCTALIA_STUB("settings-toggle") },
-	{ MODKEY,                    XKB_KEY_k,           spawn,            MODAL(66, 11, "calendar", "dwl-calendar") },
+	{ MODKEY,                    XKB_KEY_k,           spawn,            MODAL("calendar") },
 
 	/* Toggles. Shift+B is dwl's own bar, not Noctalia's. */
 	{ MODKEY|SHIFT,              XKB_KEY_b,           togglebar,        {0} },
@@ -351,14 +350,14 @@ static const Key keys[] = {
 	/* Hardware keys */
 	{ 0, XKB_KEY_XF86AudioRaiseVolume,   spawn, SHCMD(VOLCMD("5%+")) },
 	{ 0, XKB_KEY_XF86AudioLowerVolume,   spawn, SHCMD(VOLCMD("5%-")) },
-	{ 0, XKB_KEY_XF86AudioMute,          spawn, SHCMD("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; pkill -USR1 slstatus") },
+	{ 0, XKB_KEY_XF86AudioMute,          spawn, SHCMD("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; dwl-bar-refresh") },
 	{ 0, XKB_KEY_XF86AudioMicMute,       spawn, SHCMD("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle") },
 	{ 0, XKB_KEY_XF86AudioPlay,          spawn, SHCMD("playerctl play-pause") },
 	{ 0, XKB_KEY_XF86AudioStop,          spawn, SHCMD("playerctl stop") },
 	{ 0, XKB_KEY_XF86AudioPrev,          spawn, SHCMD("playerctl previous") },
 	{ 0, XKB_KEY_XF86AudioNext,          spawn, SHCMD("playerctl next") },
-	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, SHCMD("brightnessctl set 5%+; pkill -USR1 slstatus") },
-	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, SHCMD("brightnessctl set 5%-; pkill -USR1 slstatus") },
+	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, SHCMD("brightnessctl set 5%+; dwl-bar-refresh") },
+	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, SHCMD("brightnessctl set 5%-; dwl-bar-refresh") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },

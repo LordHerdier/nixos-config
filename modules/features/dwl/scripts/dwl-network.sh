@@ -10,8 +10,6 @@
 # The flags are for the bar block: right clicking the Wi-Fi name or the Bluetooth
 # entry toggles that one without opening the popup.
 
-refresh() { pkill -USR1 -x slstatus || true; }
-
 wifi_on() { [ "$(nmcli radio wifi)" = enabled ]; }
 
 bt_on() {
@@ -22,7 +20,7 @@ bt_on() {
 
 toggle_wifi() {
   if wifi_on; then nmcli radio wifi off; else nmcli radio wifi on; fi
-  refresh
+  dwl-bar-refresh
 }
 
 toggle_bluetooth() {
@@ -32,7 +30,7 @@ toggle_bluetooth() {
     rfkill unblock bluetooth || true
     bluetoothctl power on >/dev/null
   fi
-  refresh
+  dwl-bar-refresh
 }
 
 case ${1:-} in
@@ -122,7 +120,7 @@ wifi_menu() {
             nmcli --ask dev wifi connect "$ssid" || { pause; continue; }
           fi
         fi
-        refresh
+        dwl-bar-refresh
         exit 0
         ;;
     esac
@@ -174,7 +172,7 @@ bt_menu() {
               && timeout 20 bluetoothctl connect "$mac"; } || { pause; continue; }
             ;;
         esac
-        refresh
+        dwl-bar-refresh
         exit 0
         ;;
     esac

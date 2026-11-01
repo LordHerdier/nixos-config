@@ -115,7 +115,7 @@ in
         nixos-hardware.nixosModules.framework-amd-ai-300-series
         qylock.nixosModules.default
         ../modules/features/qylock.nix
-        ../modules/features/dwl.nix
+        ../modules/features/dwl
       ];
       extraHomeUsers = {
         kiddo = [ ../home/kiddo.nix ];

@@ -15,7 +15,7 @@
 #
 # COLORS ARE PARAMETERS, as #rrggbb. The defaults are the OneShot palette,
 # which is also what config.h falls back to without them;
-# modules/features/dwl.nix overrides them from the session user's
+# modules/features/dwl overrides them from the session user's
 # `my.theme`. They reach config.h as -D flags rather than substituted
 # placeholders so config.h stays valid C for clangd.nix.
 

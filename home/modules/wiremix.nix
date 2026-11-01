@@ -1,7 +1,7 @@
 # home/modules/wiremix.nix
 #
-# wiremix, the PipeWire mixer behind dwl's Super+A popup (dwl-modal in
-# modules/features/dwl.nix). The package itself is installed system-wide
+# wiremix, the PipeWire mixer behind dwl's Super+A popup (`dwl-modal mixer`,
+# modules/features/dwl). The package itself is installed system-wide
 # there; this only writes ~/.config/wiremix/wiremix.toml.
 
 { ... }:

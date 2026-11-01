@@ -40,7 +40,7 @@ if [ "${1:-}" != menu ]; then
     notify-send -a Recording "Recording saved" "Saved in <i>${file:-$dir}</i>."
     exit 0
   fi
-  exec dwl-modal record 72 8 dwl-record menu
+  exec dwl-modal record
 fi
 
 # Everything is one of wf-recorder's -g geometries, except a single screen,

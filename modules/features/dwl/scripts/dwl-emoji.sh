@@ -2,8 +2,8 @@
 #
 # Emoji picker in a centred kitty popup (Super+. in pkgs/dwl/config.h),
 # standing in for Noctalia's "/emo" launcher. DWL_EMOJI_LIST is the
-# "emoji<TAB>name" file dwl.nix builds from Unicode's emoji-test.txt. Enter copies the emoji to
-# the clipboard; the last 30 picks are listed first.
+# "emoji<TAB>name" file scripts.nix builds from Unicode's emoji-test.txt.
+# Enter copies the emoji to the clipboard; the last 30 picks are listed first.
 
 list=$DWL_EMOJI_LIST
 recent=${XDG_STATE_HOME:-$HOME/.local/state}/dwl-emoji/recent

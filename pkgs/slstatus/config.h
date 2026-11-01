@@ -11,14 +11,15 @@ static const char unknown_str[] = "n/a";
 
 /* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
  * @battery@ are substituted by default.nix with scripts that print the
- * PipeWire sink volume and BAT1's charge, coloured with ^fg(), and
+ * PipeWire sink volume and the battery charge, coloured with ^fg(), and
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
  * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
  * @brightness@ with the backlight level (accent while dwl-nightlight is on),
  * and @network@ with the Wi-Fi name and a bt marker for connected Bluetooth
  * devices.
- * dwl's volume and brightness keys and layout switch, dwl-dnd, dwl-caffeine
- * and dwl-nightlight send SIGUSR1 to redraw immediately.
+ * The scripts live in ./scripts. dwl's volume and brightness keys and layout
+ * switch, dwl-dnd, dwl-caffeine and dwl-nightlight run dwl-bar-refresh to
+ * redraw immediately, as REDRAW below does.
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
@@ -30,14 +31,14 @@ static const char unknown_str[] = "n/a";
 #define SEP         "^fg(@muted@) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
 #define BRI         "brightnessctl -q -c backlight set "
-#define REDRAW      "; pkill -USR1 slstatus"
+#define REDRAW      "; dwl-bar-refresh"
 
 static const struct arg args[] = {
 	/* function       format           argument */
 	/* notifications bell: left click centre, middle click clear all,
 	 * right click toggles do not disturb */
 	{ run_command,
-	  "^lm(dwl-modal notifications 120 30 dwl-notifications)"
+	  "^lm(dwl-modal notifications)"
 	  "^mm(dwl-notifications --clear)^rm(dwl-dnd)"
 	  "%s^lm()^mm()^rm()" SEP,
 	  "@notifications@" },
@@ -46,7 +47,7 @@ static const struct arg args[] = {
 	/* network: left click dwl-network (Super+Alt+A); the script adds the
 	 * right-click regions that toggle Wi-Fi and Bluetooth */
 	{ run_command,
-	  "^lm(dwl-modal network 90 24 dwl-network)"
+	  "^lm(dwl-modal network)"
 	  LABEL("net ") "%s^lm()" SEP,
 	  "@network@" },
 	/* brightness: left click night light (Super+Shift+N), right click
@@ -58,7 +59,7 @@ static const struct arg args[] = {
 	  "@brightness@" },
 	/* volume: left click mixer, right click mute, scroll +-5% */
 	{ run_command,
-	  "^lm(dwl-modal mixer 110 30 wiremix)"
+	  "^lm(dwl-modal mixer)"
 	  "^rm(wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" REDRAW ")"
 	  "^us(" VOL "5%%+" REDRAW ")^ds(" VOL "5%%-" REDRAW ")"
 	  LABEL("vol ") "%s^lm()^rm()^us()^ds()" SEP,
@@ -67,6 +68,6 @@ static const struct arg args[] = {
 	/* clock, centred on the bar by ^ct(): left click toggles dwl-calendar
 	 * (Super+K) */
 	{ datetime,
-	  "^ct()^lm(dwl-modal calendar 66 11 dwl-calendar)%s^lm()^ct()",
+	  "^ct()^lm(dwl-modal calendar)%s^lm()^ct()",
 	  "%a %d %b %H:%M" },
 };

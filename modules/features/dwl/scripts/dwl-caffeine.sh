@@ -21,4 +21,4 @@ else
     sleep infinity >/dev/null 2>&1
   notify-send -a Caffeine "Caffeine on"
 fi
-pkill -USR1 -x slstatus || true
+dwl-bar-refresh

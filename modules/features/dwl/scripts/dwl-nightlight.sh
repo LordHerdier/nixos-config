@@ -13,4 +13,4 @@ else
   setsid -f wlsunset -t 4000 -T 4001 >/dev/null 2>&1
   notify-send -a "Night light" "Night light on"
 fi
-pkill -USR1 -x slstatus || true
+dwl-bar-refresh

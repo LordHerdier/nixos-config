@@ -1,0 +1,141 @@
+# modules/features/dwl
+#
+# dwl as a selectable login session. The compositor itself comes from
+# pkgs/dwl (via the overlay in parts/overlay.nix), which is where patches
+# and config.h live; its bar's status line is pkgs/slstatus.
+#
+# Shows up as "dwl" in tuigreet's session list (F3), next to Hyprland and
+# the gamescope Steam session. Needs the desktop-hyprland profile for the
+# kitty / wofi that config.h launches.
+#
+# Colours (bar, borders, mako, slstatus) follow charlotte's
+# `my.theme.default`, the same palette her kitty/wofi/nvim get on this
+# host, so switching that one option recolours the whole session.
+#
+# | File           | Purpose                                                  |
+# | -------------- | -------------------------------------------------------- |
+# | `default.nix`  | Session entry, dwl-startup, systemd target, PATH         |
+# | `scripts.nix`  | The dwl-* helpers in ./scripts and their runtime inputs  |
+# | `startup.sh`   | dwl-startup: user services, mako, clipboard, tray apps   |
+# | `mako.conf`    | Notification daemon config, coloured from `my.theme`     |
+# | `portals.nix`  | xdg-desktop-portal routing for XDG_CURRENT_DESKTOP=dwl   |
+
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  # The session user's resolved theme. Read across from Home Manager
+  # rather than duplicated as a system option, so the two cannot drift.
+  t = config.home-manager.users.charlotte.my.theme.active;
+
+  dwl = pkgs.dwl.override {
+    inherit (t.palette) bg fg;
+    inherit (t.roles)
+      surface
+      borderInactive
+      muted
+      accent
+      accentFg
+      border
+      ;
+    urgent = t.roles.error;
+  };
+
+  slstatus = pkgs.slstatus.override {
+    inherit (t.roles)
+      accent
+      muted
+      error
+      success
+      ;
+  };
+
+  scripts = import ./scripts.nix { inherit lib pkgs; };
+
+  # Same roles as the bar's colors[] (see `dwl` above).
+  makoConfig = pkgs.replaceVars ./mako.conf {
+    inherit (t.palette) fg;
+    inherit (t.roles) surface border error;
+  };
+
+  # Built without errexit: a step that fails must not end the session.
+  startup = pkgs.writeShellApplication {
+    name = "dwl-startup";
+    bashOptions = [
+      "nounset"
+      "pipefail"
+    ];
+    runtimeInputs = [
+      pkgs.cliphist
+      pkgs.coreutils
+      pkgs.dbus
+      pkgs.mako
+      pkgs.systemd
+      pkgs.wl-clipboard
+      scripts.caffeine
+      scripts.wallpaper
+    ];
+    runtimeEnv = {
+      DWL_MAKO_CONFIG = makoConfig;
+      DWL_POLKIT_AGENT = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+    };
+    text = builtins.readFile ./startup.sh;
+  };
+
+  session = pkgs.writeShellScriptBin "dwl-session" ''
+    export XDG_CURRENT_DESKTOP=dwl
+    export XDG_SESSION_TYPE=wayland
+    # dwl's bar reads its status line from stdin, so slstatus is piped in
+    # (no exec: this is a pipeline; slstatus dies of SIGPIPE when dwl exits).
+    ${lib.getExe' slstatus "slstatus"} -s | ${lib.getExe' dwl "dwl"} -s ${lib.getExe startup}
+  '';
+
+  sessionEntry =
+    (pkgs.writeTextDir "share/wayland-sessions/dwl.desktop" ''
+      [Desktop Entry]
+      Name=dwl
+      Comment=Dynamic window manager for Wayland
+      Exec=${lib.getExe session}
+      Type=Application
+    '').overrideAttrs
+      (_: {
+        passthru.providedSessions = [ "dwl" ];
+      });
+in
+{
+  imports = [ ./portals.nix ];
+
+  services.displayManager.sessionPackages = [ sessionEntry ];
+
+  # Started and stopped by dwl-startup. graphical-session.target refuses
+  # a manual start, so this binds to it the way hyprland-session.target
+  # (home/modules/hyprland/default.nix) does.
+  systemd.user.targets.dwl-session = {
+    description = "dwl compositor session";
+    documentation = [ "man:systemd.special(7)" ];
+    bindsTo = [ "graphical-session.target" ];
+    wants = [ "graphical-session-pre.target" ];
+    after = [ "graphical-session-pre.target" ];
+    unitConfig.PropagatesStopTo = [ "graphical-session.target" ];
+  };
+
+  # dwl-session on PATH so the slstatus pipeline also applies when launching
+  # from a TTY (plain `dwl` has no status input and shows the bar's default).
+  environment.systemPackages = lib.attrValues scripts ++ [
+    dwl
+    session
+    # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
+    pkgs.wiremix
+    # Brightness and media keys in pkgs/dwl/config.h.
+    pkgs.brightnessctl
+    pkgs.playerctl
+    # Super+Shift+C colour picker (dwl-screenshot carries its own copy).
+    pkgs.hyprpicker
+    # notify-send, for scripts and testing mako.
+    pkgs.libnotify
+  ];
+}
