@@ -27,7 +27,7 @@ monitors: the unfocused one keeps only its tags and the clock.
 
 | File          | Purpose                                                                                                                             |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `default.nix` | `dwl.override { configH = ./config.h; }` plus every `patches/*.patch`; theme colours and the screen shader path go in as `-D` flags |
+| `default.nix` | `dwl.override { configH = ./config.h; }` plus every `patches/*.patch`; the screen shader path and the fallback colours go in as `-D` flags |
 | `config.h`    | The dwl config (replaces upstream `config.def.h` at build time)                                                                     |
 | `clangd.nix`  | Generates a `.clangd` so LSP works on `config.h` (see below)                                                                        |
 | `patches/`    | Patches applied to the dwl source, in filename order                                                                                |
@@ -36,8 +36,8 @@ The rest of the session lives elsewhere:
 
 - `modules/features/dwl/`: the login session (`dwl.desktop`, `dwl-session`,
   `dwl-startup`, the `dwl-session` systemd target), the `dwl-*` helper scripts
-  in `scripts/`, mako and the portals. It overrides this package's colours
-  from `my.theme` and is imported by Index only (`parts/hosts.nix`).
+  in `scripts/`, mako and the portals. It writes the `my.theme` colour files
+  dwl reads at runtime and is imported by Index only (`parts/hosts.nix`).
 - `pkgs/slstatus/`: the bar's status line, piped into `dwl -s` by
   `dwl-session`. Its `config.h` holds the bar's click and scroll regions.
 - `parts/overlay.nix`: sets `screenShader` to hyprCRT's `crt.frag`.
@@ -88,6 +88,7 @@ Applied in filename order; the number prefix is the order.
 | `97-spawn-focused.patch`               | local                                                               | `spawnfocused`: `spawn`, but with `DWL_FOCUS_GEOM="x,y wxh"` (slurp's format, layout coordinates, borders included) set to the focused client's box. Lets `dwl-record` (Super+Shift+R) record just that window before its picker popup takes focus                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `98-bar-unfocused-clock.patch`         | local                                                               | Unfocused monitors hide the system tray and right-hand status but still draw `^ct()` centred blocks (the clock)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `99-screen-shader.patch`               | local                                                               | `togglescreenshader` (Super+Shift+G) runs a fragment shader over each output's final frame, using the same contract as Hyprland's `decoration:screen_shader` (`tex`, `v_texcoord`, `fullSize`), so hyprCRT's `crt.frag` (`screenshader` in `config.h`, set by `default.nix`) runs unchanged. The scene renders into an off-screen swapchain and a raw GLES2 pass draws it onto the output's buffer, so it needs the GLES2 renderer. While it is on, the cursor is drawn in software and direct scan-out is off. The file is re-read each time the shader is enabled; if it fails to compile, the error goes to stderr and the shader turns itself off |
+| `99-theme-colours.patch`               | local                                                               | `loadcolors` reads `name=#rrggbb` lines (`bg fg surface border_inactive muted accent accent_fg border urgent`) at startup and on `SIGUSR2`, then repaints the root background, client borders, tray and bars, so a palette change needs no rebuild or restart. `dwl-theme NAME` installs a palette as the user override and signals dwl; a rebuild that changes `my.theme.default` signals it from an activation script |
 
 `05-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops
@@ -100,9 +101,11 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
 - **Look**: 1px borders, bar at the top, `monospace:size=12`, focus follows
   the mouse (`sloppyfocus`), windows 90% opaque (`default_opacity`). Colours
   (`colors[]`, `rootcolor`, and `sepcolors` for the `|` between tray and
-  status) are `COL_*` macros that `default.nix` sets from `-D` flags, which
-  `modules/features/dwl` fills from `my.theme`; without them they fall back to
-  the OneShot palette.
+  status) are read at startup and on `SIGUSR2` from
+  `$XDG_STATE_HOME/dwl/colors`, else `/etc/dwl/colors` (`99-theme-colours`).
+  `modules/features/dwl` writes the latter from `my.theme.default` and a file
+  per palette for `dwl-theme`; with neither file they fall back to the
+  `COL_*` macros, the OneShot palette.
 - **Tags**: ten, named `1`-`10`.
 - **Autostart**: a `kitty` running the `t` zsh function (loops over tmuninator
   confs)

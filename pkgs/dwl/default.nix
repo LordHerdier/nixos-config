@@ -13,10 +13,11 @@
 # to apply, or leave ./config.h behind config.def.h. Diff against the new
 # config.def.h (`nix build nixpkgs#dwl.src`) and refresh the patch.
 #
-# COLORS ARE PARAMETERS, as #rrggbb. The defaults are the OneShot palette,
-# which is also what config.h falls back to without them;
-# modules/features/dwl overrides them from the session user's
-# `my.theme`. They reach config.h as -D flags rather than substituted
+# COLORS ARE PARAMETERS, as #rrggbb, but only the fallback: dwl reads its
+# real colours from a file at runtime (99-theme-colours.patch), which
+# modules/features/dwl writes from the session user's `my.theme`. The
+# defaults are the OneShot palette, which is also what config.h falls back
+# to without them; they reach config.h as -D flags rather than substituted
 # placeholders so config.h stays valid C for clangd.nix.
 #
 # SCREEN SHADER. `screenShader` is the path of the fragment shader that

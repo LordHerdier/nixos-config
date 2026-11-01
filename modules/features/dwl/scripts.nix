@@ -8,7 +8,12 @@
 # They all go on PATH (default.nix), since config.h and slstatus call them
 # by name from plain shell commands.
 
-{ lib, pkgs }:
+{
+  lib,
+  pkgs,
+  dwl,
+  themes,
+}:
 
 let
   mkScript =
@@ -135,6 +140,20 @@ let
       slurp
       wl-clipboard
     ];
+
+    # DWL_BIN is the dwl to signal: one from before the colour-reload
+    # patch would die of the SIGUSR2.
+    theme = {
+      deps = with pkgs; [
+        coreutils
+        gnused
+        procps
+      ];
+      env = {
+        DWL_BIN = lib.getExe' dwl "dwl";
+        DWL_THEMES = themes;
+      };
+    };
 
     # qylock-lock comes from PATH (modules/features/qylock.nix), as Super+L's does.
     session-menu.deps = with pkgs; [

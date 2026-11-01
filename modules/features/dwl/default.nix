@@ -10,7 +10,9 @@
 #
 # Colours (bar, borders, mako, slstatus) follow charlotte's
 # `my.theme.default`, the same palette her kitty/wofi/nvim get on this
-# host, so switching that one option recolours the whole session.
+# host, so switching that one option recolours the session. dwl itself
+# reads its colours at runtime, so that needs no restart, and `dwl-theme`
+# switches its palette on the spot (scripts/dwl-theme.sh).
 #
 # | File           | Purpose                                                  |
 # | -------------- | -------------------------------------------------------- |
@@ -30,20 +32,36 @@
 let
   # The session user's resolved theme. Read across from Home Manager
   # rather than duplicated as a system option, so the two cannot drift.
-  t = config.home-manager.users.charlotte.my.theme.active;
+  hm = config.home-manager.users.charlotte;
+  t = hm.my.theme.active;
 
-  dwl = pkgs.dwl.override {
-    inherit (t.palette) bg fg;
-    inherit (t.roles)
-      surface
-      borderInactive
-      muted
-      accent
-      accentFg
-      border
-      ;
-    urgent = t.roles.error;
-  };
+  # Colours are not an input: dwl reads them at runtime (/etc/dwl/colors,
+  # below), so a palette change does not rebuild or restart it.
+  dwl = pkgs.dwl;
+
+  # What dwl's loadcolors (pkgs/dwl/patches/99-theme-colours.patch) reads,
+  # one file per palette. The "# NAME" line is for dwl-theme.
+  colorsFile =
+    name: theme:
+    pkgs.writeText "dwl-colors-${name}" ''
+      # ${name}
+      bg=${theme.palette.bg}
+      fg=${theme.palette.fg}
+      surface=${theme.roles.surface}
+      border_inactive=${theme.roles.borderInactive}
+      muted=${theme.roles.muted}
+      accent=${theme.roles.accent}
+      accent_fg=${theme.roles.accentFg}
+      border=${theme.roles.border}
+      urgent=${theme.roles.error}
+    '';
+
+  themes = pkgs.linkFarm "dwl-themes" (
+    lib.mapAttrsToList (name: theme: {
+      inherit name;
+      path = colorsFile name theme;
+    }) hm.my.theme.palettes
+  );
 
   slstatus = pkgs.slstatus.override {
     inherit (t.roles)
@@ -54,7 +72,14 @@ let
       ;
   };
 
-  scripts = import ./scripts.nix { inherit lib pkgs; };
+  scripts = import ./scripts.nix {
+    inherit
+      lib
+      pkgs
+      dwl
+      themes
+      ;
+  };
 
   # Same roles as the bar's colors[] (see `dwl` above).
   makoConfig = pkgs.replaceVars ./mako.conf {
@@ -110,6 +135,16 @@ in
   imports = [ ./portals.nix ];
 
   services.displayManager.sessionPackages = [ sessionEntry ];
+
+  # my.theme.default as dwl's colours when charlotte has not picked another
+  # with dwl-theme, and a rebuild that changes it recolours the live session.
+  environment.etc."dwl/colors".source = colorsFile hm.my.theme.default t;
+  system.activationScripts.dwl-recolour = {
+    deps = [ "etc" ];
+    text = ''
+      ${lib.getExe scripts.theme} reload || true
+    '';
+  };
 
   # Started and stopped by dwl-startup. graphical-session.target refuses
   # a manual start, so this binds to it the way hyprland-session.target
