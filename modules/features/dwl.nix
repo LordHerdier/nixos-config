@@ -129,6 +129,20 @@ let
     text = builtins.readFile ./dwl-dnd.sh;
   };
 
+  # Session / power menu (Super+O), which Noctalia owns under Hyprland.
+  # qylock-lock comes from PATH (modules/features/qylock.nix), as Super+L's does.
+  sessionMenu = pkgs.writeShellApplication {
+    name = "dwl-session-menu";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.fzf
+      pkgs.procps
+      pkgs.systemd
+      pkgs.util-linux
+    ];
+    text = builtins.readFile ./dwl-session-menu.sh;
+  };
+
   # Night light toggle (Super+Shift+N), which Noctalia owns under Hyprland.
   nightlight = pkgs.writeShellApplication {
     name = "dwl-nightlight";
@@ -291,6 +305,7 @@ in
     clipboard
     notifications
     dnd
+    sessionMenu
     nightlight
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix

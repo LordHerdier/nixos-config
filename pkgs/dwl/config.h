@@ -264,7 +264,7 @@ static const Key keys[] = {
 
 	/* Noctalia panels & menus */
 	{ MODKEY,                    XKB_KEY_a,           spawn,            MIXER },
-	{ MODKEY,                    XKB_KEY_o,           spawn,            NOCTALIA_STUB("panel-toggle session") },
+	{ MODKEY,                    XKB_KEY_o,           spawn,            MODAL(60, 12, "session", "dwl-session-menu") },
 	{ MODKEY,                    XKB_KEY_w,           spawn,            MODAL(120, 30, "notifications", "dwl-notifications") },
 	{ MODKEY|ALT,                XKB_KEY_w,           spawn,            SHCMD("dwl-dnd") },
 	{ MODKEY,                    XKB_KEY_comma,       spawn,            NOCTALIA_STUB("settings-toggle") },
