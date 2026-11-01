@@ -25,7 +25,7 @@ session shows up in its session picker automatically.
 ## index
 
 native nixos laptop (framework ai 300 / amd ai 300 series). `hosts/Index/default.nix`.
-the one host with two logged-in roles: charlotte's hyprland session and
+the one host with two logged-in roles: charlotte's hyprland (or dwl) session and
 a dedicated **kiddo** account running gnome — see [kiddo.md](kiddo.md)
 for that whole setup.
 
@@ -43,9 +43,13 @@ for that whole setup.
   `features/zram.nix`
 - `features/systemd-boot-silent/` is imported but **commented out** in
   the host file — left as a note that it was tried, not currently active
+- `features/qylock.nix` and `features/dwl/` come in through
+  `extraModules` in `parts/hosts.nix`, not the host file. qylock is the
+  lock screen; dwl is a second compositor session, see
+  [`pkgs/dwl/README.md`](../pkgs/dwl/README.md)
 - greetd + tuigreet replaces sddm (`services.displayManager.sddm.enable
   = lib.mkForce false`), specifically so its session picker (F3) can
-  offer both the default Hyprland session and the gamescope "Steam"
+  offer the default Hyprland session, dwl and the gamescope "Steam"
   session; `--remember-session` keeps whichever was picked last
 - home-manager for both users runs asynchronously at boot
   (`systemd.services.home-manager-{charlotte,kiddo}.before = []`) so

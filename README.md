@@ -118,6 +118,11 @@ home-manager users, how a host picks up its modules) is in
 idle timeline: dim at 2.5 min → lock at 5 min → display off at 5.5 min → suspend
 at 30 min.
 
+index also has a [dwl](pkgs/dwl/README.md) session, picked from tuigreet's F3
+menu. it's a patched dwl 0.9 with a slstatus bar, kitty popups standing in for
+noctalia's panels, qylock as the lock screen, and the same CRT shader on
+Super+Shift+G. the session itself is `modules/features/dwl/`.
+
 <details>
 <summary>deep dive: lua config + lock screen colors</summary>
 

@@ -1,7 +1,8 @@
 # features
 
 every file under `modules/features/` is one opt-in capability, imported
-directly by whichever `hosts/<Name>/default.nix` wants it. this is the
+directly by whichever `hosts/<Name>/default.nix` wants it (or, for a few,
+via the host's `extraModules` in `parts/hosts.nix`). this is the
 catalog — grouped by what they're for, not alphabetically — with the
 gotcha each one's header comment exists to warn about. see
 [hosts.md](hosts.md) for which hosts import which.
@@ -114,8 +115,23 @@ per host, not part of a "what kind of desktop is this" bundle:
   disk-swap defaults are far too conservative for something this fast.
   no disk swap exists on these machines at all.
 - **`nix-ld.nix`** — lets dynamically-linked non-nix binaries run.
-- **`qylock.nix`** — sddm + the qylock quickshell theme (`clockwork/orbital`),
-  index only.
+- **`qylock.nix`** — the qylock quickshell lock screen (`clockwork/orbital`),
+  plus sddm. index only, and imported from `parts/hosts.nix`'s
+  `extraModules` rather than the host file. index force-disables sddm in
+  favor of greetd, so what's live there is the lock screen: `qylock-lock`,
+  which dwl binds to Super+L.
+- **`dwl/`** — dwl as a second login session next to hyprland, picked from
+  tuigreet's F3 list. index only, also via `extraModules`. the compositor
+  itself (config.h, patch stack) is `pkgs/dwl`, documented in
+  [`pkgs/dwl/README.md`](../pkgs/dwl/README.md), and its bar's status line
+  is `pkgs/slstatus`. this module holds the session entry, `dwl-startup`,
+  the `dwl-session` systemd target, the `dwl-*` helper scripts behind the
+  popups, mako and portal routing; colours come from charlotte's
+  `my.theme`. gotchas: it needs the desktop-hyprland profile for the
+  kitty/wofi it launches, and if hyprland is already running on another
+  VT, `dwl-startup` leaves the shared systemd user services
+  (`graphical-session.target`, portals) alone, so the two sessions don't
+  stop each other's.
 - **`systemd-boot-silent/`** — quiet boot (credit: `smravec/nixos-config`).
   imported but currently disabled (commented out) on index; active on
   pine.

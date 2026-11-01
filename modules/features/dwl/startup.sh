@@ -2,7 +2,7 @@
 #
 # Runs inside the compositor (dwl -s). dwl exits when this process does,
 # so it must stay alive: `sleep infinity` holds the session open until
-# Super+Shift+Q. Add long-running helpers (bar, wallpaper, polkit agent)
+# Super+Shift+L. Add long-running helpers (bar, wallpaper, polkit agent)
 # above it with `&`.
 #
 # Built without errexit (default.nix): a step that fails here must not end
