@@ -184,6 +184,16 @@ let
       gnugrep
       wlrctl
     ];
+
+    # DWL_BIN is the dwl to signal: one from before the layout-signal patch
+    # would die of the SIGUSR1.
+    xkb-switch = {
+      deps = with pkgs; [
+        coreutils
+        procps
+      ];
+      env.DWL_BIN = lib.getExe' dwl "dwl";
+    };
   };
 in
 scripts
