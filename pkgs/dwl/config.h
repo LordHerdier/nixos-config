@@ -27,6 +27,9 @@ static const char *fonts[]                 = {"monospace:size=12"};
 #ifndef COL_BORDER_INACTIVE
 #define COL_BORDER_INACTIVE 0x4a3d66ff
 #endif
+#ifndef COL_MUTED
+#define COL_MUTED       0x4a3d66ff
+#endif
 #ifndef COL_ACCENT
 #define COL_ACCENT      0x9664ffff
 #endif
@@ -50,6 +53,8 @@ static uint32_t colors[][3]                = {
 	[SchemeSel]  = { COL_ACCENT_FG, COL_ACCENT,  COL_BORDER },
 	[SchemeUrg]  = { 0,             0,           COL_URGENT },
 };
+/* the " | " between the tray and the status text, matching slstatus's SEP */
+static uint32_t sepcolors[3]               = { COL_MUTED, COL_SURFACE, COL_BORDER_INACTIVE };
 
 static const float default_opacity = 0.9;
 

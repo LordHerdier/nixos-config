@@ -29,6 +29,7 @@
   fg ? "#cbb8ff",
   surface ? "#000000",
   borderInactive ? "#4a3d66",
+  muted ? "#4a3d66",
   accent ? "#9664ff",
   accentFg ? "#000000",
   border ? "#9664ff",
@@ -47,6 +48,7 @@ in
       (define "FG" fg)
       (define "SURFACE" surface)
       (define "BORDER_INACTIVE" borderInactive)
+      (define "MUTED" muted)
       (define "ACCENT" accent)
       (define "ACCENT_FG" accentFg)
       (define "BORDER" border)

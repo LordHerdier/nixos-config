@@ -538,7 +538,7 @@ index 8f30d8e..367e8ab 100644
  	}
  
 +	if (sepw > 0) {
-+		drwl_setscheme(m->drw, colors[SchemeNorm]);
++		drwl_setscheme(m->drw, sepcolors);
 +		drwl_text(m->drw, m->b.width - tw - sepw, 0, sepw, m->b.height, 0, " | ", 0);
 +	}
 +

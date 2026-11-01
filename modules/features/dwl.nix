@@ -24,6 +24,7 @@ let
     inherit (t.roles)
       surface
       borderInactive
+      muted
       accent
       accentFg
       border
