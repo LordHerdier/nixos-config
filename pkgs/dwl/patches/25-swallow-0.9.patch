@@ -161,7 +161,7 @@ index 229c574..42be38f 100644
  	setmon(c, mon, newtags);
  }
  
-@@ -2184,6 +2207,20 @@ unset_fullscreen:
+@@ -2184,6 +2207,21 @@ unset_fullscreen:
  	}
  }
  
@@ -174,7 +174,8 @@ index 229c574..42be38f 100644
 +	snprintf(buf, sizeof(buf) - 1, "/proc/%u/stat", (unsigned)pid);
 +	if (!(f = fopen(buf, "r")))
 +		return 0;
-+	fscanf(f, "%*u %*s %*c %u", &v);
++	if (fscanf(f, "%*u %*s %*c %u", &v) != 1)
++		v = 0;
 +	fclose(f);
 +	return (pid_t)v;
 +}

@@ -56,7 +56,7 @@ static uint32_t colors[][3]                = {
 /* the " | " between the tray and the status text, matching slstatus's SEP */
 static uint32_t sepcolors[3]               = { COL_MUTED, COL_SURFACE, COL_BORDER_INACTIVE };
 
-static const float default_opacity = 0.9;
+static const float default_opacity = 0.9f;
 
 /* tagging */
 static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
