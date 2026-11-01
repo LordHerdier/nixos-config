@@ -222,6 +222,7 @@ let
       pkgs.jq
       pkgs.libnotify
       pkgs.procps
+      pkgs.pulseaudio
       pkgs.slurp
       pkgs.util-linux
       pkgs.wf-recorder
