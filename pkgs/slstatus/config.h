@@ -19,9 +19,10 @@ static const char unknown_str[] = "n/a";
  *
  * @accent@ and @muted@ are my.theme colours as rrggbb, also from default.nix.
  *
- * ^fg(...) colours and ^lm/^rm/^us/^ds(...) click/scroll regions are dwl's
- * inline status commands (95-bar-status-commands.patch). A region command
- * ends at the first ')', so none of these may contain one. */
+ * ^fg(...) colours, ^lm/^rm/^us/^ds(...) click/scroll regions and ^ct()
+ * centring are dwl's inline status commands (95-bar-status-commands.patch,
+ * 96-bar-status-centre.patch). A region command ends at the first ')', so
+ * none of these may contain one. */
 #define LABEL(text) "^fg(@accent@)" text "^fg()"
 #define SEP         "^fg(@muted@) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "
@@ -45,9 +46,10 @@ static const struct arg args[] = {
 	  "^us(" VOL "5%%+" REDRAW ")^ds(" VOL "5%%-" REDRAW ")"
 	  LABEL("vol ") "%s^lm()^rm()^us()^ds()" SEP,
 	  "@volume@" },
-	{ run_command,    LABEL("bat ") "%s" SEP, "@battery@" },
-	/* clock: left click toggles dwl-calendar (Super+K) */
+	{ run_command,    LABEL("bat ") "%s", "@battery@" },
+	/* clock, centred on the bar by ^ct(): left click toggles dwl-calendar
+	 * (Super+K) */
 	{ datetime,
-	  "^lm(dwl-modal calendar 66 11 dwl-calendar)%s^lm()",
+	  "^ct()^lm(dwl-modal calendar 66 11 dwl-calendar)%s^lm()^ct()",
 	  "%a %d %b %H:%M" },
 };

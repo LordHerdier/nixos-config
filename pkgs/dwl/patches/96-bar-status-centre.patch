@@ -1,0 +1,184 @@
+diff --git a/dwl.c b/dwl.c
+index b32d368..6411f19 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -136,6 +136,7 @@ typedef struct {
+ 	const char *text;
+ 	uint32_t fg, bg;
+ 	const char *cmd[StCmdLast];
++	int centre; /* drawn in the middle of the bar, not at the right */
+ } StatusBlock;
+ 
+ typedef struct Monitor Monitor;
+@@ -470,6 +471,7 @@ static void toggleview(const Arg *arg);
+ static void trayactivate(const Arg *arg);
+ static void traymenu(const Arg *arg);
+ static void traynotify(void *data);
++static int statuscentrew(Monitor *m);
+ static StatusBlock *statusblockat(Monitor *m, double cx);
+ static int statusw(Monitor *m);
+ static int traysepw(Monitor *m);
+@@ -872,8 +874,8 @@ axisnotify(struct wl_listener *listener, void *data)
+ 				barscroll = 0;
+ 				cx = (cursor->x - selmon->m.x) * selmon->wlr_output->scale;
+ 				tw = statusw(selmon);
+-				if (cx > selmon->b.width - tw - traysepw(selmon)) {
+-					sb = statusblockat(selmon, cx);
++				sb = statusblockat(selmon, cx);
++				if (sb || cx > selmon->b.width - tw - traysepw(selmon)) {
+ 					if (!CLEANMASK(mods) && sb && sb->cmd[adir == AxisUp ? StScrollUp : StScrollDown]) {
+ 						spawnstatuscmd(sb, adir == AxisUp ? StScrollUp : StScrollDown);
+ 						return;
+@@ -1043,9 +1045,9 @@ buttonpress(struct wl_listener *listener, void *data)
+ 				while (cx >= tx && ++ti < tray_n_items);
+ 				click = ClkTray;
+ 				arg.ui = ti;
+-			} else if (cx > selmon->b.width - tw - traysepw(selmon)) {
++			} else if ((sb = statusblockat(selmon, cx))
++					|| cx > selmon->b.width - tw - traysepw(selmon)) {
+ 				click = ClkStatus;
+-				sb = statusblockat(selmon, cx);
+ 			} else
+ 				click = ClkTitle;
+ 		}
+@@ -1969,7 +1971,7 @@ void
+ drawbar(Monitor *m)
+ {
+ 	int traywidth = 0, sepw;
+-	int x, w, tw = 0;
++	int x, w, tw = 0, cw = 0, cs = 0, rx, end;
+ 	int boxs = m->drw->font->height / 9;
+ 	int boxw = m->drw->font->height / 6 + 2;
+ 	uint32_t i, occ = 0, urg = 0;
+@@ -1989,8 +1991,11 @@ drawbar(Monitor *m)
+ 	if (m == selmon) { /* status is only drawn on selected monitor */
+ 		drwl_setscheme(m->drw, colors[SchemeNorm]);
+ 		tw = statusw(m);
+-		x = m->b.width - tw;
+-		drwl_rect(m->drw, x, 0, tw, m->b.height, 1, 1);
++		cw = statuscentrew(m);
++		cs = (m->b.width - cw) / 2;
++		rx = m->b.width - tw;
++		x = cs;
++		drwl_rect(m->drw, rx, 0, tw, m->b.height, 1, 1);
+ 		for (i = 0; i < (uint32_t)nsblocks; i++) {
+ 			if (!(w = drwl_font_getwidth(m->drw, sblocks[i].text)))
+ 				continue;
+@@ -1998,8 +2003,13 @@ drawbar(Monitor *m)
+ 			scm[ColBg] = sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
+ 			scm[ColBorder] = colors[SchemeNorm][ColBorder];
+ 			drwl_setscheme(m->drw, scm);
+-			drwl_text(m->drw, x, 0, w, m->b.height, 0, sblocks[i].text, 0);
+-			x += w;
++			if (sblocks[i].centre) {
++				drwl_text(m->drw, x, 0, w, m->b.height, 0, sblocks[i].text, 0);
++				x += w;
++			} else {
++				drwl_text(m->drw, rx, 0, w, m->b.height, 0, sblocks[i].text, 0);
++				rx += w;
++			}
+ 		}
+ 	}
+ 
+@@ -2024,7 +2034,17 @@ drawbar(Monitor *m)
+ 	drwl_setscheme(m->drw, colors[SchemeNorm]);
+ 	x = drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, m->ltsymbol, 0);
+ 
+-	if ((w = m->b.width - (tw + x + traywidth + sepw)) > m->b.height) {
++	/* The title stops short of centred status text; the bar between that
++	 * and the tray or right-hand status is left blank */
++	end = m->b.width - (tw + traywidth + sepw);
++	if (cw && x < cs + cw) {
++		if (cs + cw < end) {
++			drwl_setscheme(m->drw, colors[SchemeNorm]);
++			drwl_rect(m->drw, cs + cw, 0, end - (cs + cw), m->b.height, 1, 1);
++		}
++		end = cs;
++	}
++	if ((w = end - x) > m->b.height) {
+ 		if (c) {
+ 			drwl_setscheme(m->drw, colors[SchemeNorm]);
+ 			drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, client_get_title(c), 0);
+@@ -2058,29 +2078,48 @@ drawbar(Monitor *m)
+ 	wlr_buffer_unlock(&buf->base);
+ }
+ 
+-/* the status block under bar x-coordinate cx, which must be inside the
+- * status text */
++/* width of the ^ct() status text drawn in the middle of the bar; 0 with
++ * none, or on a monitor that draws no status */
++int
++statuscentrew(Monitor *m)
++{
++	int i, w = 0;
++
++	if (m != selmon)
++		return 0;
++	for (i = 0; i < nsblocks; i++)
++		if (sblocks[i].centre)
++			w += drwl_font_getwidth(m->drw, sblocks[i].text);
++	return w;
++}
++
++/* the status block under bar x-coordinate cx, centred or right-hand, or
++ * NULL if cx is not over any status text */
+ StatusBlock *
+ statusblockat(Monitor *m, double cx)
+ {
+-	int i, x = m->b.width - statusw(m);
++	int i, w, x = m->b.width - statusw(m), cx0 = (m->b.width - statuscentrew(m)) / 2;
++	int *bx;
+ 
+ 	for (i = 0; i < nsblocks; i++) {
+-		x += drwl_font_getwidth(m->drw, sblocks[i].text);
+-		if (cx < x)
++		w = drwl_font_getwidth(m->drw, sblocks[i].text);
++		bx = sblocks[i].centre ? &cx0 : &x;
++		if (cx >= *bx && cx < *bx + w)
+ 			return &sblocks[i];
++		*bx += w;
+ 	}
+ 	return NULL;
+ }
+ 
+-/* width of the status text, including 2px of right padding */
++/* width of the right-hand status text, including 2px of right padding */
+ int
+ statusw(Monitor *m)
+ {
+ 	int i, w = 2;
+ 
+ 	for (i = 0; i < nsblocks; i++)
+-		w += drwl_font_getwidth(m->drw, sblocks[i].text);
++		if (!sblocks[i].centre)
++			w += drwl_font_getwidth(m->drw, sblocks[i].text);
+ 	return w;
+ }
+ 
+@@ -3797,6 +3836,8 @@ setup(void)
+  *                                       argument reverts to SchemeNorm
+  *   ^lm(cmd) ^mm(cmd) ^rm(cmd)          left/middle/right click region
+  *   ^us(cmd) ^ds(cmd)                   scroll up/down region
++ *   ^ct()                               toggle drawing the following text
++ *                                       in the middle of the bar
+  * A region runs until the same command with an empty argument, e.g.
+  * "^lm(foot)click me^lm()". cmd runs through /bin/sh -c and ends at the
+  * first ')'. "^^" is a literal '^'; anything else starting with '^' is
+@@ -3804,7 +3845,7 @@ setup(void)
+ void
+ setstatus(const char *s)
+ {
+-	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds" };
++	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds", "ct" };
+ 	char *p = stextbuf, *end = stextbuf + sizeof(stextbuf) - 1, hex[9], *e;
+ 	const char *arg, *close;
+ 	StatusBlock *b = sblocks;
+@@ -3855,6 +3896,8 @@ setstatus(const char *s)
+ 				b->fg = v;
+ 			else
+ 				b->bg = v;
++		} else if (i == LENGTH(names) - 1) {
++			b->centre = !b->centre;
+ 		} else if (n && p + n < end) {
+ 			memcpy(p, arg, n);
+ 			p[n] = '\0';
