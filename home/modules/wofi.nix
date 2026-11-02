@@ -75,6 +75,7 @@ in
   config = mkIf cfg.enable {
     my.theme.fragments.wofi = mkIf follows {
       file = "wofi.css";
+      wal = true;
       render =
         t: lib.concatStrings (lib.mapAttrsToList (k: v: "@define-color wofi_${k} ${v};\n") (colours t));
     };

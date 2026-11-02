@@ -137,6 +137,7 @@ in
 
   home-manager.users.charlotte.my.theme.fragments.mako = {
     file = "mako";
+    wal = true;
     render = makoConfig;
     reload = "makoctl reload";
     runtimeInputs = [ pkgs.mako ];
