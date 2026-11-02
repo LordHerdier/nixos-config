@@ -78,6 +78,7 @@ in
 
   config.my.theme.fragments.nvim = lib.mkIf follows {
     file = "nvim.lua";
+    wal = true;
     render = paletteLua;
     # No reload hook: every running neovim watches the state directory
     # (see 10-theme.nix) and re-applies on its own.
