@@ -22,15 +22,19 @@
   gawk,
   gnugrep,
   gnused,
+  libnotify,
   mako,
   networkmanager,
+  pipewire,
   procps,
+  sound-theme-freedesktop,
   wireplumber,
 }:
 
 let
   # ./scripts/slstatus-NAME.sh as `slstatus-NAME`, with the dwl colour
-  # names it may print as SLSTATUS_ACCENT / _ALERT / _GOOD.
+  # names it may print as SLSTATUS_ACCENT / _ALERT / _GOOD, and the low-battery
+  # ping as SLSTATUS_PING.
   mkScript =
     name: deps:
     writeShellApplication {
@@ -40,12 +44,16 @@ let
         SLSTATUS_ACCENT = "accent";
         SLSTATUS_ALERT = "alert";
         SLSTATUS_GOOD = "good";
+        SLSTATUS_PING = "${sound-theme-freedesktop}/share/sounds/freedesktop/stereo/dialog-warning.oga";
       };
       text = builtins.readFile ./scripts/slstatus-${name}.sh;
     };
 
   scripts = lib.mapAttrs mkScript {
-    battery = [ ];
+    battery = [
+      libnotify
+      pipewire
+    ];
     brightness = [
       brightnessctl
       coreutils
