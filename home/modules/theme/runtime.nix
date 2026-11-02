@@ -78,6 +78,19 @@ let
         '';
       };
 
+      wal = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Also follow `theme-set wal`. The fragment is rendered once with
+          placeholder colours, and wal's real ones are substituted in at
+          runtime, so `render` must only pass palette and role colours
+          through (no maths on them beyond what mkTheme derives) and must
+          not use `accentDim`. Fragments that do not opt in keep the
+          default palette's colours while wal is active.
+        '';
+      };
+
       runtimeInputs = mkOption {
         type = types.listOf types.package;
         default = [ ];
@@ -101,16 +114,66 @@ let
     }) cfg.palettes
   );
 
+  # nixpkgs passes the wrapper args as one "--prefix PATH : ..." string,
+  # which the current makeWrapper hook rejects. Split into separate words.
+  pywal = pkgs.pywal16.overrideAttrs (_: {
+    makeWrapperArgs = [
+      "--prefix"
+      "PATH"
+      ":"
+      (lib.makeBinPath [ pkgs.imagemagick ])
+    ];
+  });
+
+  # Placeholder palette for `wal = true` fragments: one distinct, valid hex
+  # per slot (so mkTheme's role derivation still works), each mapped to the
+  # wal colour that replaces it at runtime.
+  walSlots =
+    let
+      keys = cfg.lib.paletteKeys;
+      slot =
+        k:
+        if k == "bg" then
+          "background"
+        else if k == "fg" then
+          "foreground"
+        else
+          "color${toString (lib.lists.findFirstIndex (x: x == k) null ansiOrder)}";
+      ansiOrder = lib.filter (k: k != "bg" && k != "fg") keys;
+    in
+    lib.imap0 (i: k: {
+      inherit k;
+      hex = "c0de${cfg.lib.hexByte i}";
+      slot = slot k;
+    }) keys;
+
+  walTheme = cfg.lib.mkTheme {
+    name = "wal";
+    palette = lib.listToAttrs (map (s: lib.nameValuePair s.k "#${s.hex}") walSlots);
+  };
+
+  walTemplates = pkgs.linkFarm "theme-wal-templates" (
+    map (f: {
+      name = f.file;
+      path = pkgs.writeText "theme-wal-${f.file}" (f.render walTheme);
+    }) (lib.filter (f: f.wal && f.file != null) fragments)
+  );
+
   themeSet = pkgs.writeShellApplication {
     name = "theme-set";
     runtimeInputs = [
       pkgs.coreutils
+      pywal
+      pkgs.gnused
+      pkgs.jq
     ]
     ++ lib.concatMap (f: f.runtimeInputs) fragments;
     runtimeEnv = {
       THEME_PALETTES = "${paletteDir}";
       THEME_STATE = stateDir;
       THEME_DEFAULT = cfg.default;
+      THEME_WAL_TEMPLATES = "${walTemplates}";
+      THEME_WAL_SLOTS = concatMapStringsSep "\n" (s: "${s.hex} ${s.slot}") walSlots;
       THEME_NAMES = concatStringsSep "\n" (attrNames cfg.palettes);
     };
     text = ''

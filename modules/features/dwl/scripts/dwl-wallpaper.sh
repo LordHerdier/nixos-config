@@ -5,6 +5,10 @@
 # $XDG_STATE_HOME/dwl-wallpaper so `restore` (run at session start) and the
 # next/prev steps pick up where the last run left off. `set` shows one given
 # file and `list` prints the images in cycle order (both for dwl-wallpaper-pick).
+#
+# While `theme-set wal` is active the new wallpaper also re-derives the pywal
+# colours (theme-set comes from the user's PATH, it is a home-manager package).
+# `restore` leaves them alone, since wal is already holding that image.
 
 dir="${DWL_WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/dwl-wallpaper"
@@ -76,4 +80,9 @@ mapfile -t old < <(pgrep -u "$(id -u)" -f '(^|/)\.?swaybg(-wrapped)? -m fill' ||
 setsid swaybg -m fill -i "$pick" >/dev/null 2>&1 &
 sleep 0.3
 [ "${#old[@]}" -gt 0 ] && kill "${old[@]}" 2>/dev/null || true
+
+if [ "${1:-}" != restore ] && [ -e "${XDG_STATE_HOME:-$HOME/.local/state}/theme/wal" ] \
+  && command -v theme-set >/dev/null; then
+  setsid theme-set wal "$pick" >/dev/null 2>&1 &
+fi
 exit 0

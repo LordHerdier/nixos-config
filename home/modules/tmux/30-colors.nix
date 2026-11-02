@@ -95,6 +95,7 @@ in
 {
   my.theme.fragments.tmux = {
     file = "tmux.conf";
+    wal = true;
     render = colours;
     # Every server, not just the one this shell is in. Stale sockets just
     # fail to connect.

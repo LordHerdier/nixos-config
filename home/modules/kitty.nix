@@ -89,6 +89,7 @@ in
 
     my.theme.fragments.kitty = mkIf follows {
       file = "kitty.conf";
+      wal = true;
       render = t: lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "${k} ${v}") (colours t)) + "\n";
       # SIGUSR1 makes every kitty reload its config, includes and all.
       reload = "pkill -USR1 -x kitty";
