@@ -41,21 +41,20 @@ let
 
   # What dwl's loadcolors (pkgs/dwl/patches/99-theme-colours.patch) reads,
   # one file per palette. The "# NAME" line is for dwl-theme.
-  colorsFile =
-    name: theme:
-    pkgs.writeText "dwl-colors-${name}" ''
-      # ${name}
-      bg=${theme.palette.bg}
-      fg=${theme.palette.fg}
-      surface=${theme.roles.surface}
-      border_inactive=${theme.roles.borderInactive}
-      muted=${theme.roles.muted}
-      accent=${theme.roles.accent}
-      accent_fg=${theme.roles.accentFg}
-      border=${theme.roles.border}
-      urgent=${theme.roles.error}
-      success=${theme.roles.success}
-    '';
+  colorsText = name: theme: ''
+    # ${name}
+    bg=${theme.palette.bg}
+    fg=${theme.palette.fg}
+    surface=${theme.roles.surface}
+    border_inactive=${theme.roles.borderInactive}
+    muted=${theme.roles.muted}
+    accent=${theme.roles.accent}
+    accent_fg=${theme.roles.accentFg}
+    border=${theme.roles.border}
+    urgent=${theme.roles.error}
+    success=${theme.roles.success}
+  '';
+  colorsFile = name: theme: pkgs.writeText "dwl-colors-${name}" (colorsText name theme);
 
   themes = pkgs.linkFarm "dwl-themes" (
     lib.mapAttrsToList (name: theme: {
@@ -134,6 +133,14 @@ in
   imports = [ ./portals.nix ];
 
   services.displayManager.sessionPackages = [ sessionEntry ];
+
+  # The same colours file as a fragment, so `theme-set wal` can fill it in;
+  # the reload hook that hands it to dwl is in home/modules/theme/default.nix.
+  home-manager.users.charlotte.my.theme.fragments.dwl-colors = {
+    file = "dwl-colors";
+    render = t: colorsText t.name t;
+    wal = true;
+  };
 
   home-manager.users.charlotte.my.theme.fragments.mako = {
     file = "mako";

@@ -100,7 +100,7 @@ set_wal() {
   echo "$img" >"$walstate"
   build_wal_palette
   point_at_dir "$walpalette"
-  reload_all ""
+  reload_all wal
 }
 
 # The palette `step` places away from the current one, wrapping.
@@ -125,7 +125,7 @@ main() {
       wal -n -e -q -R
       build_wal_palette
       point_at_dir "$walpalette"
-      reload_all ""
+      reload_all wal
     else
       reload_all "$([ -r "$override" ] && cat "$override" || true)"
     fi

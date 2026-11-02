@@ -1,4 +1,4 @@
-# dwl-theme {NAME|next|prev|default|list|current|reload}
+# dwl-theme {NAME|file PATH|next|prev|default|list|current|reload}
 #
 # Switches the colours of the running dwl (bar, tray, borders, background)
 # between the my.theme palettes without a rebuild or a restart.
@@ -52,6 +52,18 @@ set_theme() {
   reload
 }
 
+# A colours file that is not one of the built palettes (theme-set wal).
+set_file() {
+  [ -f "${1:-}" ] || {
+    echo "dwl-theme: not a file: ${1:-}" >&2
+    exit 1
+  }
+  mkdir -p "$(dirname "$override")"
+  cp "$1" "$override.tmp"
+  mv "$override.tmp" "$override"
+  reload
+}
+
 # The palette `step` places away from the current one, wrapping.
 step() {
   local cur names i
@@ -72,10 +84,11 @@ default)
   rm -f "$override"
   reload
   ;;
+file) set_file "${2:-}" ;;
 next) step 1 ;;
 prev) step -1 ;;
 "")
-  echo "usage: dwl-theme {NAME|next|prev|default|list|current|reload}" >&2
+  echo "usage: dwl-theme {NAME|file PATH|next|prev|default|list|current|reload}" >&2
   exit 1
   ;;
 *) set_theme "$1" ;;

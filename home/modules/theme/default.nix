@@ -45,10 +45,15 @@ in
 
   # dwl is a system feature (modules/features/dwl) that keeps its own
   # runtime colours; hand it the palette through its switcher. Not on
-  # PATH outside a dwl host, which is fine.
+  # PATH outside a dwl host, which is fine. wal has no named palette, so
+  # dwl is given the colours file (dwl-colors fragment, modules/features/dwl).
   config.my.theme.fragments.dwl.reload = ''
     if command -v dwl-theme >/dev/null; then
-      dwl-theme "''${THEME_NAME:-default}"
+      if [ "''${THEME_NAME:-}" = wal ]; then
+        dwl-theme file "${config.my.theme.runtime.active}/dwl-colors"
+      else
+        dwl-theme "''${THEME_NAME:-default}"
+      fi
     fi
   '';
 
