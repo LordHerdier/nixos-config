@@ -60,6 +60,7 @@
     gco = "git checkout";
     gcob = "git checkout -b";
     gd = "git diff";
+    gds = "git diff --staged";
     gp = "git pull";
     gpu = "git push";
     gs = "git status";
