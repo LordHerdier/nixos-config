@@ -394,6 +394,7 @@ static const Button buttons[] = {
 	{ ClkClient,   MODKEY|WLR_MODIFIER_SHIFT, BTN_LEFT, moveresize, {.ui = CurResize} },
 	{ ClkClient,   MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ ClkClient,   MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
+	{ ClkLauncher, 0,      BTN_LEFT,   spawn,          SHCMD("wofi --show drun") },
 	{ ClkTagBar,   0,      BTN_LEFT,   view,           {0} },
 	{ ClkTagBar,   0,      BTN_RIGHT,  toggleview,     {0} },
 	{ ClkTagBar,   MODKEY, BTN_LEFT,   tag,            {0} },
