@@ -56,7 +56,10 @@ dwl-wallpaper restore || true
 # Notifications, which Noctalia owns under Hyprland. mako is a runtime
 # input of this script rather than on PATH, so its D-Bus activation file
 # can't grab org.freedesktop.Notifications in a Hyprland session.
-mako --config "$DWL_MAKO_CONFIG" &
+# The active palette's config (theme-set), else the one built in.
+mako_config=$DWL_MAKO_ACTIVE
+[ -r "$mako_config" ] || mako_config=$DWL_MAKO_CONFIG
+mako --config "$mako_config" &
 # Clipboard history for dwl-clipboard (Super+V). Runtime inputs rather
 # than PATH, like mako: Noctalia keeps its own history under Hyprland.
 # Both exit with the compositor when the Wayland connection drops.

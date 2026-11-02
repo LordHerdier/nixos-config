@@ -7,11 +7,20 @@
 # Nightfox addresses colors as base/bright pairs, which is exactly the
 # ANSI 16 split the palette already carries.
 
-{ pkgs, theme, ... }:
+{
+  pkgs,
+  theme,
+  themeRuntime,
+  paletteLua,
+  ...
+}:
 
 let
-  p = theme.palette;
-  r = theme.roles;
+  # Followed palettes: neovim watches ${themeRuntime} for `theme-set`
+  # repointing `active`, and re-applies. Pinned ones (themeRuntime null)
+  # just use the palette they were built with. The built-in one is also
+  # the fallback when the active file is missing or does not parse.
+  watch = themeRuntime != null;
 in
 {
   config.vim = {
@@ -25,22 +34,14 @@ in
     };
 
     luaConfigRC.theme = # lua
-      ''
+    ''
+      local builtin = (function()
+      ${paletteLua theme}
+      end)()
+
+      local function apply(t)
         require("nightfox").setup({
-          palettes = {
-            all = {
-              black    = "${p.black}",
-              red      = { base = "${p.red}", bright = "${p.brightRed}" },
-              green    = { base = "${p.green}", bright = "${p.brightGreen}" },
-              yellow   = { base = "${p.yellow}", bright = "${p.brightYellow}" },
-              blue     = { base = "${p.blue}", bright = "${p.brightBlue}" },
-              magenta  = { base = "${p.magenta}", bright = "${p.brightMagenta}" },
-              cyan     = { base = "${p.cyan}", bright = "${p.brightCyan}" },
-              white    = { base = "${p.white}", bright = "${p.brightWhite}" },
-              bg0      = "${p.bg}",
-              fg1      = "${p.fg}",
-            },
-          },
+          palettes = { all = t.palette },
           options = {
             transparent    = true,
             terminal_colors = false,
@@ -48,7 +49,31 @@ in
           },
         })
         vim.cmd("colorscheme nightfox")
-        vim.api.nvim_set_hl(0, "WinSeparator", { fg = "${r.border}", bg = "NONE" });
-      '';
+        vim.api.nvim_set_hl(0, "WinSeparator", { fg = t.border, bg = "NONE" });
+      end
+
+    ''
+    + (
+      if !watch then
+        "apply(builtin)\n"
+      else
+        ''
+
+          -- Follow theme-set. It replaces the `active` symlink with a rename,
+          -- which shows up as an event for "active" on the directory.
+          local dir = "${themeRuntime}"
+          local function reload()
+            local ok, t = pcall(dofile, dir .. "/active/nvim.lua")
+            apply(ok and type(t) == "table" and t or builtin)
+          end
+          reload()
+          local watcher = vim.uv.new_fs_event()
+          if watcher then
+            watcher:start(dir, {}, vim.schedule_wrap(function(err, name)
+              if not err and name == "active" then reload() end
+            end))
+          end
+        ''
+    );
   };
 }

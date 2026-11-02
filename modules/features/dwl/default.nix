@@ -75,11 +75,15 @@ let
       ;
   };
 
-  # Same roles as the bar's colors[] (see `dwl` above).
-  makoConfig = pkgs.replaceVars ./mako.conf {
-    inherit (t.palette) fg;
-    inherit (t.roles) surface border error;
-  };
+  # Same roles as the bar's colors[] (see `dwl` above). A fragment per
+  # palette so `theme-set` can switch it (makoctl reload), and the default
+  # one as a store file for a session where the state dir has nothing yet.
+  makoConfig =
+    theme:
+    builtins.replaceStrings
+      [ "@fg@" "@surface@" "@border@" "@error@" ]
+      [ theme.palette.fg theme.roles.surface theme.roles.border theme.roles.error ]
+      (builtins.readFile ./mako.conf);
 
   # Built without errexit: a step that fails must not end the session.
   startup = pkgs.writeShellApplication {
@@ -99,7 +103,8 @@ let
       scripts.wallpaper
     ];
     runtimeEnv = {
-      DWL_MAKO_CONFIG = makoConfig;
+      DWL_MAKO_CONFIG = pkgs.writeText "mako-config" (makoConfig t);
+      DWL_MAKO_ACTIVE = "${hm.my.theme.runtime.active}/mako";
       DWL_POLKIT_AGENT = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
     };
     text = builtins.readFile ./startup.sh;
@@ -129,6 +134,13 @@ in
   imports = [ ./portals.nix ];
 
   services.displayManager.sessionPackages = [ sessionEntry ];
+
+  home-manager.users.charlotte.my.theme.fragments.mako = {
+    file = "mako";
+    render = makoConfig;
+    reload = "makoctl reload";
+    runtimeInputs = [ pkgs.mako ];
+  };
 
   # my.theme.default as dwl's colours when charlotte has not picked another
   # with dwl-theme, and a rebuild that changes it recolours the live session.

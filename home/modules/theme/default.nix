@@ -41,6 +41,17 @@ let
   cfg = config.my.theme;
 in
 {
+  imports = [ ./runtime.nix ];
+
+  # dwl is a system feature (modules/features/dwl) that keeps its own
+  # runtime colours; hand it the palette through its switcher. Not on
+  # PATH outside a dwl host, which is fine.
+  config.my.theme.fragments.dwl.reload = ''
+    if command -v dwl-theme >/dev/null; then
+      dwl-theme "''${THEME_NAME:-default}"
+    fi
+  '';
+
   options.my.theme = {
     default = mkOption {
       type = types.enum (lib.attrNames cfg.palettes);

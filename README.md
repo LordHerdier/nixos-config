@@ -268,6 +268,31 @@ follows it: kitty, tmux, fzf, spotify-player and neovim all draw from the same
 file. an app can still pin a different palette through its own option
 (`my.kitty.palette`, `my.nvim.palette`).
 
+### switching palettes at runtime
+
+`theme-set {NAME|next|prev|default|list|current|reload}` changes the palette
+without a rebuild. an app that follows `my.theme.default` registers a
+*fragment* under `my.theme.fragments.<app>` (`home/modules/theme/runtime.nix`):
+a function from a resolved theme to the text of its colour file, plus an
+optional reload hook. every fragment is rendered for every palette at build
+time into `~/.config/theme/palettes/<palette>/`, and `~/.local/state/theme/active`
+points at the current one. the app's generated config includes its file from
+there, and `theme-set` repoints `active` and runs the hooks.
+
+| app            | how it picks up a switch                                          |
+| -------------- | ----------------------------------------------------------------- |
+| kitty          | `include` in kitty.conf; `pkill -USR1 kitty` reloads every window |
+| tmux           | `source-file`; every server is re-sourced                         |
+| neovim         | fs-watches the state dir and re-runs nightfox's setup             |
+| wofi           | `@import` of a GTK colour file, read each time wofi opens         |
+| mako, dwl, bar | `makoctl reload`; `dwl-theme` (SIGUSR2)                           |
+
+`theme-set default` drops the override, and a rebuild with no override points
+`active` at the new `my.theme.default`, so changing it in Nix still recolours
+a live session. an app pinned to a palette other than the default registers no
+fragment and keeps its colours inline, so a switch leaves it alone. spotify-player,
+spicetify, GTK, GNOME Console and the wallpaper stay rebuild-time.
+
 `catppuccin-mocha` and `gruvbox-nightfox` are kept as palettes because they are
 what kitty and neovim used to carry inline, and either can be pinned back on one
 line.

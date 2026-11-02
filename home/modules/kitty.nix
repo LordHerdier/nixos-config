@@ -3,6 +3,7 @@
 {
   config,
   lib,
+  pkgs,
   hostName,
   ...
 }:
@@ -18,8 +19,47 @@ let
   cfg = config.my.kitty;
 
   theme = config.my.theme.palettes.${cfg.palette};
-  p = theme.palette;
-  r = theme.roles;
+
+  # Every colour kitty draws from the palette. Inline when kitty is pinned
+  # to a palette of its own; otherwise a runtime fragment (see
+  # home/modules/theme/runtime.nix) that `theme-set` can swap.
+  colours =
+    t:
+    let
+      p = t.palette;
+      r = t.roles;
+    in
+    {
+      cursor = r.cursor;
+      url_color = r.url;
+      active_border_color = r.accent;
+      inactive_border_color = r.borderInactive;
+
+      background = p.bg;
+      foreground = p.fg;
+      selection_background = r.selectionBg;
+      # Not a color: tells kitty to keep each cell's own foreground.
+      selection_foreground = "none";
+
+      color0 = p.black;
+      color1 = p.red;
+      color2 = p.green;
+      color3 = p.yellow;
+      color4 = p.blue;
+      color5 = p.magenta;
+      color6 = p.cyan;
+      color7 = p.white;
+      color8 = p.brightBlack;
+      color9 = p.brightRed;
+      color10 = p.brightGreen;
+      color11 = p.brightYellow;
+      color12 = p.brightBlue;
+      color13 = p.brightMagenta;
+      color14 = p.brightCyan;
+      color15 = p.brightWhite;
+    };
+
+  follows = config.my.theme.follows cfg.palette;
 in
 {
   options.my.kitty = {
@@ -47,6 +87,14 @@ in
 
   config = mkIf cfg.enable {
 
+    my.theme.fragments.kitty = mkIf follows {
+      file = "kitty.conf";
+      render = t: lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "${k} ${v}") (colours t)) + "\n";
+      # SIGUSR1 makes every kitty reload its config, includes and all.
+      reload = "pkill -USR1 -x kitty";
+      runtimeInputs = [ pkgs.procps ];
+    };
+
     programs.kitty = {
       enable = true;
 
@@ -66,7 +114,6 @@ in
         disable_ligatures = "never";
 
         # Cursor
-        cursor = r.cursor;
         cursor_shape = "beam";
         cursor_beam_thickness = 1;
         cursor_blink_interval = 1;
@@ -83,7 +130,6 @@ in
         pointer_shape_when_dragging = "beam";
 
         # URL handling
-        url_color = r.url;
         url_style = "single";
         open_url_with = "default";
         detect_urls = "yes";
@@ -92,9 +138,6 @@ in
         enabled_layouts = "splits";
         window_padding_width = "0 8 8";
         draw_minimal_borders = "yes";
-
-        active_border_color = r.accent;
-        inactive_border_color = r.borderInactive;
 
         # Tabs
         tab_bar_style = "powerline";
@@ -109,35 +152,16 @@ in
         # Transparency
         background_opacity = toString cfg.opacity;
 
-        # Theme -- see my.kitty.palette
-        background = p.bg;
-        foreground = p.fg;
-        selection_background = r.selectionBg;
-        # Not a color: tells kitty to keep each cell's own foreground.
-        selection_foreground = "none";
-
-        color0 = p.black;
-        color1 = p.red;
-        color2 = p.green;
-        color3 = p.yellow;
-        color4 = p.blue;
-        color5 = p.magenta;
-        color6 = p.cyan;
-        color7 = p.white;
-        color8 = p.brightBlack;
-        color9 = p.brightRed;
-        color10 = p.brightGreen;
-        color11 = p.brightYellow;
-        color12 = p.brightBlue;
-        color13 = p.brightMagenta;
-        color14 = p.brightCyan;
-        color15 = p.brightWhite;
-
         editor = "vim";
         allow_remote_control = "yes";
         allow_hyperlinks = "yes";
         term = "xterm-kitty";
-      };
+      }
+      // lib.optionalAttrs (!follows) (colours theme);
+
+      extraConfig = lib.optionalString follows ''
+        include ${config.my.theme.runtime.active}/kitty.conf
+      '';
 
       keybindings = {
         "ctrl+v" = "paste_from_clipboard";

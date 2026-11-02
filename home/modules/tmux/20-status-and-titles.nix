@@ -1,10 +1,8 @@
 # home/modules/tmux/20-status-and-titles.nix
 
-{ config, lib, ... }:
+{ lib, ... }:
 
 let
-  theme = config.my.theme.active;
-
   # vim-tpipeline's bridge files, written by neovim and read back here.
   # See ../nvf/plugins/96-tpipeline.nix.
   #
@@ -43,9 +41,9 @@ in
     # title is eaten before the branch and line:col are, rather than the
     # other way round. Verified at 90 columns, where now-playing loses
     # its first few characters and neovim's half stays whole.
-    set -g status-left "#[fg=${theme.roles.surface},bg=${theme.palette.yellow},bold] ❐ #S #[default]${vimbridge}#[default]"
+    set -g status-left "#[fg=#{@tm_surface},bg=#{@tm_attention},bold] ❐ #S #[default]${vimbridge}#[default]"
     set -g status-left-length 200
-    set -g status-right " #[range=user|nowplaying,fg=${theme.palette.magenta}]#(~/.config/tmux/scripts/now-playing.sh)#[norange,default] #{?client_prefix,⌨ ,}#{?mouse,↗ ,}#{?synchronize-panes,⚏ ,}| #{session_dots} | ${vimbridgeR}#[default]"
+    set -g status-right " #[range=user|nowplaying,fg=#{@tm_magenta}]#(~/.config/tmux/scripts/now-playing.sh)#[norange,default] #{?client_prefix,⌨ ,}#{?mouse,↗ ,}#{?synchronize-panes,⚏ ,}| #{session_dots} | ${vimbridgeR}#[default]"
     set -g status-right-length 200
 
     set -g set-titles on
