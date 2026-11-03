@@ -32,6 +32,7 @@
       gum
       inetutils
       inputs.forgejo-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.pluralspace-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       jq
       lazydocker
       lazygit

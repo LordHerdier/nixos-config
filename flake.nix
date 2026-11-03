@@ -54,6 +54,9 @@
 
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     spicetify-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    pluralspace-cli.url = "github:LordHerdier/pluralspace-cli";
+    pluralspace-cli.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

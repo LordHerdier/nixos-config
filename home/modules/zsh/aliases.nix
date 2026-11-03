@@ -28,6 +28,7 @@
     y = "yazi";
     browse = "yazi";
     path = "realpath";
+    plsp = "pluralspace";
 
     # Nix
     n = "nix";
