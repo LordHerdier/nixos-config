@@ -1,4 +1,4 @@
-# modules/time.nix
+# modules/common/time.nix
 
 { ... }:
 

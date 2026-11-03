@@ -18,14 +18,17 @@ gotcha each one's header comment exists to warn about. see
   refresh/HDR to the connecting client, reverts on disconnect) and an
   independent watchdog timer, because sunshine's own revert hook
   (`global_prep_cmd`'s `undo`) is unreliable across reconnects upstream.
-- **`rdp.nix`** — gnome's built-in RDP server, headless mode, for
-  productivity sessions from e.g. an iPad. **not** started automatically
-  (`wantedBy` deliberately omitted): the headless backend claims
-  mutter's RemoteDesktop portal the moment it runs, which starves
-  sunshine of the same portal on startup. start/stop it by hand with
-  `systemctl --user {start,stop} gnome-remote-desktop-headless`, and run
-  `grdctl --headless rdp set-credentials/enable` once, logged in locally,
-  before the first use.
+- **`rdp.nix`** — gnome's built-in RDP server in *system* mode (what
+  Settings calls "Remote Login"), for productivity sessions from e.g. an
+  iPad. runs as the unprivileged `gnome-remote-desktop` system user and
+  asks GDM (`RemoteDisplayFactory`) for a brand-new session per client,
+  so it never touches charlotte's autologin session that sunshine
+  streams, and can be always-on. consequences: it asserts GDM is the
+  display manager (apthos overrides desktop-common's SDDM), and it still
+  needs one-time manual setup as root (a TLS cert/key under
+  `/etc/gnome-remote-desktop/` and credentials via `grdctl --system`) —
+  see the module header. the older headless user-session mode lost
+  because it claimed mutter's RemoteDesktop portal and starved sunshine.
 - **`usbmuxd.nix`** — iphone/ipad usb pairing (libimobiledevice), so the
   "Trust This Device" prompt appears at all.
 
@@ -34,8 +37,9 @@ gotcha each one's header comment exists to warn about. see
 - **`tailscale.nix`** — just `services.tailscale.enable`, nothing
   fancier; `open-webui.nix` and `ollama-vulkan.nix` build on top of it
   for tailnet-only exposure.
-- **`syncthing.nix`** — syncs `~/documents` and `~/pictures` between
-  every host that imports it (currently index and apthos). device IDs
+- **`syncthing.nix`** — syncs `~/documents` and `~/Pictures` between
+  hosts listed in its `allDevices` (currently index and apthos;
+  charlie-laptop imports the module but has no entry, so it has no peers). device IDs
   are hardcoded per host in the module (`allDevices`), and the module
   derives each host's *peer* list by filtering out its own `hostName` —
   adding a third host means deploying there first to mint its device
@@ -73,6 +77,7 @@ gotcha each one's header comment exists to warn about. see
 
 - **`ollama.nix`** — local LLM server tuned for the framework
   13/index's Radeon 890M (ROCm, `gfx1150`, one model loaded at a time).
+  not currently imported by any host; kept for when it's wanted on index.
 - **`ollama-vulkan.nix`** — the apthos variant: vulkan-accelerated
   instead of CUDA, specifically because `ollama-cuda` would have to
   compile llama.cpp from scratch locally (unfree CUDA builds aren't
@@ -88,7 +93,8 @@ gotcha each one's header comment exists to warn about. see
 - **`builder-cache.nix`** — uses the `builder` CT on twm
   (`10.0.10.8:5000`, see [hosts.md](hosts.md#builder)) as a binary cache
   ahead of cache.nixos.org, so anything the builder's ci has already
-  built is a download. on every host. `connect-timeout = 5` so a machine
+  built is a download. on every `mkHost` host (pine and index get it via
+  `remote-builder.nix`). `connect-timeout = 5` so a machine
   that can't reach `10.0.10.0/24` (off the lan, wsl without a route) falls
   through to cache.nixos.org quickly instead of hanging.
 - **`remote-builder.nix`** — imports the cache module and also offloads
@@ -111,7 +117,8 @@ per host, not part of a "what kind of desktop is this" bundle:
 - **`gvfs.nix`** — virtual filesystem support (needed for nautilus/thunar
   to browse mtp devices, archives, etc).
 - **`zram.nix`** — compressed swap in RAM, `zstd`, capped at 50% of RAM;
-  tuned sysctls (`swappiness=180`, `page-cluster=0`) because the
+  tuned sysctls (`swappiness=180`, `page-cluster=0`, plus
+  `watermark_boost_factor=0` / `watermark_scale_factor=125`) because the
   disk-swap defaults are far too conservative for something this fast.
   no disk swap exists on these machines at all.
 - **`nix-ld.nix`** — lets dynamically-linked non-nix binaries run.
@@ -136,6 +143,19 @@ per host, not part of a "what kind of desktop is this" bundle:
   imported but currently disabled (commented out) on index; active on
   pine.
 
+## hardware workarounds
+
+- **`librepods.nix`** — LibrePods (AirPods ANC/transparency control, ear
+  detection, battery) outside Apple's ecosystem. uses the harveywuk fork
+  (the airpods noctalia plugin needs its status file and verbs), adds
+  charlotte to the `librepods` group, and overrides `QT_STYLE_OVERRIDE`
+  for the app because font-rendering.nix's value breaks its QML.
+  index only.
+- **`framework-kmod-fix.nix`** — rebuilds `framework-laptop-kmod` with an
+  install phase that runs `modules_install`, since current nixpkgs
+  requires a `.ko.cer` digest the upstream package doesn't ship. drop it
+  once nixpkgs fixes the package. index only.
+
 ## accounts & controls
 
 - **`parental-controls.nix`** — enables malcontent (gnome's "Parental
@@ -149,6 +169,8 @@ per host, not part of a "what kind of desktop is this" bundle:
 `nvidia.nix` (proprietary driver for a passed-through GPU with no
 host-side driver contention) is covered under apthos in
 [hosts.md](hosts.md); `kmonad.nix` lives under `modules/common/` (not
-`features/`) because it's about *which physical keyboard* a host has,
-not an opt-in capability — see the top-level README's keyboard section
-for the layer design.
+`features/`) because it's about *which physical keyboards* a host has,
+not an opt-in capability — it grabs the built-in board, a generic USB
+board and the Keychron K6 — see the top-level README's keyboard section
+for the layer design. `wsl-docker-desktop.nix` (the WSL hosts' bridge to
+Docker Desktop) is covered in [hosts.md](hosts.md).

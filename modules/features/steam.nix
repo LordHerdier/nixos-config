@@ -1,4 +1,4 @@
-# home/modules/features/steam.nix
+# modules/features/steam.nix
 
 { pkgs, ... }:
 

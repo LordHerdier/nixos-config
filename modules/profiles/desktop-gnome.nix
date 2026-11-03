@@ -9,7 +9,8 @@
 # Hyprland for Charlotte) and disables the SDDM this pulls in
 # (services.displayManager.sddm.enable = lib.mkForce false) in favor of
 # greetd + tuigreet, which is what lets its F3 picker offer both
-# sessions. Apthos imports this alone and keeps SDDM.
+# sessions. Apthos imports this alone and swaps SDDM for GDM (see its
+# host file).
 
 { ... }:
 

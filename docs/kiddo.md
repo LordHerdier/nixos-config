@@ -55,10 +55,11 @@ account:
   most load-bearing setting is the keyboard layout: plain `us` qwerty,
   overriding the system-wide colemak default, because a six-year-old
   learning to read cannot use colemak. **this does not defeat kmonad** —
-  kmonad remaps the built-in keyboard at the evdev layer, below
-  X/Wayland, and only grabs the specific `platform-i8042-serio-0-event-kbd`
-  device, so an external USB keyboard would still be true qwerty
-  regardless of dconf. the rest of the module is accessibility tuning for a
+  kmonad remaps keyboards at the evdev layer, below
+  X/Wayland, and only grabs the specific devices listed in
+  `modules/common/kmonad/kmonad.nix` (the built-in board, a SEM USB board
+  and the Keychron K6), so any other external keyboard would still be true
+  qwerty regardless of dconf. the rest of the module is accessibility tuning for a
   six-year-old, not just preference: 1.25x text scaling and a 32px cursor
   (bigger targets, easier to read), no hot corners (an accidental trigger
   would be confusing), one fixed workspace (dynamic workspaces are the most

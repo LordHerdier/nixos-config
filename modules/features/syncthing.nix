@@ -1,7 +1,9 @@
 # modules/features/syncthing.nix
 #
-# Syncs charlotte's ~/documents and ~/pictures between every host that
-# imports this module (currently Index and Apthos).
+# Syncs charlotte's ~/documents and ~/Pictures between every host that
+# imports this module and has an entry in allDevices (currently Index and
+# Apthos; Charlie-Laptop imports it too but has no entry, so it has no
+# peers and syncs nothing).
 #
 # hostName is used so each host only lists its *peers* as devices, never
 # itself.

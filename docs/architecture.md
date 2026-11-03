@@ -4,9 +4,11 @@
 
 every nixos module in this repo is one of:
 
-- **`modules/common/`** — applied to every host, no exceptions. users,
-  nix settings (flakes, gc, auto-optimise), ssh, time zone, fonts,
-  printing, security basics. small and boring on purpose.
+- **`modules/common/`** — the baseline. `mkHost` applies the core of it to every host: users,
+  nix settings (flakes, gc, auto-optimise), time zone, packages, security
+  basics. small and boring on purpose. `ssh.nix`, `fonts.nix`,
+  `printing.nix` (avahi) and `kmonad/` also live here but are opt-in:
+  a host imports them itself, `mkHost` does not.
 - **`modules/features/`** — opt-in capabilities. one file, one concern:
   `tailscale.nix`, `syncthing.nix`, `steam.nix`, `sunshine.nix`,
   `ollama.nix`, `parental-controls.nix`, and so on. a host imports the
@@ -19,19 +21,21 @@ every nixos module in this repo is one of:
   (bluetooth, libinput), `dev-docker.nix`, `wsl.nix`. profiles compose
   modules; they don't define new capabilities themselves.
 
-`modules/users/kiddo.nix` is a fourth, narrower category: a host-scoped
-extra *system user*. It's not under `common/` because most hosts have no
-business creating that account — see [kiddo.md](kiddo.md).
+`modules/users/` (`kiddo.nix`, `rivian.nix`) is a fourth, narrower category:
+host-scoped extra *system users*, both index-only. They're not under
+`common/` because most hosts have no business creating those accounts —
+see [kiddo.md](kiddo.md).
 
 the home-manager side (`home/`) mirrors this: `home/modules/` is one file
 per tool, `home/profiles/` bundles them into roles
 (`desktop-hyprland.nix`, `desktop-gnome.nix`, `kid.nix`, `wsl.nix`), and
 `home/hosts/*.nix` is the thin per-machine layer that picks a profile and
 adds anything genuinely host-specific (e.g. `home/hosts/Index.nix` turns
-on easyeffects; `home/hosts/Apthos.nix` pulls in the oneshot rice
-modules; `home/hosts/Charlie-Laptop.nix` forces `my.theme.default` to
-`kanagawa`, overriding the `oneshot` default `home/charlotte.nix` sets
-for everyone else).
+on easyeffects and forces `my.theme.default` to `halloween`;
+`home/hosts/Apthos.nix` pulls in the oneshot rice
+modules). the shared desktop/shell stack lives in
+`home/desktop-user.nix`, which sets `my.theme.default = "kanagawa"`;
+`home/charlotte.nix` and `home/rivian.nix` only add identity on top.
 
 ## `mkHost`, in `parts/hosts.nix`
 
@@ -43,13 +47,14 @@ every `nixosConfigurations.<Name>` is built by one function,
 `mkHost { hostName, isWsl, hostPath, extraModules, extraHomeUsers }`.
 what it does, in order:
 
-1. sets `nixpkgs.hostPlatform` and registers the `overlays` that add the
-   few custom packages (`oneshot-cursors`, `oneshot-gtk-theme`,
-   `oneshot-icons`, `oneshot-wallpaper`) to `pkgs` (plus `concord`, taken from
-   its own flake), plus one *replacement*
-   — `gnome-console`, patched for an upstream bug rather than customised,
-   which is why it's the one overlay entry that reads `prev`.
-2. imports the five `modules/common/*.nix` files unconditionally.
+1. sets `nixpkgs.hostPlatform` and registers the overlay in
+   `parts/overlay.nix`, which adds the custom packages to `pkgs`:
+   `oneshot-cursors`, `oneshot-gtk-theme`, `oneshot-icons`,
+   `oneshot-wallpaper`, `concord` (taken from its own flake), `dwl` (with
+   hyprCRT's shader path), `dwl-clangd` and `slstatus`. `gnome-console`,
+   `dwl` and `slstatus` are *replacements* of nixpkgs packages (a patched
+   console, a configured dwl/slstatus), which is why they read `prev`.
+2. imports the five `modules/common/*.nix` files that really are universal (`packages`, `security`, `time`, `users`, `nix`) unconditionally.
 3. imports `hostPath` — the host's own `default.nix` — which is where
    that host's `modules/features/*.nix` and `modules/profiles/*.nix`
    picks happen.
@@ -63,7 +68,8 @@ what it does, in order:
 7. configures any `extraHomeUsers` — a `username -> [ home-manager
    modules ]` map, wired into `home-manager.users` *without* touching
    `home/charlotte.nix`. index is the only host that uses this, for
-   `kiddo`.
+   `kiddo` (the separate kid profile) and `rivian` (the same
+   `home/desktop-user.nix` stack as charlotte, plus `home/hosts/Index.nix`).
 
 `home-manager.extraSpecialArgs` hands `dotfiles`, `hostName`, `isWsl` and
 `inputs` into every home-manager module — that's how e.g.
@@ -71,9 +77,9 @@ what it does, in order:
 `home/modules/files.nix` can reach into the `dotfiles` flake input for
 `bin/`, oh-my-posh themes, and yazi config.
 
-the five `nixosConfigurations` entries at the bottom of `parts/hosts.nix` are
-each a short call to `mkHost` — that's the full list of hosts this flake
-knows about; see [hosts.md](hosts.md) for what each one turns on.
+the `nixosConfigurations` at the bottom of `parts/hosts.nix` are six short
+calls to `mkHost` plus the standalone `Builder` — that's the full list of
+hosts this flake knows about; see [hosts.md](hosts.md) for what each one turns on.
 
 ## adding a host
 

@@ -23,10 +23,9 @@
 #   .polarity  "dark" | "light"
 #
 # WHICH palette a consumer gets is per-app, defaulting to
-# `my.theme.default`. That indirection is not ceremony: kitty, neovim and
-# tmux are currently on three different palettes, and keeping the choice
-# nameable is what lets them be ported one at a time without changing how
-# any of them look.
+# `my.theme.default`. That indirection is not ceremony: any app can
+# pin its own palette (my.kitty.palette, my.nvim.palette) without
+# touching how the others look.
 
 { config, lib, ... }:
 

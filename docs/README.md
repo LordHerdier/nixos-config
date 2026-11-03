@@ -6,7 +6,7 @@ tour; these are the reference.
 | doc | covers |
 |-----|--------|
 | [architecture.md](architecture.md) | the flake's `mkHost` pattern, module layering (`common`/`features`/`profiles`), how home-manager is wired per host, how to add a host |
-| [hosts.md](hosts.md) | what each of the five hosts actually turns on, host by host |
+| [hosts.md](hosts.md) | what each of the seven hosts actually turns on, host by host |
 | [features.md](features.md) | catalog of every module under `modules/features/`, with scope and gotchas |
 | [kiddo.md](kiddo.md) | the kiddo account on index, end to end — system user, home-manager profile, parental controls, what actually bounds her |
 | [secrets.md](secrets.md) | secretspec/pass, the smb credentials file, syncthing device keys — what's checked in vs. what isn't |

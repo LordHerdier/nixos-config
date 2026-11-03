@@ -17,7 +17,7 @@ in
 
   dconf.settings = {
     # The single most important setting in this file. The system default
-    # is colemak (services.xserver.xkb.variant in the hyprland profile),
+    # is colemak (services.xserver.xkb.variant in desktop-common.nix),
     # which a six-year-old learning to read cannot use. GNOME takes its
     # layout from dconf rather than the X server defaults, so this gives
     # her plain QWERTY inside her session only.
@@ -25,8 +25,9 @@ in
     # NOTE: this does NOT defeat kmonad. kmonad remaps the built-in
     # laptop keyboard at the evdev layer, below X/Wayland, so the
     # built-in keys stay colemak-with-homerow-mods no matter what dconf
-    # says. kmonad only grabs platform-i8042-serio-0-event-kbd, so an
-    # external USB keyboard is untouched and will be true QWERTY.
+    # says. kmonad grabs specific boards only (the built-in one, a SEM
+    # USB keyboard and the Keychron K6; see modules/common/kmonad), so
+    # any other external keyboard is untouched and will be true QWERTY.
     "org/gnome/desktop/input-sources" = {
       sources = mkArray "(ss)" [
         (mkTuple [

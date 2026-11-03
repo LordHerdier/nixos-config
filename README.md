@@ -1,6 +1,6 @@
 # nixos config
 
-> nix flakes + home-manager configuration for five machines
+> nix flakes + home-manager configuration for seven machines
 
 [![flake check](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml/badge.svg)](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml)
 [![host builds](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FLordHerdier%2Fnixos-config%2Fcommits%2Fmain%2Fstatus&query=%24.state&label=host%20builds&logo=nixos&logoColor=white)](https://github.com/LordHerdier/nixos-config/commits/main)
@@ -63,6 +63,8 @@ inputs, known in-flight work). start at [`docs/README.md`](docs/README.md).
 | **apthos**         | nixos vm (proxmox, gpu + nvme passthrough) | gnome desktop, autologin, streamed via sunshine/moonlight — riced after OneShot                           |
 | **charlie-laptop** | nixos-wsl                                  | windows wsl — dev shell environment                                                                       |
 | **nico**           | nixos-wsl                                  | windows wsl — minimal shell setup                                                                         |
+| **work-laptop**    | native nixos                               | laptop — hyprland desktop, replaces the windows + wsl setup on the work machine                           |
+| **builder**        | nixos lxc (proxmox), headless              | remote build server + binary cache + ci for this repo; the one host that doesn't go through `mkHost`      |
 
 see [`docs/hosts.md`](docs/hosts.md) for what each host actually turns on.
 
@@ -82,14 +84,15 @@ terminal tabs and a reference doc:
 ├── secretspec.toml     # secret declarations, backed by `pass` (see docs/secrets.md)
 ├── pkgs/                # custom derivations (the oneshot-* rice assets, dwl, ...)
 ├── modules/
-│   ├── common/         # baseline (users, nix settings, packages, ssh, fonts, printing)
+│   ├── common/         # baseline every host gets (users, nix, packages, security, time; ssh/fonts/printing are opt-in)
 │   ├── features/       # opt-in capabilities (steam, tailscale, sunshine, ollama, syncthing, parental-controls, ...)
 │   ├── profiles/       # module bundles (laptop, desktop-hyprland, desktop-gnome, dev-docker, wsl)
 │   └── users/          # host-scoped extra system users (kiddo)
-├── hosts/              # per-machine nixos configs
+├── hosts/              # per-machine nixos configs (incl. the standalone Builder)
 └── home/
     ├── charlotte.nix   # base home-manager entry point
     ├── kiddo.nix       # kiddo's home-manager entry point (index only)
+    ├── rivian.nix      # rivian's home-manager entry point (index only)
     ├── modules/        # per-tool home configs (shell, editor, desktop, theme)
     ├── profiles/       # home-manager role bundles (desktop-hyprland, desktop-gnome, kid, wsl)
     └── hosts/          # per-machine home overrides
@@ -109,7 +112,7 @@ home-manager users, how a host picks up its modules) is in
 | compositor  | hyprland (wayland)                                                                   |
 | bar         | noctalia                                                                             |
 | launcher    | noctalia                                                                             |
-| terminal    | kitty — CaskaydiaCove Nerd Font, 0.8 opacity, colors from `my.theme`                 |
+| terminal    | kitty — CaskaydiaCove Nerd Font, opaque (the compositor handles transparency), colors from `my.theme`                 |
 | lock / idle | hyprlock + hypridle                                                                  |
 | theming     | [noctalia](https://github.com/noctalia-dev/noctalia) — material you wallpaper colors |
 | audio       | pipewire                                                                             |
@@ -130,9 +133,11 @@ Super+Shift+G. the session itself is `modules/features/dwl/`.
 
 hyprland is configured in **lua**, not hyprlang. `home/modules/hyprland/` sets
 `configType = "lua"`, so home-manager generates `~/.config/hypr/hyprland.lua`
-from `settings`, alongside `binds.lua` and `crt.lua` — hand-written lua loaded
-through `extraLuaFiles`, because ~90 `hl.bind()` calls and a closure that
-toggles a shader do not fit through nix attrs. hyprlock and hypridle are
+from `settings`, alongside `binds.lua` and `monitors.lua` — hand-written lua loaded
+through `extraLuaFiles`, because ~60 `hl.bind()` calls and the monitor
+layout do not fit through nix attrs. the CRT shader toggle is the
+`hyprcrt-toggle` binary from the `hyprCRT-shader` flake, exec'd from
+`binds.lua`. hyprlock and hypridle are
 separate programs with their own hyprlang parsers and are untouched by this.
 
 two consequences worth knowing. hyprland picks its config format once at startup
@@ -140,17 +145,18 @@ and never re-checks, so switching a host to lua needs a logout, not a reload —
 reload makes it regenerate a stub `hyprland.conf` and the desktop comes up
 looking unconfigured. and `hyprctl keyword` is rejected under the lua parser;
 `hyprctl eval '<lua>'` replaces it, which is also the only way to inspect or
-poke config state by hand. `home/modules/hyprland/MIGRATION.md` has the details
-and the pre-switch verification recipe.
+poke config state by hand.
 
 the lock screen's colors follow noctalia's current scheme rather than
-`my.theme`. noctalia rewrites `~/.config/noctalia/colors.json` whenever the
-scheme changes; `home/modules/hyprland/hyprlock-colors.nix` turns that into the
-hyprlang variables hyprlock sources, and hypridle's `lock_cmd` regenerates it
-immediately before locking — hyprlock reads its config at launch, so that is the
-only moment it has to be right. if noctalia hasn't written colors.json yet, the
-generator falls back to `my.theme`; that is the one place the declared palette
-touches the hyprland desktop, and only as a cold start.
+`my.theme`. noctalia (v5) renders `noctalia-colors.conf.tmpl` into
+`~/.config/hypr/noctalia-colors.conf` on every theme apply, startup included,
+and hyprlock sources that. `home/modules/hyprland/hyprlock-colors.nix` owns the
+template and the path, plus a small generator that only matters on a cold start:
+hyprlock parses its config at launch and a missing `source`d file is fatal, so
+if noctalia has never rendered the file the generator seeds it from `my.theme`,
+and never overwrites a file noctalia has written. hypridle's `lock_cmd` runs
+that generator before launching hyprlock. that seed is the one place the
+declared palette touches the hyprland lock screen.
 
 </details>
 
@@ -217,9 +223,10 @@ monochrome purple by design — `my.oneshot-console.palette` points it at a
 readable palette inside the same black-and-purple window. kitty, the terminal
 actually used for work here, follows `my.theme.default` and is unaffected.
 
-not covered: gnome shell's own chrome (top bar, overview, dash) isn't gtk and is
-unaffected by any of this — it'd need a `gnome-shell.css` plus the user themes
-extension.
+gnome shell's own chrome (top bar, overview, panel menus) isn't gtk, so it has
+its own half: `theme/gnome-shell/gnome-shell.css` (overrides only), selected
+through the user themes extension (`my.gnome-extensions.user-themes`) and the
+`user-theme` dconf key, both set by `oneshot-gtk.nix`.
 
 optional: `my.oneshot-gtk.pixelFont = true;` swaps the interface font for
 Terminus 10, the bitmap font the game's UI uses. off by default.
@@ -359,7 +366,12 @@ hold a → meta    hold s → alt    hold d → shift    hold f → ctrl
 hold j → ctrl    hold k → shift  hold l → alt      hold ; → meta
 ```
 
-`g`/`h` toggle a nav layer that maps `hjkl` → arrow keys.
+`g`/`h` toggle a nav layer that maps `hjkl` → arrow keys. holding `caps`
+(tap for a normal caps lock) is an *extend* layer: arrows, home/end, pgup/pgdn,
+esc, backspace and friends under the right hand. `rctl` (`ralt` on the Keychron K6) held reaches a switcher layer that swaps
+in a `nomod` layer (no homerow mods) or a `left-hand` layer (mods on the left
+hand only, with a space-held mirror layer for one-handed typing). the same keymap runs on the built-in board, a
+generic usb board and the K6.
 
 ---
 
@@ -378,6 +390,10 @@ hold j → ctrl    hold k → shift  hold l → alt      hold ; → meta
 | spicetify-nix             | patches the spotify client for `my.theme` colors |
 | dotfiles                  | bin scripts, oh-my-posh themes, yazi config      |
 | hacky-tts, hacky-launcher | small personal tools, each its own flake         |
+| hyprCRT-shader            | the CRT screen shader + toggle (hyprland and dwl) |
+| easyeffects-presets       | audio presets (index)                            |
+| concord                   | discord client (overlay package)                 |
+| pluralspace-cli           | personal cli, own flake                          |
 | forgejo-cli               | cli for a self-hosted forgejo instance           |
 | zen-browser               | zen browser package                              |
 
@@ -390,5 +406,5 @@ hold j → ctrl    hold k → shift  hold l → alt      hold ; → meta
 sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)
 
 # update dotfiles input
-sudo nix flake lock --update-input dotfiles /etc/nixos
+sudo nix flake update dotfiles --flake /etc/nixos
 ```

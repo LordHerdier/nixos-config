@@ -1,4 +1,4 @@
-# modules/security.nix
+# modules/common/security.nix
 
 { ... }:
 

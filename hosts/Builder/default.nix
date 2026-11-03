@@ -54,7 +54,7 @@ in
   # Serves this box's /nix/store as a binary cache for the clients that use
   # modules/features/remote-builder.nix. The signing key is generated once
   # on the CT (`nix-store --generate-binary-cache-key builder-1 ...`) and
-  # never leaves it; the public half is in remote-builder.nix.
+  # never leaves it; the public half is in builder-cache.nix.
   services.harmonia.cache = {
     enable = true;
     signKeyPaths = [ "/var/lib/harmonia/cache-sk" ];
@@ -66,7 +66,7 @@ in
     trusted-users = [ "nixbuild" ];
     max-jobs = 4;
     cores = 0; # each job may use every core
-    # The disk is ~80G: collect garbage mid-build instead of failing on it.
+    # The disk is 120G: collect garbage mid-build instead of failing on it.
     min-free = 5 * 1024 * 1024 * 1024;
     max-free = 20 * 1024 * 1024 * 1024;
   };

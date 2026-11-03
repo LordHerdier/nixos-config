@@ -1,4 +1,4 @@
-# hosts/Pine.nix
+# home/hosts/Pine.nix
 
 {
   imports = [

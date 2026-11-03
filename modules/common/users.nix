@@ -1,4 +1,4 @@
-# modules/users.nix
+# modules/common/users.nix
 
 { pkgs, ... }:
 

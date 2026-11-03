@@ -23,12 +23,12 @@ before walking away.
 
 ```sh
 # everything
-sudo nix flake update /etc/nixos
+sudo nix flake update --flake /etc/nixos
 
 # one input at a time (lower blast radius; preferred for the personal
 # flakes, since they're singly-maintained and can break without warning)
-sudo nix flake lock --update-input dotfiles /etc/nixos
-sudo nix flake lock --update-input noctalia /etc/nixos
+sudo nix flake update dotfiles --flake /etc/nixos
+sudo nix flake update noctalia --flake /etc/nixos
 ```
 
 two inputs are worth extra care on update:
@@ -53,16 +53,16 @@ see [architecture.md](architecture.md#adding-a-host).
 
 ## known in-flight work
 
-- **hyprland hyprlang → lua migration**
-  (`home/modules/hyprland/MIGRATION.md`): landed and verified on index
-  (2026-10-17). **pine imports the same `desktop-hyprland.nix` profile
-  and has not been restarted since** — hyprland picks its config format
-  once at startup and never re-checks, so pine is still running the old
-  format in memory until its next logout/login, at which point it picks
-  up lua automatically. don't `hyprctl reload` on pine expecting the new
-  config to take — that only regenerates a stub `hyprland.conf` and
-  leaves the session looking unconfigured; a real logout is required.
-  delete `MIGRATION.md` once pine has been confirmed on lua.
+- **hyprland hyprlang → lua migration**: landed and verified on index
+  (2026-10-17); the migration notes file has since been deleted.
+  **pine imports the same `desktop-hyprland.nix` profile — confirm it
+  has been through a logout/login since.** hyprland picks its config
+  format once at startup and never re-checks, so a session started
+  before the switch keeps running the old format in memory until its
+  next logout, at which point it picks up lua automatically. don't
+  `hyprctl reload` expecting the new config to take — that only
+  regenerates a stub `hyprland.conf` and leaves the session looking
+  unconfigured; a real logout is required.
 - **index's `systemd-boot-silent`** is imported in
   `hosts/Index/default.nix` but commented out — tried, not currently
   active. pine has it live.
@@ -77,15 +77,18 @@ see [architecture.md](architecture.md#adding-a-host).
 
 ## troubleshooting
 
-- **sunshine and the RDP server fighting over mutter's RemoteDesktop
-  portal, or over the display itself** — these are two *separate*
-  failure modes, both covered in `modules/features/{sunshine,rdp}.nix`'s
-  header comments. the display-contention one is why `rdp.nix` is
-  deliberately not started automatically; the portal-contention one
-  means even starting it manually can stall sunshine's own startup if
-  you start the RDP service while sunshine is still coming up. stop the
-  RDP user unit (`systemctl --user stop gnome-remote-desktop-headless`)
-  before expecting sunshine/moonlight to work again.
+- **RDP connects but hangs at handover, or the RDP session comes up
+  broken** — `rdp.nix` runs gnome-remote-desktop in *system* mode and
+  depends on GDM's `RemoteDisplayFactory`; check that GDM (not SDDM) is
+  the live display manager, that the system daemon is up
+  (`systemctl status gnome-remote-desktop`), and that the one-time TLS
+  cert/credentials from the module header were set
+  (`grdctl --system status --show-credentials`). it is always on, so it
+  no longer competes with sunshine for mutter's portal the way the old
+  headless user-session mode did; if sunshine itself stalls on startup,
+  look at sunshine, not RDP. the module header also flags an untested
+  caveat about a remote login as charlotte while her autologin session
+  is up.
 - **sunshine's picture is black but input works** — almost always the
   CUDA/NVENC wrapper regressing after a `sunshine`/nixpkgs bump; see the
   long comment in `sunshine.nix` about `SUNSHINE_BUILD_CUDA` and
