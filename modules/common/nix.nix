@@ -11,6 +11,9 @@
   };
   nixpkgs.config = {
     allowUnfree = true;
+    # lutris's FHS env hardcodes gtk2, which nixpkgs now marks broken.
+    # Warn instead of failing evaluation until lutris drops it upstream.
+    problems.handlers."gtk+".broken = "warn";
   };
 
   nix.optimise.automatic = true;
