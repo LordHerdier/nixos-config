@@ -1,6 +1,6 @@
 # modules/features/fingerprint-reader.nix
 
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   environment.systemPackages = [ pkgs.fprintd ];
@@ -39,9 +39,13 @@
     });
   '';
 
-  security.pam.services.sudo.fprintAuth = true;
-  security.pam.services.login.fprintAuth = true;
-  security.pam.services.polkit-1.fprintAuth = true;
+  security.pam.services = lib.genAttrs [ "sudo" "login" "polkit-1" ] (_: {
+    fprintAuth = true;
+    rules.auth.fprintd.args = [
+      "max-tries=1"
+      "timeout=5"
+    ];
+  });
 
   environment.etc."polkit-1/actions/com.bitwarden.Bitwarden.policy" = {
     text = ''
