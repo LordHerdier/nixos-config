@@ -50,6 +50,30 @@
     };
   };
 
+  # WSL has no reachable Wayland compositor from nvim's point of view (or
+  # WAYLAND_DISPLAY is unset), so the wl-copy provider fails with "cannot
+  # connect to the wayland backend". Talk to the Windows clipboard instead:
+  # clip.exe for copy, powershell Get-Clipboard for paste. Detected at
+  # runtime so the same build works on the native NixOS hosts.
+  config.vim.luaConfigRC.wsl-clipboard = # lua
+    ''
+      if vim.fn.has("wsl") == 1 then
+        local ps = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+        local clip = "/mnt/c/Windows/System32/clip.exe"
+        local paste = {
+          ps, "-NoProfile", "-NoLogo", "-NonInteractive", "-Command",
+          "[Console]::OutputEncoding=[Text.Encoding]::UTF8;" ..
+          "[Console]::Out.Write((Get-Clipboard -Raw))",
+        }
+        vim.g.clipboard = {
+          name = "wsl-clip",
+          copy = { ["+"] = { clip }, ["*"] = { clip } },
+          paste = { ["+"] = paste, ["*"] = paste },
+          cache_enabled = 0,
+        }
+      end
+    '';
+
   config.vim.luaConfigRC.pane-borders = # lua
     ''
       -- Global statusline, so splits do not each get their own bar. Inside
