@@ -1,0 +1,113 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "transient_prompt": {
+    "background": "transparent",
+    "foreground": "#d2cb04",
+    "template": "→ "
+  },
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "foreground": "#F1FA8C",
+          "properties": {
+            "style": "folder"
+          },
+          "style": "diamond",
+          "template": "<#42E66C></><b>{{ .Path }}</b>",
+          "type": "path"
+        },
+        {
+          "foreground": "#43CCEA",
+          "style": "diamond",
+          "template": "<#43CCEA>🐕‍🦺</>",
+          "type": "text"
+        },
+        {
+          "foreground": "#43CCEA",
+          "properties": {
+            "branch_icon": ""
+          },
+          "style": "diamond",
+          "template": "<#ffffff>🚀</>",
+          "type": "git"
+        },
+        {
+          "type": "terraform",
+          "style": "diamond",
+          "foreground": "#43CCEA",
+          "template": " ⛰️{{.WorkspaceName}}"
+        },
+        {
+          "foreground": "#43CCEA",
+          "properties": {
+
+          },
+          "style": "diamond",
+          "template": "<#ffffff> 🐋 </><b>{{ .Context }}</b>",
+          "type": "docker"
+        },
+        {
+          "type": "python",
+          "style": "diamond",
+          "foreground": "#43CCEA",
+          "template": "<#43CCEA>🐍</>"
+        },
+        {
+          "type": "svn",
+          "style": "diamond",
+          "foreground": "#43CCEA",
+          "template": "<#43CCEA>🐙</>"
+        }
+
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "svn",
+          "style": "diamond",
+          "foreground": "#43CCEA",
+          "properties": {
+            "fetch_status": true
+          },
+          "template": "{{.Working.String}}"
+        },
+        {
+          "type": "git",
+          "style": "diamond",
+          "foreground": "#43CCEA",
+          "properties": {
+            "branch_icon": "",
+            "fetch_status": true
+          },
+          "template": "{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} 🚀 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} 🔄 {{ .Staging.String }}{{ end }}"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "foreground": "#d2cb04",
+          "style": "plain",
+          "template": "–→",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "secondary_prompt": {
+    "background": "transparent",
+    "foreground": "#d2cb04",
+    "template": "––→ "
+  },
+  "final_space": true,
+  "version": 3
+}
