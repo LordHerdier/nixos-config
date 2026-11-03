@@ -1,0 +1,151 @@
+diff --git a/dwl.c b/dwl.c
+index 38a6942..a50daaf 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -133,7 +133,7 @@ typedef struct {
+ 	const Arg arg;
+ } Button;
+ 
+-enum { StBtnLeft, StBtnMiddle, StBtnRight, StScrollUp, StScrollDown, StCmdLast }; /* status region commands */
++enum { StBtnLeft, StBtnMiddle, StBtnRight, StScrollUp, StScrollDown, StHover, StCmdLast }; /* status region commands; StHover is text, not a command */
+ 
+ /* A run of status text drawn in one colour, optionally inside click regions.
+  * fg/bg of 0 mean the SchemeNorm colour. */
+@@ -498,6 +498,8 @@ static void traynotify(void *data);
+ static int statuscentrew(Monitor *m);
+ static StatusBlock *statusblockat(Monitor *m, double cx);
+ static int statusw(Monitor *m);
++static const char *statustext(const StatusBlock *b);
++static void updatehover(void);
+ static int traysepw(Monitor *m);
+ static void unlocksession(struct wl_listener *listener, void *data);
+ static void unmaplayersurfacenotify(struct wl_listener *listener, void *data);
+@@ -588,6 +590,7 @@ static int consumed[KEY_MAX + 1];
+ 
+ static char stextbuf[4096]; /* block texts and region commands, NUL-separated */
+ static StatusBlock sblocks[64];
++static int hoverblk = -1; /* index into sblocks of the block under the pointer with a ^hv() text */
+ static int nsblocks;
+ static struct wl_event_source *status_event_source;
+ 
+@@ -2038,7 +2041,7 @@ drawbar(Monitor *m)
+ 		for (i = 0; i < (uint32_t)nsblocks; i++) {
+ 			if (m != selmon && !sblocks[i].centre)
+ 				continue;
+-			if (!(w = drwl_font_getwidth(m->drw, sblocks[i].text)))
++			if (!(w = drwl_font_getwidth(m->drw, statustext(&sblocks[i]))))
+ 				continue;
+ 			scm[ColFg] = sblocks[i].fgrole ? statuscolor(sblocks[i].fgrole)
+ 				: sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
+@@ -2047,10 +2050,10 @@ drawbar(Monitor *m)
+ 			scm[ColBorder] = colors[SchemeNorm][ColBorder];
+ 			drwl_setscheme(m->drw, scm);
+ 			if (sblocks[i].centre) {
+-				drwl_text(m->drw, x, 0, w, m->b.height, 0, sblocks[i].text, 0);
++				drwl_text(m->drw, x, 0, w, m->b.height, 0, statustext(&sblocks[i]), 0);
+ 				x += w;
+ 			} else {
+-				drwl_text(m->drw, rx, 0, w, m->b.height, 0, sblocks[i].text, 0);
++				drwl_text(m->drw, rx, 0, w, m->b.height, 0, statustext(&sblocks[i]), 0);
+ 				rx += w;
+ 			}
+ 		}
+@@ -2131,7 +2134,7 @@ statuscentrew(Monitor *m)
+ 
+ 	for (i = 0; i < nsblocks; i++)
+ 		if (sblocks[i].centre)
+-			w += drwl_font_getwidth(m->drw, sblocks[i].text);
++			w += drwl_font_getwidth(m->drw, statustext(&sblocks[i]));
+ 	return w;
+ }
+ 
+@@ -2144,7 +2147,7 @@ statusblockat(Monitor *m, double cx)
+ 	int *bx;
+ 
+ 	for (i = 0; i < nsblocks; i++) {
+-		w = drwl_font_getwidth(m->drw, sblocks[i].text);
++		w = drwl_font_getwidth(m->drw, statustext(&sblocks[i]));
+ 		bx = sblocks[i].centre ? &cx0 : &x;
+ 		if (cx >= *bx && cx < *bx + w)
+ 			return &sblocks[i];
+@@ -2153,6 +2156,35 @@ statusblockat(Monitor *m, double cx)
+ 	return NULL;
+ }
+ 
++/* the text drawn for status block b: its ^hv() text while the pointer is
++ * over it, otherwise its own */
++const char *
++statustext(const StatusBlock *b)
++{
++	return b - sblocks == hoverblk && b->cmd[StHover] ? b->cmd[StHover] : b->text;
++}
++
++/* Expand the status block under the pointer if it has a ^hv() text and
++ * collapse the previous one, redrawing the bars when that changes. */
++void
++updatehover(void)
++{
++	struct wlr_scene_node *node;
++	struct wlr_scene_buffer *buffer;
++	StatusBlock *sb = NULL;
++	int idx;
++
++	if (!locked && !exclusive_focus && selmon &&
++		(node = wlr_scene_node_at(&layers[LyrBottom]->node, cursor->x, cursor->y, NULL, NULL)) &&
++		(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer)
++		sb = statusblockat(selmon, (cursor->x - selmon->m.x) * selmon->wlr_output->scale);
++	idx = sb && sb->cmd[StHover] ? sb - sblocks : -1;
++	if (idx == hoverblk)
++		return;
++	hoverblk = idx;
++	drawbars();
++}
++
+ /* width of the right-hand status text, including 2px of right padding */
+ int
+ statusw(Monitor *m)
+@@ -2161,7 +2193,7 @@ statusw(Monitor *m)
+ 
+ 	for (i = 0; i < nsblocks; i++)
+ 		if (!sblocks[i].centre)
+-			w += drwl_font_getwidth(m->drw, sblocks[i].text);
++			w += drwl_font_getwidth(m->drw, statustext(&sblocks[i]));
+ 	return w;
+ }
+ 
+@@ -3082,6 +3114,8 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
+ 			selmon = xytomon(cursor->x, cursor->y);
+ 	}
+ 
++	updatehover();
++
+ 	/* Update drag icon's position */
+ 	wlr_scene_node_set_position(&drag_icon->node, (int)round(cursor->x), (int)round(cursor->y));
+ 
+@@ -4045,6 +4079,8 @@ setup(void)
+  *                                       follows loadcolors
+  *   ^lm(cmd) ^mm(cmd) ^rm(cmd)          left/middle/right click region
+  *   ^us(cmd) ^ds(cmd)                   scroll up/down region
++ *   ^hv(text)                           region drawn as text instead while
++ *                                       the pointer is over it
+  *   ^ct()                               toggle drawing the following text
+  *                                       in the middle of the bar
+  * A region runs until the same command with an empty argument, e.g.
+@@ -4054,7 +4090,7 @@ setup(void)
+ void
+ setstatus(const char *s)
+ {
+-	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds", "ct" };
++	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds", "hv", "ct" };
+ 	/* in statuscolor() order */
+ 	static const char *const roles[] = { "accent", "muted", "alert", "good" };
+ 	char *p = stextbuf, *end = stextbuf + sizeof(stextbuf) - 1, hex[9], *e;
+@@ -4489,6 +4525,8 @@ statusin(int fd, unsigned int mask, void *data)
+ 	status[strcspn(status, "\n")] = '\0';
+ 
+ 	setstatus(status);
++	hoverblk = -1;
++	updatehover();
+ 	drawbars();
+ 
+ 	return 0;

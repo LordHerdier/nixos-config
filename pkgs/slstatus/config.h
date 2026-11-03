@@ -15,8 +15,8 @@ static const char unknown_str[] = "n/a";
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
  * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
  * @brightness@ with the backlight level (accent while dwl-nightlight is on),
- * and @network@ with the Wi-Fi name and a bt marker for connected Bluetooth
- * devices.
+ * and @network@ with Wi-Fi and Bluetooth, each a + or - that expands to the
+ * network or device name on hover.
  * The scripts live in ./scripts. dwl's volume and brightness keys and layout
  * switch, dwl-dnd, dwl-caffeine and dwl-nightlight run dwl-bar-refresh to
  * redraw immediately, as REDRAW below does.
@@ -25,7 +25,7 @@ static const char unknown_str[] = "n/a";
  * the bar's colours follow dwl-theme without slstatus being rebuilt.
  *
  * ^fg(...) colours, ^lm/^rm/^us/^ds(...) click/scroll regions and ^ct()
- * centring are dwl's inline status commands (95-bar-status-commands.patch,
+ * centring and ^hv(text) hover text are dwl's inline status commands (95-bar-status-commands.patch,
  * 96-bar-status-centre.patch). A region command ends at the first ')', so
  * none of these may contain one. */
 #define LABEL(text) "^fg(accent)" text "^fg()"

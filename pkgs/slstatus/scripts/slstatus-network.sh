@@ -1,10 +1,12 @@
 # slstatus-network
 #
-# The Wi-Fi network (or "eth" on a wired link), red "off" with the radio
-# disabled and "none" when disconnected, then an accent "bt" label
-# followed, in the normal colour, by the first connected Bluetooth device's
-# name (and +N for more). Each half is its own right-click region (toggling
-# Wi-Fi or Bluetooth).
+# Wi-Fi then Bluetooth, each collapsed to "+" (connected) or "-" (nothing
+# connected, red when the radio is off) and expanded on hover to the
+# network or device name, or "off" / "none". The expansion is a dwl ^hv()
+# region (99-z-bar-status-hover.patch). Each half is also its own
+# right-click region (toggling Wi-Fi or Bluetooth). The first connected
+# Bluetooth device's name gets +N for more. The "net" label comes from
+# slstatus's config.h, the "bt" one is printed here.
 
 name=
 while IFS=: read -r type state conn; do
@@ -14,31 +16,34 @@ while IFS=: read -r type state conn; do
   esac
 done < <(nmcli -t -f TYPE,STATE,CONNECTION device)
 name=${name//\\:/:}
-name=${name//^/}
+# ^ and ) would end or escape a ^hv() region
+name=${name//[\^)]/}
 printf '^rm(dwl-network --toggle-wifi)'
 if [ -n "$name" ]; then
-  printf '%s' "${name:0:14}"
+  printf '^hv(%s)+^hv()' "$name"
 elif [ "$(nmcli radio wifi)" = disabled ]; then
-  printf '^fg(%s)off^fg()' "$SLSTATUS_ALERT"
+  printf '^fg(%s)^hv(off)-^hv()^fg()' "$SLSTATUS_ALERT"
 else
-  printf '^fg(%s)none^fg()' "$SLSTATUS_ALERT"
+  printf '^hv(none)-^hv()'
 fi
 printf '^rm()'
 # Right click toggles Bluetooth, so the entry stays up whenever there is
-# an adapter: "bt off" in red, a bare "bt" with nothing connected.
+# an adapter.
 bt=$(timeout 2 bluetoothctl show 2>/dev/null || true)
 if [[ $bt == *"Powered: yes"* ]]; then
   bt=$(timeout 2 bluetoothctl devices Connected | sed 's/\x1b\[[0-9;]*m//g' || true)
-  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt^fg()' "$SLSTATUS_ACCENT"
+  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt^fg() ' "$SLSTATUS_ACCENT"
   if [ -n "$bt" ]; then
     read -r _ _ dev <<<"$(head -n1 <<<"$bt")"
-    dev=${dev//^/}
-    printf ' %s' "${dev:0:14}"
+    dev=${dev//[\^)]/}
     n=$(wc -l <<<"$bt")
-    [ "$n" -le 1 ] || printf ' +%s' "$((n - 1))"
+    [ "$n" -le 1 ] || dev+=" +$((n - 1))"
+    printf '^hv(%s)+^hv()' "$dev"
+  else
+    printf '^hv(none)-^hv()'
   fi
   printf '^rm()'
 elif [[ $bt == *Powered:* ]]; then
-  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt off^fg()^rm()' "$SLSTATUS_ALERT"
+  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt^fg() ^fg(%s)^hv(off)-^hv()^fg()^rm()' "$SLSTATUS_ACCENT" "$SLSTATUS_ALERT"
 fi
 echo
