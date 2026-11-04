@@ -6,6 +6,7 @@
   environment.systemPackages = with pkgs; [
     git
     at
+    bc
     gnumake
     curl
     dnsutils
