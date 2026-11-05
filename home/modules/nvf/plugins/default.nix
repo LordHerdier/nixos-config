@@ -11,6 +11,15 @@
     in
     map (f: dir + "/${f}") nixFiles;
 
+  config.vim.keymaps = [
+    {
+      mode = "n";
+      key = "<leader>tc";
+      action = "<cmd>ColorizerToggle<CR>";
+      desc = "Toggle colour highlighting";
+    }
+  ];
+
   config.vim = {
     spellcheck.enable = true;
 
