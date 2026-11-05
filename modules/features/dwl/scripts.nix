@@ -118,6 +118,16 @@ let
       scripts.dnd
     ];
 
+    powersave.deps = with pkgs; [
+      brightnessctl
+      coreutils
+      gawk
+      jq
+      libnotify
+      wlr-randr
+      scripts.bar-refresh
+    ];
+
     record.deps = with pkgs; [
       coreutils
       fzf

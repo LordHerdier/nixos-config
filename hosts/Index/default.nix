@@ -39,6 +39,7 @@
     ../../modules/features/syncthing.nix
     ../../modules/features/zram.nix
     ../../modules/features/framework-kmod-fix.nix
+    ../../modules/features/lean-specialisation.nix
   ];
 
   system.stateVersion = "25.11";

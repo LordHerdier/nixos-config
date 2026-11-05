@@ -302,6 +302,7 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_d,           spawn,            NOCTALIA_STUB("theme-mode-toggle") },
 	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            SHCMD("dwl-nightlight") },
 	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            SHCMD("dwl-caffeine") },
+	{ MODKEY|SHIFT,              XKB_KEY_p,           spawn,            SHCMD("dwl-powersave") },
 	/* Colemak <-> QWERTY (89-xkb-layout) */
 	{ MODKEY|ALT,                XKB_KEY_k,           switchxkblayout,  {.i = +1} },
 
