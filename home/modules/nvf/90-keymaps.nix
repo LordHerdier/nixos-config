@@ -58,15 +58,16 @@ let
     }
   ];
 
+  # "x" (Visual only), never "v": `:vmap` also covers Select mode, which is
+  # where luasnip parks the cursor after expanding a snippet. Mapping printable
+  # keys there makes `u`/`e`/`n`/`i` move instead of typing over the placeholder.
   allModes = [
     "n"
-    "v"
     "x"
     "o"
   ];
   nonOperatorModes = [
     "n"
-    "v"
     "x"
   ];
 
@@ -81,6 +82,27 @@ in
 
   config.vim = {
     keymaps = movementKeymaps ++ [
+      # vim-repeat defines its default maps lazily, in autoload/repeat.vim,
+      # the first time anything calls repeat#set (e.g. a snippet expansion).
+      # It guards them with hasmapto(), but we remap undo to `l`, so nothing
+      # referenced <Plug>(RepeatUndo) and it clobbered our `u` -> `k` with
+      # `nmap u <Plug>(RepeatUndo)`. These inert maps only exist so
+      # hasmapto() is true and vim-repeat leaves `u` / <C-r> alone.
+      {
+        mode = "n";
+        key = "<Plug>(RepeatUndoGuard)";
+        action = "<Plug>(RepeatUndo)";
+        noremap = false;
+        desc = "Keep vim-repeat from remapping u";
+      }
+      {
+        mode = "n";
+        key = "<Plug>(RepeatRedoGuard)";
+        action = "<Plug>(RepeatRedo)";
+        noremap = false;
+        desc = "Keep vim-repeat from remapping <C-r>";
+      }
+
       # ==================== Basic ====================
       {
         mode = "n";

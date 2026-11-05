@@ -105,6 +105,9 @@
     name: dev
     root: ~/Documents/code
     windows:
+      - zsh:
+          panes:
+            - clear
       - berry:
           root: ~/Documents/berrytree
           panes:
