@@ -55,6 +55,12 @@
       usbmuxd.enable = lib.mkForce false;
     };
 
+    # No CPU boost: caps burst power when something heavy does run. It has
+    # no effect at idle (cores draw ~0.05 W), so this only matters under
+    # load, where it trades peak speed for battery. amd_pstate=active
+    # exposes the switch globally; tmpfiles writes it at boot and on switch.
+    systemd.tmpfiles.rules = [ "w /sys/devices/system/cpu/cpufreq/boost - - - - 0" ];
+
     # Mic/output effects chain (deepfilternet etc.) -- ~45% of a core.
     # Both users that import home/hosts/Index.nix get it, so force both off.
     home-manager.users = {
