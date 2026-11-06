@@ -14,6 +14,7 @@
     ./modules/nvf
     ./modules/gnupg.nix
     ./modules/atuin.nix
+    ./modules/direnv.nix
     ./modules/zsh
     ./modules/tmux
     ./modules/spotify-player.nix

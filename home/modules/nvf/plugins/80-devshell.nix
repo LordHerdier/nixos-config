@@ -7,14 +7,13 @@
 # swap the running nvim's environment into the devshell -- LSPs started
 # afterwards inherit it. No daemon or per-project file needed.
 #
-# The automatic alternative is `vim.utility.direnv.enable` (direnv.vim),
-# which syncs the environment on directory change. It is intentionally left
-# off: direnv is not installed on this system and nothing here sets
-# `programs.direnv.enable`, so the plugin would have no binary to talk to.
-# Enable it here once direnv is set up, if the .envrc workflow is wanted.
+# `vim.utility.direnv` (direnv.vim) syncs the environment on directory
+# change, so a project's `.envrc` (`use flake`) loads its devshell
+# automatically. direnv itself is set up in home/modules/direnv.nix.
 
 { ... }:
 
 {
   config.vim.utility.nix-develop.enable = true;
+  config.vim.utility.direnv.enable = true;
 }
