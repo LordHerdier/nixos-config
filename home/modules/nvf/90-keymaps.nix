@@ -153,6 +153,14 @@ in
         desc = "Disabled";
       }
 
+      {
+        mode = "n";
+        key = "<leader>ltd";
+        lua = true;
+        action = "function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end";
+        desc = "Toggle LSP diagnostics";
+      }
+
       # ==================== Colemak Movement (normal-only) ====================
       {
         mode = "n";
