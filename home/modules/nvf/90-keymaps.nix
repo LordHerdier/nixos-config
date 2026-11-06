@@ -211,6 +211,25 @@ in
         desc = "Visual select to end of line";
       }
 
+      # Explicit rather than relying on the builtin `gx`, which depended on
+      # netrw in older nvims. <cfile> keeps URL chars (?&=:%#) via 'isfname'.
+      {
+        mode = "n";
+        key = "gx";
+        lua = true;
+        action = ''
+          function()
+            local target = vim.fn.expand("<cfile>")
+            if target == "" then
+              vim.notify("No URL under cursor", vim.log.levels.WARN)
+              return
+            end
+            vim.ui.open(target)
+          end
+        '';
+        desc = "Open URL under cursor";
+      }
+
       # ==================== Buffer Navigation ====================
       {
         mode = "n";
