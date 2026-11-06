@@ -15,6 +15,7 @@
     ../modules/games.nix
     ../modules/hacky-tts.nix
     ../modules/hacky-launcher.nix
+    ../modules/hacky-idle.nix
   ];
 
   my.kitty.enable = true;

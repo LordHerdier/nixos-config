@@ -60,8 +60,8 @@ hl.bind(
     { float = true }
   )
 )
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("hacky-tts-toggle"))
-hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("hacky-launcher-toggle"))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("hacky-tts-idle-toggle"))
+hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("hacky-launcher-idle-toggle"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(screenshot))
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd(colorpicker))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("moonlight stream 'nico' 'desktop'"))
