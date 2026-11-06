@@ -54,10 +54,11 @@ fi
 
 # Builder cache + offload reachability. Hosts come from the generated nix
 # config (substituters in nix.conf, /etc/nix/machines), not hardcoded.
-zmodload zsh/net/tcp
-_motd_probe() {  # host port -> 0 if a TCP connect succeeds
-  ztcp "$1" "$2" 2>/dev/null || return 1
-  ztcp -c $REPLY
+_motd_probe() {  # host port -> 0 if a TCP connect succeeds within 3 s
+  # ztcp has no timeout option, so run it in a child zsh under timeout(1).
+  timeout 3 zsh -c 'zmodload zsh/net/tcp
+    ztcp "$1" "$2" 2>/dev/null || exit 1
+    ztcp -c $REPLY' _ "$1" "$2"
 }
 if [[ -r /etc/nix/nix.conf ]]; then
   for sub in ${(s: :)${${(M)${(f)"$(</etc/nix/nix.conf)"}:#substituters*}#*=}}; do
@@ -71,7 +72,9 @@ if [[ -r /etc/nix/nix.conf ]]; then
   done
 fi
 if [[ -r /etc/nix/machines ]]; then
-  bhost=${${${(f)"$(</etc/nix/machines)"}[1]#*://}#*@}
+  mlines=("${(@f)$(</etc/nix/machines)}")
+  bhost=${mlines[1]#*://}
+  bhost=${bhost#*@}
   bhost=${bhost%% *}
   if [[ -n $bhost ]]; then
     if _motd_probe "$bhost" 22; then
