@@ -16,6 +16,7 @@
     ./init/50-history-completion.nix
     ./init/60-functions.nix
     ./init/61-manpager.nix
+    ./init/62-motd.nix
     ./init/99-private-extras.nix
   ];
 
