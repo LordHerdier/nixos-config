@@ -425,11 +425,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793674880,
-        "narHash": "sha256-ml3hL6i5ejki7crtOrR35Aa9XxqeSGPjL7B+PGdOCfo=",
+        "lastModified": 1793924624,
+        "narHash": "sha256-eFrBJ+qqs8ogqahqLCFqqcse1bTk0kyfr8CX085NfAc=",
         "owner": "LordHerdier",
         "repo": "pluralspace-cli",
-        "rev": "4257af9f257232979212c1344c6b21e34bbad1ca",
+        "rev": "1adbab422d0a798cb868c7900f3a48b2ce46318c",
         "type": "github"
       },
       "original": {
