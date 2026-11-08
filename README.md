@@ -1,6 +1,6 @@
 # nixos config
 
-> nix flakes + home-manager configuration for seven machines
+> nix flakes + home-manager configuration for eight machines
 
 [![flake check](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml/badge.svg)](https://github.com/LordHerdier/nixos-config/actions/workflows/flake-check.yml)
 [![host builds](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FLordHerdier%2Fnixos-config%2Fcommits%2Fmain%2Fstatus&query=%24.state&label=host%20builds&logo=nixos&logoColor=white)](https://github.com/LordHerdier/nixos-config/commits/main)
@@ -64,6 +64,7 @@ inputs, known in-flight work). start at [`docs/README.md`](docs/README.md).
 | **charlie-laptop** | nixos-wsl                                  | windows wsl — dev shell environment                                                                       |
 | **nico**           | nixos-wsl                                  | windows wsl — minimal shell setup                                                                         |
 | **work-laptop**    | native nixos                               | laptop — hyprland desktop, replaces the windows + wsl setup on the work machine                           |
+| **pelican**        | nixos vm (proxmox), headless               | pelican game panel + wings, replacing the AMP box; `mkHost` with `withHome = false`                      |
 | **builder**        | nixos lxc (proxmox), headless              | remote build server + binary cache + ci for this repo; `mkHost` with `withHome = false`                   |
 
 see [`docs/hosts.md`](docs/hosts.md) for what each host actually turns on.

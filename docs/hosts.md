@@ -1,7 +1,7 @@
 # hosts
 
-seven `nixosConfigurations`, all built by the same `mkHost` function (see
-[architecture.md](architecture.md)); `Builder` passes `withHome = false`. what follows is what each one
+eight `nixosConfigurations`, all built by the same `mkHost` function (see
+[architecture.md](architecture.md)); `Pelican` and `Builder` pass `withHome = false`. what follows is what each one
 actually turns on — the feature/profile names below are all under
 `modules/` unless noted, and link to [features.md](features.md) for
 detail on any one of them.
@@ -151,6 +151,34 @@ machine. `hosts/Work-Laptop/default.nix`.
 - home side: `home/profiles/desktop-hyprland.nix`, with `my.hackyTts` turned
   off (its piper-tts dependency chain doesn't build here)
 
+## pelican
+
+**not a workstation** — the Pelican game panel and its Wings node on one
+headless nixos VM (VMID 220) on twm, at `10.0.20.220` on the services VLAN
+(vmbr20). 4 cores, 16 GiB. replaces the AMP box. `hosts/Pelican/`, built by
+`mkHost` with `withHome = false`; in inframanagement's inventory as `pelican`,
+in `dmz_services` and `nixos`.
+
+- `profiles/server.nix` + `profiles/proxmox-vm.nix`: built as a `.vma.zst`
+  and restored with `qmrestore`, then updated in place with `nh os switch
+  --target-host`. static address via systemd-networkd (`networking.nix`).
+- two disks: the image's root (`virtio0`, grown to 32G) and a data disk
+  (`virtio1`, 200G, formatted on first boot) at `/srv/pelican`, holding the
+  panel's data dir (`.env`/`APP_KEY`, SQLite) and wings' volumes and
+  backups. the VM can be rebuilt from a new image without touching it.
+- `features/pelican/panel.nix` and, once a node exists, `wings.nix`
+  (`wingsNodeUuid` in the host file gates it; until it's set only the panel
+  runs). panel at `https://pelican.svc.lorscapa.com`, node API at
+  `https://wings.svc.lorscapa.com`, both through caddy-services, so LAN and
+  tailnet only. SFTP direct on `pelican.h.lorscapa.com:2022`.
+- secrets from infisical (`features/infisical-runner.nix`, `pelican`
+  project): `APP_KEY` in `/pelican-panel`, the node token in `/pelican-wings`.
+- game ports: router port-forward → OPNsense → `10.0.20.220`, for each
+  allocation created in the panel. not automated; docker publishes them on
+  the VM, so nothing changes in nix.
+- the bring-up order (infisical, image, disks, installer, node) is in the
+  header of `hosts/Pelican/default.nix`.
+
 ## builder
 
 **not a workstation** — a headless nixos LXC (CT 407) on the proxmox host
@@ -162,7 +190,7 @@ home-manager, no desktop, no `home/hosts/` file. imports
 `builder`, in the `infra` and `nixos` groups.
 
 - pine and index offload builds to it via `features/remote-builder.nix`;
-  all six hosts use it as a binary cache via `features/builder-cache.nix`
+  all six desktop/wsl hosts use it as a binary cache via `features/builder-cache.nix`
   (see [features.md](features.md#compute--ai))
 - unprivileged container with `nesting=1`, which is what lets the nix
   build sandbox work inside it
@@ -174,7 +202,7 @@ home-manager, no desktop, no `home/hosts/` file. imports
 - serves its store as a signed binary cache (harmonia, port 5000)
 - `hosts/Builder/ci.nix` + `ci-build.sh`: every 5 minutes it polls
   github for `main` and open PRs from this repo's own branches (never
-  forks) of `LordHerdier/nixos-config` and builds all six hosts for
+  forks) of `LordHerdier/nixos-config` and builds every host but itself for
   any new commit (flake-lock bump PRs included), posting a
   `nixos-ci/<host>` commit status for each. every host
   pulls from the cache (`features/builder-cache.nix`); only index and pine

@@ -81,8 +81,8 @@ what it does, in order:
 `home/modules/files.nix` can reach into the `dotfiles` flake input for
 `bin/`, oh-my-posh themes, and yazi config.
 
-the `nixosConfigurations` at the bottom of `parts/hosts.nix` are seven short
-calls to `mkHost` (`Builder` with `withHome = false`) — that's the full list of
+the `nixosConfigurations` at the bottom of `parts/hosts.nix` are eight short
+calls to `mkHost` (`Pelican` and `Builder` with `withHome = false`) — that's the full list of
 hosts this flake knows about; see [hosts.md](hosts.md) for what each one turns on.
 
 ## adding a host

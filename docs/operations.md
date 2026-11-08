@@ -10,9 +10,10 @@ sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)
 sudo nixos-rebuild switch --flake /etc/nixos#Index
 ```
 
-the seven valid targets are the `nixosConfigurations` names in
+the eight valid targets are the `nixosConfigurations` names in
 `parts/hosts.nix`: `Pine`, `Index`, `Apthos`, `Charlie-Laptop`, `Nico`, `Work-Laptop`,
-`Builder` — see [hosts.md](hosts.md).
+`Pelican`, `Builder` — see [hosts.md](hosts.md). the two servers are deployed
+remotely: `nh os switch --target-host root@<ip> -H <Name> /etc/nixos`.
 
 `nix.settings.warn-dirty = false` (`modules/common/nix.nix`) means
 `nixos-rebuild` won't nag about uncommitted changes — useful for

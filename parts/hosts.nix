@@ -131,6 +131,13 @@ in
       };
     };
 
+    # Pelican game panel + Wings (VM on twm) -- see hosts/Pelican.
+    "Pelican" = mkHost {
+      hostName = "Pelican";
+      hostPath = ../hosts/Pelican/default.nix;
+      withHome = false;
+    };
+
     # Headless build server (LXC on twm) -- see hosts/Builder.
     "Builder" = mkHost {
       hostName = "Builder";
