@@ -23,7 +23,11 @@ let
       name = "dwl-${name}";
       runtimeInputs = s.deps;
       runtimeEnv = s.env or { };
-      text = builtins.readFile ./scripts/dwl-${name}.sh;
+      # A script with `pages` gets ./scripts/settings/PAGE.sh ahead of its own
+      # file, so pages are plain function files rather than scripts of their own.
+      text =
+        lib.concatMapStrings (p: builtins.readFile ./scripts/settings/${p}.sh + "\n") (s.pages or [ ])
+        + builtins.readFile ./scripts/dwl-${name}.sh;
     };
 
   # "emoji<TAB>name" for every fully-qualified emoji in Unicode's test file,
@@ -99,7 +103,11 @@ let
       st
     ];
 
-    network.deps = with pkgs; [
+    settings.pages = [
+      "common"
+      "network"
+    ];
+    settings.deps = with pkgs; [
       bluez
       coreutils
       fzf

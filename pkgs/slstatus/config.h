@@ -48,7 +48,7 @@ static const struct arg args[] = {
 	  "^lm(dwl-xkb-switch)"
 	  LABEL("kb ") "%s^lm()" SEP,
 	  "@keyboard@" },
-	/* network: left click dwl-network (Super+Alt+A); the script adds the
+	/* network: left click dwl-settings network (Super+Alt+A); the script adds the
 	 * right-click regions that toggle Wi-Fi and Bluetooth */
 	{ run_command,
 	  "^lm(dwl-modal network)"

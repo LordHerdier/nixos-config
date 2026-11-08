@@ -21,10 +21,11 @@ case $name in
   clipboard)     set -- 120 30 dwl-clipboard ;;
   emoji)         set -- 80 24 dwl-emoji ;;
   mixer)         set -- 110 30 wiremix ;;
-  network)       set -- 90 24 dwl-network ;;
+  network)       set -- 90 24 dwl-settings network ;;
   notifications) set -- 120 30 dwl-notifications ;;
   record)        set -- 72 8 dwl-record menu ;;
   session)       set -- 60 12 dwl-session-menu ;;
+  settings)      set -- 90 28 dwl-settings ;;
   wallpaper)     set -- 140 35 dwl-wallpaper-pick ;;
   windows)       set -- 100 20 dwl-windows ;;
   *)

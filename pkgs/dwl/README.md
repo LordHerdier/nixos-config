@@ -142,7 +142,9 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   | `Super+.`       | Emoji picker                                                                 |
   | `Super+Alt+Tab` | Window switcher (wlrctl, `85-foreign-toplevel-management`)                   |
   | `Super+A`       | `wiremix` mixer                                                              |
-  | `Super+Alt+A`   | Network menu: Wi-Fi, Bluetooth, power profile                                |
+  | `Super+/`       | Settings menu (`dwl-settings`)                                               |
+  | `Super+H`       | Keybind cheat sheet                                                          |
+  | `Super+Alt+A`   | Network page of the settings menu: Wi-Fi, Bluetooth, power profile           |
   | `Super+O`       | Session menu                                                                 |
   | `Super+W`       | Notifications                                                                |
   | `Super+Alt+W`   | Do not disturb (`dwl-dnd`, no popup)                                         |

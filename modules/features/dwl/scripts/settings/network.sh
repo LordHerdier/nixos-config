@@ -1,14 +1,5 @@
-# dwl-network [--toggle-wifi | --toggle-bluetooth]
-#
-# Wi-Fi, Bluetooth and power-profile menu in a centred st-wl popup
-# (Super+Alt+A, or left-clicking the bar's net block), standing in for the
-# network / Bluetooth / power-profile pages of Noctalia's control centre.
-# Super+A stays the audio mixer. Wi-Fi goes through nmcli, Bluetooth through
-# bluetoothctl and the profile through powerprofilesctl. Escape goes back a
-# level, then closes; connecting to something closes the popup.
-#
-# The flags are for the bar block: right clicking the Wi-Fi name or the Bluetooth
-# entry toggles that one without opening the popup.
+# Network page: Wi-Fi, Bluetooth and the power profile. Concatenated into
+# dwl-settings by scripts.nix, so it relies on common.sh's pick and pause.
 
 wifi_on() { [ "$(nmcli radio wifi)" = enabled ]; }
 
@@ -33,11 +24,6 @@ toggle_bluetooth() {
   dwl-bar-refresh
 }
 
-case ${1:-} in
-  --toggle-wifi) toggle_wifi; exit 0 ;;
-  --toggle-bluetooth) toggle_bluetooth; exit 0 ;;
-esac
-
 # The connection (SSID) the Wi-Fi device is on, if any. nmcli's terse output
 # escapes colons in the name.
 wifi_name() {
@@ -60,17 +46,6 @@ wifi_profile() {
       break
     fi
   done
-}
-
-# label<TAB>payload lines on stdin; prints the chosen line.
-pick() {
-  fzf --delimiter '\t' --with-nth 1 --layout reverse --no-sort \
-    --prompt "$1> " --header 'enter: pick · esc: back'
-}
-
-pause() {
-  printf '\nfailed · press any key'
-  read -rsn1 || true
 }
 
 wifi_rows() {
@@ -195,25 +170,39 @@ power_menu() {
   powerprofilesctl set "${sel#*$'\t'}"
 }
 
-while :; do
-  wifi=$(wifi_name)
-  if wifi_on; then wifi=${wifi:-not connected}; else wifi=off; fi
-  if bt_on; then
-    n=$(bluetoothctl devices Connected | wc -l)
-    bt="on · $n connected"
+# One line for the top level.
+network_summary() {
+  local wifi
+  if wifi_on; then
+    wifi=$(wifi_name)
+    echo "${wifi:-not connected}"
   else
-    bt=off
+    echo off
   fi
-  sel=$(
-    {
-      printf 'Wi-Fi          %s\twifi\n' "$wifi"
-      printf 'Bluetooth      %s\tbt\n' "$bt"
-      printf 'Power profile  %s\tpower\n' "$(powerprofilesctl get)"
-    } | pick network
-  ) || exit 0
-  case ${sel#*$'\t'} in
-    wifi) wifi_menu ;;
-    bt) bt_menu ;;
-    power) power_menu ;;
-  esac
-done
+}
+
+network_menu() {
+  local wifi bt n sel
+  while :; do
+    wifi=$(wifi_name)
+    if wifi_on; then wifi=${wifi:-not connected}; else wifi=off; fi
+    if bt_on; then
+      n=$(bluetoothctl devices Connected | wc -l)
+      bt="on · $n connected"
+    else
+      bt=off
+    fi
+    sel=$(
+      {
+        printf 'Wi-Fi          %s\twifi\n' "$wifi"
+        printf 'Bluetooth      %s\tbt\n' "$bt"
+        printf 'Power profile  %s\tpower\n' "$(powerprofilesctl get)"
+      } | pick network
+    ) || return 0
+    case ${sel#*$'\t'} in
+      wifi) wifi_menu ;;
+      bt) bt_menu ;;
+      power) power_menu ;;
+    esac
+  done
+}

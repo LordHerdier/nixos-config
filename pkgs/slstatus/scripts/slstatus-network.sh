@@ -26,7 +26,7 @@ fi
 name=${name//\\:/:}
 # ^ and ) would end or escape a ^hv() region
 name=${name//[\^)]/}
-printf '^rm(dwl-network --toggle-wifi)'
+printf '^rm(dwl-settings --toggle-wifi)'
 if [ -n "$name" ]; then
   printf '^hv(%s)%s^hv()' "$name" "$flag"
 elif [ "$(nmcli radio wifi)" = disabled ]; then
@@ -40,7 +40,7 @@ printf '^rm()'
 bt=$(timeout 2 bluetoothctl show 2>/dev/null || true)
 if [[ $bt == *"Powered: yes"* ]]; then
   bt=$(timeout 2 bluetoothctl devices Connected | sed 's/\x1b\[[0-9;]*m//g' || true)
-  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt^fg() ' "$SLSTATUS_ACCENT"
+  printf ' ^rm(dwl-settings --toggle-bluetooth)^fg(%s)bt^fg() ' "$SLSTATUS_ACCENT"
   if [ -n "$bt" ]; then
     read -r _ _ dev <<<"$(head -n1 <<<"$bt")"
     dev=${dev//[\^)]/}
@@ -52,6 +52,6 @@ if [[ $bt == *"Powered: yes"* ]]; then
   fi
   printf '^rm()'
 elif [[ $bt == *Powered:* ]]; then
-  printf ' ^rm(dwl-network --toggle-bluetooth)^fg(%s)bt^fg() ^fg(%s)^hv(off)-^hv()^fg()^rm()' "$SLSTATUS_ACCENT" "$SLSTATUS_ALERT"
+  printf ' ^rm(dwl-settings --toggle-bluetooth)^fg(%s)bt^fg() ^fg(%s)^hv(off)-^hv()^fg()^rm()' "$SLSTATUS_ACCENT" "$SLSTATUS_ALERT"
 fi
 echo
