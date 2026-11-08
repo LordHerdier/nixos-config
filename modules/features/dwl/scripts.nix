@@ -103,22 +103,37 @@ let
       st
     ];
 
-    settings.pages = [
-      "common"
-      "network"
-    ];
-    settings.deps = with pkgs; [
-      bluez
-      coreutils
-      fzf
-      gnugrep
-      gnused
-      networkmanager
-      power-profiles-daemon
-      procps
-      util-linux
-      scripts.bar-refresh
-    ];
+    # theme-set, which the appearance page calls, is not here: it comes from
+    # the Home Manager profile, as the dwl-theme hook assumes.
+    settings = {
+      pages = [
+        "common"
+        "network"
+        "sound"
+        "appearance"
+        "notifications"
+      ];
+      deps = with pkgs; [
+        bluez
+        coreutils
+        fzf
+        gawk
+        gnugrep
+        gnused
+        mako
+        networkmanager
+        power-profiles-daemon
+        procps
+        util-linux
+        wireplumber
+        scripts.airpods
+        scripts.bar-refresh
+        scripts.caffeine
+        scripts.dnd
+        scripts.modal
+      ];
+      env.DWL_THEMES = themes;
+    };
 
     nightlight.deps = with pkgs; [
       libnotify
