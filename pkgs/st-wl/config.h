@@ -454,6 +454,14 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XKB_KEY_Prior,       zoom,            {.f = +1} },
 	{ TERMMOD,              XKB_KEY_Next,        zoom,            {.f = -1} },
 	{ TERMMOD,              XKB_KEY_Home,        zoomreset,       {.f =  0} },
+	/* Same as kitty's ctrl+= / ctrl+- / ctrl+KP_0 */
+	{ MOD_MASK_CTRL,        XKB_KEY_equal,       zoom,            {.f = +1} },
+	{ MOD_MASK_CTRL,        XKB_KEY_plus,        zoom,            {.f = +1} },
+	{ MOD_MASK_CTRL,        XKB_KEY_KP_Add,      zoom,            {.f = +1} },
+	{ MOD_MASK_CTRL,        XKB_KEY_minus,       zoom,            {.f = -1} },
+	{ MOD_MASK_CTRL,        XKB_KEY_KP_Subtract, zoom,            {.f = -1} },
+	{ MOD_MASK_CTRL,        XKB_KEY_0,           zoomreset,       {.f =  0} },
+	{ MOD_MASK_CTRL,        XKB_KEY_KP_0,        zoomreset,       {.f =  0} },
 	{ TERMMOD,              XKB_KEY_C,           clipcopy,        {.i =  0} },
 	{ TERMMOD,              XKB_KEY_V,           clippaste,       {.i =  0} },
 	#if ALPHA_PATCH
