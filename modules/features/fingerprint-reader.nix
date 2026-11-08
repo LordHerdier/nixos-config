@@ -43,7 +43,7 @@
     fprintAuth = true;
     rules.auth.fprintd.args = [
       "max-tries=1"
-      "timeout=5"
+      "timeout=3"
     ];
   });
 
