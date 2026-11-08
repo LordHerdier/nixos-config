@@ -70,9 +70,22 @@ gotcha each one's header comment exists to warn about. see
   those services' `EnvironmentFile`, re-exported on every service (re)start.
   the credentials file is written by hand once per host — see
   [secrets.md](secrets.md#infisical-homelab-servers).
-- **`pelican/`** — the Pelican game server panel's node daemon, Wings
-  (`pelican/wings.nix`; the panel itself is still to come), replacing the
-  old AMP box. `pkgs/pelican-wings` builds it from source, since it isn't
+- **`pelican/`** — the Pelican game server panel and its node daemon,
+  replacing the old AMP box. importing the directory gets both; a
+  panel-only or node-only host imports `panel.nix` or `wings.nix`.
+- **`pelican/panel.nix`** — upstream's `ghcr.io/pelican/panel` image
+  (pinned by digest) through `virtualisation.oci-containers` on the same
+  docker daemon as wings. it bundles php-fpm, the queue worker, the
+  scheduler and caddy on :80, published on `my.pelican.panel.port` for
+  caddy-services to proxy (`BEHIND_PROXY`, `trustedProxies`). database is
+  SQLite, pinned with `DB_CONNECTION`. everything lives in
+  `my.pelican.panel.dataDir` (`/var/lib/pelican-panel`): the panel's own
+  `.env` (settings page edits, and `APP_KEY`, which must be backed up or
+  kept in infisical via `secretEnvVars`), the database and plugins. container
+  env set here overrides the settings page. first start: run the web
+  installer at `<url>/installer`, choosing SQLite.
+- **`pelican/wings.nix`** — the node daemon, Wings.
+  `pkgs/pelican-wings` builds it from source, since it isn't
   in nixpkgs. `my.pelican.wings.settings` is the node's `config.yml`
   (`uuid` and `remote` are required, copied from the panel's node
   Configuration tab), written to `/etc/pelican/config.yml` on every start,

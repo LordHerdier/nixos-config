@@ -1,9 +1,12 @@
 # modules/features/pelican — Pelican game server panel + Wings node
 #
-# wings.nix is the node daemon; panel.nix (the web panel) comes next. A
-# host that runs both on one VM imports this directory, and a node-only
-# host can import ./wings.nix directly.
+# panel.nix is the web panel and wings.nix is the node daemon that runs the
+# game servers. A host that runs both on one VM imports this directory; a
+# node-only or panel-only host imports the one file it needs.
 
 {
-  imports = [ ./wings.nix ];
+  imports = [
+    ./panel.nix
+    ./wings.nix
+  ];
 }
