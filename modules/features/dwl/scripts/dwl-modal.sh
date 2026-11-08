@@ -1,16 +1,13 @@
 # dwl-modal NAME
 #
-# Toggles a control popup: an st-wl with app_id "modal", which the "modal" rule
-# in pkgs/dwl/config.h floats and centres. NAME picks the popup's size (in
-# cells) and command from the table below, the one place either is set, so
-# config.h's MODAL() binds and the bar's click regions (pkgs/slstatus/config.h)
-# always open the same thing. If that popup is already open it is closed
-# instead, so the bind that opens it also dismisses it.
+# Toggles a control popup: an st-wl with app_id "modal", which config.h's
+# "modal" rule floats and centres. NAME picks its size (cells) and command
+# from the table below, shared by config.h's MODAL() binds and the bar's
+# click regions. If that popup is already open it is closed instead.
 #
-# The running st-wl is found by its command line, which still holds the
-# arguments it was started with below; the trailing " -g" keeps one title from
-# matching another that starts with it. Names are used as a regex, so keep
-# them to plain words.
+# The open popup is found by its command line; the trailing " -g" stops one
+# name matching another that starts with it. Names are used as a regex, so
+# keep them to plain words.
 
 name=${1:-}
 

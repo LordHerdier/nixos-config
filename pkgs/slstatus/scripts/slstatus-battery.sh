@@ -1,15 +1,13 @@
 # slstatus-battery
 #
 # Capacity plus + charging, - discharging, o otherwise (full / not
-# charging): red at 15% or less while discharging, green while charging.
-# Reads the first battery the kernel lists (BAT0 or BAT1, depending on the
-# laptop).
+# charging): alert colour at 15% or less while discharging, good while
+# charging. Reads the first BAT* the kernel lists.
 #
-# Also sends a critical notification and plays a ping the first time the
-# charge drops to 15%, 10% and 5% while discharging. The last level
-# announced is kept in $XDG_RUNTIME_DIR so the 5s refresh doesn't repeat it,
-# and is forgotten once the charger is plugged in or the charge is back over
-# 15%. The jobs are detached from stdout, which slstatus reads the block from.
+# Also notifies and pings the first time the charge drops to 15%, 10% and 5%
+# while discharging. The last level announced is kept in $XDG_RUNTIME_DIR so
+# the 5 s refresh doesn't repeat it; charging or going back over 15% resets
+# it. Those jobs are kept off stdout, which slstatus reads the block from.
 
 bats=(/sys/class/power_supply/BAT*)
 bat=${bats[0]}

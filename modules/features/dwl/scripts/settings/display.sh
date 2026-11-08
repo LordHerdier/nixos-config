@@ -2,11 +2,9 @@
 # and power saver. Concatenated into dwl-settings by scripts.nix; relies on
 # common.sh.
 #
-# TODO: everything here is runtime-only. wlr-randr changes are gone when dwl
-# restarts or an output is replugged, which then take the monrules in
-# pkgs/dwl/config.h (45-monitorconfig) again. To persist them, either have this
-# page write a state file that dwl-startup re-applies, or generate monrules
-# from a Nix option instead of editing config.h by hand.
+# TODO: runtime-only. wlr-randr changes are lost when dwl restarts or an
+# output is replugged, falling back to config.h's monrules. To persist them,
+# write a state file dwl-startup re-applies, or generate monrules from Nix.
 
 nightlight_on() { pgrep -u "$(id -u)" -x wlsunset >/dev/null; }
 

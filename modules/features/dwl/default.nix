@@ -1,24 +1,19 @@
 # modules/features/dwl
 #
-# dwl as a selectable login session. The compositor itself comes from
-# pkgs/dwl (via the overlay in parts/overlay.nix), which is where patches
-# and config.h live; its bar's status line is pkgs/slstatus.
+# dwl as a selectable login session ("dwl" in tuigreet's F3 list). The
+# compositor, its patches and config.h are pkgs/dwl; the bar's status line
+# is pkgs/slstatus. Needs the desktop-hyprland profile for the wofi that
+# config.h launches; st-wl, its terminal, is built here.
 #
-# Shows up as "dwl" in tuigreet's session list (F3), next to Hyprland and
-# the gamescope Steam session. Needs the desktop-hyprland profile for the
-# wofi that config.h launches; its terminal, st-wl, is built here.
-#
-# Colours (bar, borders, mako, slstatus) follow charlotte's
-# `my.theme.default`, the same palette her kitty/wofi/nvim get on this
-# host, so switching that one option recolours the session. dwl itself
-# reads its colours at runtime, so that needs no restart, and `dwl-theme`
-# switches its palette on the spot (scripts/dwl-theme.sh).
+# Colours (bar, borders, mako, slstatus, st-wl) follow charlotte's
+# `my.theme.default`, like her kitty/wofi/nvim. dwl reads them at runtime,
+# so a change needs no restart, and `dwl-theme` switches palettes live.
 #
 # | File           | Purpose                                                  |
 # | -------------- | -------------------------------------------------------- |
 # | `default.nix`  | Session entry, dwl-startup, systemd target, PATH         |
 # | `scripts.nix`  | The dwl-* helpers in ./scripts and their runtime inputs  |
-# | `startup.sh`   | dwl-startup: user services, mako, clipboard, tray apps   |
+# | `startup.sh`   | dwl-startup: user services, wallpaper, polkit, mako, ... |
 # | `mako.conf`    | Notification daemon config, coloured from `my.theme`     |
 # | `portals.nix`  | xdg-desktop-portal routing for XDG_CURRENT_DESKTOP=dwl   |
 
@@ -105,9 +100,9 @@ let
       ;
   };
 
-  # Same roles as the bar's colors[] (see `dwl` above). A fragment per
-  # palette so `theme-set` can switch it (makoctl reload), and the default
-  # one as a store file for a session where the state dir has nothing yet.
+  # mako's colours, from the same roles as dwl's. A fragment per palette so
+  # `theme-set` can switch it (makoctl reload), plus the default one as a
+  # store file for when the state dir has nothing yet.
   makoConfig =
     theme:
     builtins.replaceStrings

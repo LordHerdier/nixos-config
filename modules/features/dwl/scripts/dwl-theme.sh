@@ -1,20 +1,16 @@
 # dwl-theme {NAME|file PATH|next|prev|default|list|current|reload}
 #
-# Switches the colours of the running dwl (bar, tray, borders, background)
-# between the my.theme palettes without a rebuild or a restart.
+# Switches the running dwl's colours (bar, tray, borders, background)
+# between the my.theme palettes, live.
 #
-# Every palette is a colours file in $DWL_THEMES, one per my.theme.palettes
-# entry. dwl reads $XDG_STATE_HOME/dwl/colors if there is one and
-# /etc/dwl/colors (my.theme.default, as built) if not, at startup and on
-# SIGUSR2. So `NAME` installs that palette's file as the override and signals
-# dwl, and `default` removes the override, which goes back to whatever the
-# last rebuild set. A rebuild that changes my.theme.default recolours dwl
-# the same way (see default.nix), but only when no override is in place.
+# $DWL_THEMES holds a colours file per my.theme.palettes entry. dwl reads
+# $XDG_STATE_HOME/dwl/colors, else /etc/dwl/colors (my.theme.default, as
+# built), at startup and on SIGUSR2. `NAME` installs a palette as that
+# override and signals dwl; `default` removes it. A rebuild changing
+# my.theme.default recolours dwl too (default.nix), unless overridden.
 #
-# This only recolours what dwl draws, which includes slstatus's blocks since
-# they print dwl's colour names. mako, st-wl and the other apps follow
-# `theme-set` instead, through their my.theme fragments (home/modules/theme/
-# runtime.nix), whose dwl hook calls this script.
+# Only dwl (and so slstatus's blocks) changes. Other apps follow
+# `theme-set`, whose dwl hook (home/modules/theme/default.nix) calls this.
 
 themes="${DWL_THEMES:?}"
 system=/etc/dwl/colors
@@ -33,8 +29,8 @@ current() {
   fi
 }
 
-# Signal only the dwl this script was built with. A dwl from before this
-# patch has no SIGUSR2 handler and would die of it.
+# Signal only the dwl this script was built with: one from before
+# 99-theme-colours.patch has no SIGUSR2 handler and would die of it.
 reload() {
   local pid
   for pid in $(pgrep -x dwl); do

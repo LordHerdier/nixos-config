@@ -1,10 +1,10 @@
 # dwl-airpods
 #
 # Cycles the AirPods' noise control (Super+Alt+S), standing in for the
-# harveywuk/airpods Noctalia plugin's cycle-noise: off, transparency, adaptive,
-# ANC, skipping modes the model lacks, the same order and rules as the
-# plugin. The state comes from the status file the librepods daemon (started
-# by dwl-startup) keeps, and the change goes through librepods-ctl.
+# harveywuk/airpods Noctalia plugin's cycle-noise, with the same order and
+# rules: off, transparency, adaptive, ANC, skipping modes the model lacks.
+# Reads the librepods daemon's status file (modules/features/librepods.nix)
+# and changes the mode through librepods-ctl.
 
 status=${XDG_STATE_HOME:-$HOME/.local/state}/librepods/status.json
 

@@ -1,16 +1,14 @@
 # dwl-wallpaper-pick
 #
-# fzf menu over the dwl-wallpaper images, run in a centred st-wl popup (Super+Alt+4
-# in pkgs/dwl/config.h) so the preview pane can show thumbnails with icat-mini.
-# Each entry is applied as the cursor lands on it, but only once the cursor has
-# rested there for a moment: dwl-wallpaper starts a fresh swaybg per change, so
-# holding an arrow key would otherwise pile them up. Enter keeps the highlighted
-# wallpaper, Esc puts back the one that was up when the menu opened.
+# fzf menu over the dwl-wallpaper images in a centred st-wl popup
+# (Super+Alt+4), with icat-mini thumbnails. The highlighted entry is applied
+# once the cursor rests on it a moment (each change starts a fresh swaybg,
+# so holding an arrow key would pile them up). Enter keeps it, Esc restores
+# the wallpaper from when the menu opened.
 #
-# The pause works through a "pending" file holding the newest entry. Every
-# focus change writes it and starts a background apply that sleeps, then only
-# goes ahead if the file still names its entry. Deleting the file on exit
-# cancels whatever is still waiting.
+# The pause: each focus change writes its entry to a "pending" file and
+# starts a background apply that sleeps, then goes ahead only if the file
+# still names its entry. Deleting the file on exit cancels the rest.
 
 delay=0.25
 
@@ -44,9 +42,8 @@ done
 
 pending=$(mktemp -t dwl-wallpaper-pick.XXXXXX)
 trap 'rm -f "$pending"' EXIT
-# Pressing Super+Alt+4 again closes the popup (dwl-modal), which hangs up
-# fzf. Outlive that hangup so the code below still puts back the original
-# wallpaper, the same as Esc.
+# Super+Alt+4 again closes the popup, hanging up fzf; survive that so the
+# original wallpaper is still restored, as with Esc.
 trap : HUP TERM
 
 # shellcheck disable=SC2016 # FZF_PREVIEW_* are expanded by fzf's preview shell

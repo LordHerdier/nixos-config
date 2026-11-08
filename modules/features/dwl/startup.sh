@@ -1,19 +1,15 @@
 # dwl-startup
 #
-# Runs inside the compositor (dwl -s). dwl exits when this process does,
-# so it must stay alive: `sleep infinity` holds the session open until
-# Super+Shift+L. Add long-running helpers (bar, wallpaper, polkit agent)
-# above it with `&`.
-#
-# Built without errexit (default.nix): a step that fails here must not end
-# the session.
+# Runs inside the compositor (dwl -s), which exits when this does, so
+# `sleep infinity` holds the session open until Super+Shift+L. Start
+# long-running helpers above it with `&`. Built without errexit
+# (default.nix): a failing step must not end the session.
 
-# Every session of this user shares one systemd user manager, so only
-# the session that finds graphical-session.target down may touch it.
-# A second compositor (e.g. Hyprland already running on another VT)
-# would otherwise overwrite XDG_CURRENT_DESKTOP, restart the portals
-# under the wrong backend, and on exit stop the target out from under
-# the first session (hypridle, easyeffects, portals).
+# All of this user's sessions share one systemd user manager, so only the
+# session that finds graphical-session.target down may touch it. Otherwise a
+# second compositor (e.g. Hyprland on another VT) would overwrite
+# XDG_CURRENT_DESKTOP, restart the portals under the wrong backend, and on
+# exit stop the target (hypridle, easyeffects, portals) under the first.
 if systemctl --user is-active --quiet graphical-session.target; then
   echo "dwl-startup: graphical-session.target already active; leaving user services to the other session" >&2
   owner=0
@@ -27,20 +23,18 @@ if [ "$owner" = 1 ]; then
   systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
   dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
-  # The user manager outlives a logout, so portals started by a previous
-  # session (e.g. Hyprland) are still running with its WAYLAND_DISPLAY
-  # and XDG_CURRENT_DESKTOP, routing screencasts to that session's
-  # backend. Stopping them lets D-Bus activation restart them on first
-  # use with the environment imported above, which picks
-  # dwl-portals.conf. Done again on exit for whichever session is next.
+  # The user manager outlives a logout, so portals from a previous session
+  # still carry its environment and route screencasts to its backend.
+  # Stopped, D-Bus activation restarts them with the environment above,
+  # which picks dwl-portals.conf. Done again on exit for the next session.
   stop_portals() {
     systemctl --user stop 'xdg-desktop-portal*.service' || true
   }
   stop_portals
 
   # Brings up graphical-session.target (hypridle, easyeffects), as
-  # hyprland-session.target does under Hyprland. dwl SIGTERMs this
-  # script on exit, which the trap turns into stopping the target again.
+  # hyprland-session.target does under Hyprland. dwl SIGTERMs this script on
+  # exit, and the trap stops the target again.
   trap 'dwl-caffeine --off; systemctl --user stop dwl-session.target; stop_portals' EXIT
   systemctl --user start dwl-session.target
 else
@@ -53,16 +47,16 @@ dwl-wallpaper restore || true
 # Not hyprpolkitagent, which Hyprland uses: its hyprtoolkit renderer
 # aborts under dwl ("Couldn't open a gbm fd").
 "$DWL_POLKIT_AGENT" &
-# Notifications, which Noctalia owns under Hyprland. mako is a runtime
-# input of this script rather than on PATH, so its D-Bus activation file
-# can't grab org.freedesktop.Notifications in a Hyprland session.
-# The active palette's config (theme-set), else the one built in.
+# Notifications (Noctalia's job under Hyprland). mako is a runtime input,
+# not on PATH, so its D-Bus activation file can't grab
+# org.freedesktop.Notifications in a Hyprland session. Config: the active
+# palette's (theme-set), else the built-in one.
 mako_config=$DWL_MAKO_ACTIVE
 [ -r "$mako_config" ] || mako_config=$DWL_MAKO_CONFIG
 mako --config "$mako_config" &
-# Clipboard history for dwl-clipboard (Super+V). Runtime inputs rather
-# than PATH, like mako: Noctalia keeps its own history under Hyprland.
-# Both exit with the compositor when the Wayland connection drops.
+# Clipboard history for dwl-clipboard (Super+V); runtime inputs like mako,
+# as Noctalia keeps its own history under Hyprland. Both watchers exit with
+# the compositor.
 wl-paste --type text --watch cliphist store &
 wl-paste --type image --watch cliphist store &
 

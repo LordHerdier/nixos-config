@@ -1,56 +1,34 @@
 # pkgs/oneshot-gtk-theme/default.nix
 #
-# GTK2 + GTK3 + GTK4 + GNOME Shell theme styled after OneShot's "World
-# Machine" fake-OS UI: pure black surfaces, a single saturated purple
-# accent (#9664ff), hard square corners, no gradients or shadows, and an
-# "inverted" selection (solid accent fill + black text) matching the
-# game's active-tab and selected-icon look.
+# GTK2/3/4 + GNOME Shell theme styled after OneShot's "World Machine" UI:
+# black surfaces, one purple accent (#9664ff), square corners, no gradients
+# or shadows, and an inverted selection (accent fill, black text).
 #
-# Unlike pkgs/oneshot-cursors, nothing here is extracted game art. The
-# stylesheets are hand-written and the four widget PNGs (diamond slider
-# handle + its hover variant, checkbox tick, radio dot) are original
-# drawings. Colors are plain hex values read off the game's theme data,
-# which isn't a copyrightable asset. So this one is safe to keep in a
-# public config repo; the extracted icon/wallpaper PNGs from the same
-# project are not, and deliberately aren't vendored here.
+# Unlike pkgs/oneshot-cursors, nothing here is extracted game art: the
+# stylesheets are hand-written, the widget PNGs (slider diamond + hover,
+# check, radio dot) are original drawings, and the colours are just hex
+# values.
 #
-# Upstream is ~/documents/code/oneshot-twm-rice (themes/oneshot/);
-# theme/gtk-2.0, gtk-3.0 and gtk-4.0 are a verbatim copy of its
-# directories of the same names, with gtk-4.0/assets dereferenced from a
-# symlink into real files so the store path is self-contained. The XFCE
-# half of that repo (xfwm4 pixmaps, panel layout) is intentionally left
-# out -- Mutter has no pixmap decoration theme, and GNOME titlebars are
-# client-side, styled by the `headerbar` and `windowcontrols` rules
-# inside the GTK3/GTK4 stylesheets instead.
+# theme/gtk-{2,3,4}.0 are a verbatim copy of themes/oneshot/ in
+# ~/documents/code/oneshot-twm-rice, with gtk-4.0/assets dereferenced from a
+# symlink. Its XFCE half (xfwm4 pixmaps, panel) is left out: GNOME titlebars
+# are client-side, styled by the GTK3/4 `headerbar` rules instead.
+# theme/gnome-shell and theme/gtk-4.0/app-overrides.css are ours (the rice
+# targets XFCE and has no libadwaita apps); keeping the overrides beside
+# gtk.css lets gtk.css stay a plain copy.
 #
-# theme/gnome-shell has no upstream counterpart: the rice targets XFCE,
-# so the Shell half (top bar, overview, panel menus) was written here.
-# It is overrides-only rather than a full stylesheet, for the reason its
-# own header explains. theme/gtk-4.0/app-overrides.css is likewise ours,
-# for the same reason -- the upstream rice has no libadwaita apps to
-# patch around. Keeping it beside gtk.css rather than inside it is what
-# lets gtk.css stay a plain copy.
+# GTK4 and the Shell each need a second install step (libadwaita ignores
+# gtk-theme-name; the Shell needs the User Themes extension): see
+# home/modules/oneshot-gtk.nix, which also sets the colours from `my.theme`.
 #
-# Note the GTK4 and GNOME Shell halves each need a second install step
-# beyond this package -- libadwaita apps ignore gtk-theme-name, and the
-# Shell only reads a theme directory when the User Themes extension
-# points it at one. See home/modules/oneshot-gtk.nix for both.
-#
-# COLORS ARE PARAMETERS. The six arguments below are every distinct color
-# the three stylesheets use, and their defaults are the values the
-# stylesheets literally contain -- so building this package with no
-# arguments reproduces the game's own "Purple" theme byte for byte, and
-# the stylesheets stay valid standalone CSS you can read or copy out.
-# home/modules/oneshot-gtk.nix overrides them from `my.theme`.
-#
-# The remap works by value, not by placeholder: rather than littering
-# 239 call sites with @accent@, the build rewrites each source literal
-# wherever it appears. It runs in two passes through unique sentinels,
-# because a target color can legitimately equal a different source color
-# (swap accent and accentDim and a single pass would rewrite one into
-# the other and then on again). Every source literal must still be
-# present or the build fails -- that is the guard against a stylesheet
-# edit silently dropping out of the remap.
+# COLOURS ARE PARAMETERS. The six arguments are every palette colour the
+# stylesheets use, defaulting to the literal values in them, so a plain
+# build is the game's "Purple" theme and the CSS stays valid standalone.
+# The build rewrites each literal by value rather than via placeholders, in
+# two passes through unique sentinels, since a target can equal another
+# source colour (swapping accent and accentDim would otherwise chain). A
+# source literal that has gone missing fails the build, so a stylesheet
+# edit can't silently drop out of the remap.
 
 {
   lib,

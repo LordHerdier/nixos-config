@@ -1,13 +1,13 @@
 # dwl-session-menu
 #
-# Power / session menu in a centred st-wl popup (Super+O in pkgs/dwl/config.h),
-# standing in for Noctalia's session panel. Same entries, order and 1-7
-# shortcuts as the `session.actions` list in home/modules/noctalia.nix, and the
-# same 10 s countdown before acting: Enter skips it, any other key cancels.
+# Power / session menu in a centred st-wl popup (Super+O), standing in for
+# Noctalia's session panel: same entries, order and 1-7 shortcuts as
+# `session.actions` in home/modules/noctalia.nix, and the same 10 s
+# countdown (Enter skips it, any other key cancels).
 
-# label<TAB>command, in Noctalia's order; the shortcut is the line number.
-# Lock is the same qylock as Super+L (hypridle's lock_cmd is Hyprland's
-# hyprlock). Logout SIGTERMs dwl, which quits the way Super+Shift+L does.
+# label<TAB>command; the shortcut is the line number. Lock is qylock, as on
+# Super+L (hypridle's lock_cmd is Hyprland's hyprlock). Logout SIGTERMs dwl,
+# which quits as Super+Shift+L does.
 entries=(
   $'Lock\tqylock-lock'
   $'Suspend\tsystemctl suspend'

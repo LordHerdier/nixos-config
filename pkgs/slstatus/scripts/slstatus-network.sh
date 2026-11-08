@@ -1,13 +1,11 @@
 # slstatus-network
 #
-# Wi-Fi/Ethernet then Bluetooth. The network half collapses to "W" (Wi-Fi),
-# "E" (Ethernet), "WE" (both) or "-" (nothing connected, red when the Wi-Fi
-# radio is off); Bluetooth to "+" or "-". Hover expands to the network or
-# device name, or "off" / "none". The expansion is a dwl ^hv()
-# region (99-z-bar-status-hover.patch). Each half is also its own
-# right-click region (toggling Wi-Fi or Bluetooth). The first connected
-# Bluetooth device's name gets +N for more. The "net" label comes from
-# slstatus's config.h, the "bt" one is printed here.
+# Wi-Fi/Ethernet then Bluetooth. The network half is "W" (Wi-Fi), "E"
+# (Ethernet), "WE" (both) or "-" (nothing; alert colour when the Wi-Fi radio
+# is off); Bluetooth "+" or "-". Hovering shows the network or device name
+# (first connected device, +N for more), or "off" / "none", through dwl's
+# ^hv() (99-z-bar-status-hover.patch). Right-clicking either half toggles
+# Wi-Fi or Bluetooth. config.h prints the "net" label, this the "bt" one.
 
 name=
 flag=

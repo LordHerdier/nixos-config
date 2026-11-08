@@ -1,14 +1,13 @@
 # dwl-wallpaper {next|prev|rand|restore|set FILE|list}
 #
-# Cycles through the images in ~/Pictures/Wallpapers (sorted by name) and shows
-# the current one with swaybg. The current file is remembered in
-# $XDG_STATE_HOME/dwl-wallpaper so `restore` (run at session start) and the
-# next/prev steps pick up where the last run left off. `set` shows one given
-# file and `list` prints the images in cycle order (both for dwl-wallpaper-pick).
+# Cycles through the images in ~/Pictures/Wallpapers (sorted by name) with
+# swaybg (Super+Alt+1/2/3). The current file is kept in
+# $XDG_STATE_HOME/dwl-wallpaper for `restore` (session start) and the next
+# step. `set` and `list` are for dwl-wallpaper-pick.
 #
-# While `theme-set wal` is active the new wallpaper also re-derives the pywal
-# colours (theme-set comes from the user's PATH, it is a home-manager package).
-# `restore` leaves them alone, since wal is already holding that image.
+# While `theme-set wal` is active a new wallpaper also re-derives the pywal
+# colours (theme-set is a Home Manager package, found on PATH); `restore`
+# doesn't, as wal already holds that image.
 
 dir="${DWL_WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/dwl-wallpaper"
@@ -72,10 +71,9 @@ esac
 mkdir -p "$(dirname "$state")"
 printf '%s\n' "$pick" >"$state"
 
-# Start the new swaybg first and only then stop the old ones, so the screen
-# never flashes the bare background colour.
-# The nixpkgs swaybg is a wrapper, so the process name is ".swaybg-wrapped"
-# and `pgrep -x swaybg` matches nothing; match on the command line instead.
+# Start the new swaybg before stopping the old ones, so the background never
+# flashes. nixpkgs' swaybg is a wrapper (process ".swaybg-wrapped"), so
+# match the command line rather than `pgrep -x swaybg`.
 mapfile -t old < <(pgrep -u "$(id -u)" -f '(^|/)\.?swaybg(-wrapped)? -m fill' || true)
 setsid swaybg -m fill -i "$pick" >/dev/null 2>&1 &
 sleep 0.3

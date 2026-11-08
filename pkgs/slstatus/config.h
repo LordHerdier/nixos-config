@@ -9,25 +9,18 @@ static const char unknown_str[] = "n/a";
 /* maximum output string length */
 #define MAXLEN 4096
 
-/* dwl's bar (05-bar.patch) reads one line of this from its stdin. @volume@ and
- * @battery@ are substituted by default.nix with scripts that print the
- * PipeWire sink volume and the battery charge, coloured with ^fg(), and
- * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
- * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
- * @brightness@ with the backlight level (accent while dwl-nightlight is on),
- * and @network@ with the network (W, E, WE or -) and Bluetooth (+ or -),
- * each expanding to the network or device name on hover.
- * The scripts live in ./scripts. dwl's volume and brightness keys and layout
- * switch, dwl-dnd, dwl-caffeine and dwl-nightlight run dwl-bar-refresh to
- * redraw immediately, as REDRAW below does.
+/* dwl's bar (05-bar.patch) reads one line of this from its stdin. default.nix
+ * replaces @volume@ and the like with the ./scripts that print those blocks.
+ * Whatever changes a block (dwl's volume, brightness and layout keys,
+ * dwl-dnd, dwl-caffeine, dwl-nightlight...) runs dwl-bar-refresh to redraw
+ * at once, as REDRAW below does.
  *
- * accent and muted are dwl's theme colour names (99-theme-colours.patch), so
- * the bar's colours follow dwl-theme without slstatus being rebuilt.
- *
- * ^fg(...) colours, ^lm/^rm/^us/^ds(...) click/scroll regions and ^ct()
- * centring and ^hv(text) hover text are dwl's inline status commands (95-bar-status-commands.patch,
- * 96-bar-status-centre.patch). A region command ends at the first ')', so
- * none of these may contain one. */
+ * The inline commands are dwl's: ^fg(...) colours, where accent/muted/alert/
+ * good are theme names that follow dwl-theme (99-theme-colours.patch);
+ * ^lm/^mm/^rm/^us/^ds(cmd) click and scroll regions
+ * (95-bar-status-commands.patch); ^ct() centring (96-bar-status-centre.patch);
+ * ^hv(text) hover text (99-z-bar-status-hover.patch). An argument ends at the
+ * first ')', so none may contain one. */
 #define LABEL(text) "^fg(accent)" text "^fg()"
 #define SEP         "^fg(muted) | ^fg()"
 #define VOL         "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "

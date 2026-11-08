@@ -1,29 +1,26 @@
 # pkgs/dwl/default.nix
 #
-# dwl with this repo's config.h and any patches dropped in ./patches.
+# dwl with this repo's config.h and every patch in ./patches.
 #
-# ADDING A PATCH. Put a `.patch` file in ./patches (e.g. from the dwl wiki,
-# https://codeberg.org/dwl/dwl-patches) and rebuild; every file there is
-# applied, in filename order, so prefix with a number if order matters.
-# Patches are applied to the dwl source before ./config.h is copied over
-# config.h, so a patch that changes config.def.h (new keybinds, new rules)
-# does NOT reach the build by itself -- port those hunks into ./config.h too.
+# PATCHES (e.g. from https://codeberg.org/dwl/dwl-patches) apply in filename
+# order, so number-prefix them. They apply before ./config.h replaces
+# config.h, so a patch's config.def.h hunks (binds, rules, options) have to
+# be ported into ./config.h by hand.
 #
-# WHEN THIS BREAKS. A nixpkgs bump to a new dwl release can make a patch fail
-# to apply, or leave ./config.h behind config.def.h. Diff against the new
+# WHEN THIS BREAKS. A nixpkgs bump to a new dwl can make a patch fail to
+# apply or leave ./config.h behind config.def.h. Diff against the new
 # config.def.h (`nix build nixpkgs#dwl.src`) and refresh the patch.
 #
-# COLORS ARE PARAMETERS, as #rrggbb, but only the fallback: dwl reads its
-# real colours from a file at runtime (99-theme-colours.patch), which
-# modules/features/dwl writes from the session user's `my.theme`. The
-# defaults are the OneShot palette, which is also what config.h falls back
-# to without them; they reach config.h as -D flags rather than substituted
-# placeholders so config.h stays valid C for clangd.nix.
+# COLOURS. The parameters are only the fallback: dwl reads its real colours
+# at runtime (99-theme-colours.patch) from a file modules/features/dwl
+# writes. They default to the OneShot palette and reach config.h as -D flags
+# rather than substituted placeholders, so config.h stays valid C for
+# clangd.nix.
 #
-# SCREEN SHADER. `screenShader` is the path of the fragment shader that
-# 99-screen-shader.patch runs over each output (Super+Shift+G), passed the
-# same way; null leaves config.h's fallback. The overlay points it at
-# hyprCRT's crt.frag. dwl reads the file each time the shader is turned on.
+# SCREEN SHADER. `screenShader` is the fragment shader 99-screen-shader.patch
+# runs over each output (Super+Shift+G), passed the same way; null keeps
+# config.h's fallback. The overlay points it at hyprCRT's crt.frag. dwl
+# rereads the file each time the shader is turned on.
 
 {
   lib,

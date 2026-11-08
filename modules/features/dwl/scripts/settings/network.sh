@@ -1,5 +1,6 @@
-# Network page: Wi-Fi, Bluetooth and the power profile. Concatenated into
-# dwl-settings by scripts.nix, so it relies on common.sh's pick and pause.
+# Network page: Wi-Fi, Bluetooth, power profile, airplane mode, Ethernet,
+# VPN and IP addresses. Concatenated into dwl-settings by scripts.nix;
+# relies on common.sh.
 
 wifi_on() { [ "$(nmcli radio wifi)" = enabled ]; }
 

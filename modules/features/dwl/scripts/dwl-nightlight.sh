@@ -1,11 +1,11 @@
 # dwl-nightlight
 #
-# Toggles a fixed warm screen temperature, standing in for Noctalia's
-# nightlight-toggle under Hyprland (temperature_night = 4000 in
-# home/modules/noctalia.nix). wlsunset with no location or manual times
-# treats every hour as polar night and holds -t; -T only has to be higher.
-# The tint lasts as long as wlsunset runs, so toggling off is killing it.
-# The bar's brightness turns the accent colour while it's on.
+# Toggles a fixed warm screen temperature (Super+Shift+N), standing in for
+# Noctalia's nightlight-toggle (temperature_night = 4000 in
+# home/modules/noctalia.nix). wlsunset with no location or times treats
+# every hour as polar night and holds -t; -T only has to be higher. The tint
+# lasts while wlsunset runs. The bar's brightness is accent-coloured while
+# it's on.
 
 if pkill -u "$(id -u)" -x wlsunset; then
   notify-send -a "Night light" "Night light off"

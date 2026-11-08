@@ -1,18 +1,15 @@
 # dwl-record [menu]
 #
 # Screen recording toggle (Super+Shift+R), standing in for Noctalia's
-# screen_recorder plugin. With a recording running it stops it; otherwise it
-# opens a popup (`menu`, below) to pick what to record. The video lands in
-# ~/Videos/Recordings and a notification says where.
+# screen_recorder plugin. Stops a running recording, else opens a popup
+# (`menu`) to pick what to record into ~/Videos/Recordings.
 #
-# The popup also toggles audio: s records system audio (the default sink's
-# monitor), m the default microphone. The choice is remembered. wf-recorder
-# takes one audio device, so with both on they are mixed through a temporary
-# null sink, which stopping unloads again.
+# In the popup s toggles system audio (the default sink's monitor) and m the
+# default mic; the choice is remembered. wf-recorder takes one audio device,
+# so both are mixed through a temporary null sink, unloaded on stop.
 #
-# The bind runs this through `spawnfocused` (97-spawn-focused.patch), so
-# DWL_FOCUS_GEOM, the focused window's box, is still set here and reaches the
-# popup before the popup takes focus.
+# The bind uses `spawnfocused` (97-spawn-focused.patch), so DWL_FOCUS_GEOM
+# (the focused window's box) is set before the popup steals focus.
 
 dir="$HOME/Videos/Recordings"
 state="${XDG_RUNTIME_DIR:-/tmp}/dwl-record.file"

@@ -13,9 +13,9 @@ static const int showsystray               = 1; /* 0 means no systray */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=12"};
-/* Colours are read from a file at startup and on SIGUSR2 (loadcolors in
- * 99-theme-colours.patch). These are what is used until then, or when there is
- * no file: the OneShot palette, overridable with -D flags (pkgs/dwl/default.nix). */
+/* Fallback colours (OneShot), used until loadcolors (99-theme-colours.patch)
+ * reads the colours file at startup / on SIGUSR2, or when there is none.
+ * pkgs/dwl/default.nix overrides them with -D flags. */
 #ifndef COLORS_SYSTEM
 #define COLORS_SYSTEM "/etc/dwl/colors"
 #endif
@@ -67,9 +67,9 @@ static uint32_t successcolor               = COL_SUCCESS;
 
 static const float default_opacity = 0.9f;
 
-/* Fragment shader run over each output's final frame while
- * togglescreenshader is on (99-screen-shader). SCREEN_SHADER comes from
- * pkgs/dwl/default.nix; the fallback is where Home Manager installs it. */
+/* Fragment shader run over each output while togglescreenshader is on
+ * (99-screen-shader). SCREEN_SHADER comes from pkgs/dwl/default.nix; the
+ * fallback is where Home Manager installs hyprCRT. */
 #ifndef SCREEN_SHADER
 #define SCREEN_SHADER "/etc/profiles/per-user/charlotte/share/hyprCRT/crt.frag"
 #endif
@@ -109,12 +109,11 @@ static const Layout layouts[] = {
 /* (x=-1, y=-1) is reserved as an "autoconfigure" monitor position indicator
  * WARNING: negative values other than (-1, -1) cause problems with Xwayland clients due to
  * https://gitlab.freedesktop.org/xorg/xserver/-/issues/899 */
-/* Mirrors home/modules/hyprland/monitors.lua. Docked, DP-4 (via the Anker hub)
- * sits at the origin with the laptop panel to its right, tops aligned; rules
- * apply as outputs appear, so no dock detection is needed. eDP-1 is pinned at
- * x=2560 rather than auto so booting docked can't stack it on DP-4.
- * resx/resy/rate pick from the output's own modes (45-monitorconfig); 0 means
- * the preferred mode. DP-4 prefers 59.95Hz, hence the explicit 165.08. */
+/* Mirrors home/modules/hyprland/monitors.lua: docked, DP-4 (Anker hub) at the
+ * origin, laptop panel to its right. eDP-1 is pinned at x=2560 rather than
+ * auto so booting docked can't stack it on DP-4. resx/resy/rate pick from the
+ * output's modes (45-monitorconfig), 0 meaning preferred; DP-4 prefers
+ * 59.95Hz, hence the explicit 165.08. */
 static const MonitorRule monrules[] = {
 	/* name     mfact  nmaster scale layout       rotate/reflect              x     y   resx  resy  rate     mode adaptive */
 	{ "eDP-1",  0.55f, 1,      1.33f, &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 2560, 0,  2880, 1920, 120.0f,  0,   0 },
@@ -124,9 +123,8 @@ static const MonitorRule monrules[] = {
 };
 
 /* Output each tag lives on (50-tagmon), as Hyprland's workspace rules: DP-4
- * takes the odd tags, eDP-1 the even ones. Super+N / Super+Shift+N go to that
- * output, and plugging DP-4 in pulls its tags' windows over. When DP-4 is
- * absent every tag falls back to the focused monitor. */
+ * the odd tags, eDP-1 the even. Plugging DP-4 in pulls its tags' windows
+ * over; without it every tag uses the focused monitor. */
 static const char *tagmons[] = {
 	"DP-4", "eDP-1", "DP-4", "eDP-1", "DP-4",
 	"eDP-1", "DP-4", "eDP-1", "DP-4", "eDP-1",
@@ -138,15 +136,15 @@ static const struct xkb_rule_names xkb_rules = {
 	/* example:
 	.options = "ctrl:nocaps",
 	*/
-	/* Colemak and QWERTY, Colemak first so it's what you get at login, as in
+	/* Colemak first so it's the login layout, as in
 	 * home/modules/hyprland/30-input.nix. Super+Alt+K switches. */
 	.layout = "us,us",
 	.variant = "colemak,",
 	.options = NULL,
 };
 
-/* Run when the active layout changes (89-xkb-layout), after dwl has written
- * its name to $XDG_RUNTIME_DIR/dwl-xkb-layout, so the bar redraws at once */
+/* Run after the layout changes and dwl has written its name to
+ * $XDG_RUNTIME_DIR/dwl-xkb-layout (89-xkb-layout), so the bar redraws */
 static const char *const xkblayoutcmd[] = { "dwl-bar-refresh", NULL };
 
 static const int repeat_rate = 25;
@@ -211,9 +209,8 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 static const char *dmenucmd[] = { "wofi", "--dmenu", NULL };
 
 /* commands */
-/* Placeholder for binds that used to call `noctalia msg <verb>` under
- * Hyprland. Does nothing at runtime; grep NOCTALIA_STUB for every spot that
- * still needs a real backend patched through, the argument being the old verb. */
+/* No-op placeholder for a Hyprland bind that runs `noctalia msg <verb>` and
+ * has no dwl equivalent yet; grep NOCTALIA_STUB for the remaining ones. */
 #define NOCTALIA_STUB(verb) SHCMD("true # TODO(noctalia): " verb)
 
 /* Raise/lower the default sink (capped at 100%), then redraw the bar. */
@@ -223,21 +220,17 @@ static const char *termcmd[]  = { "st-wl", NULL };
 /* -c sets the app_id, matched by a floating rule above; -g is columnsxrows
  * (a flag added by pkgs/st-wl/patches/10-geometry-flag.patch). */
 static const char *floatterm[] = { "st-wl", "-c", "floatterm", "-g", "80x20", NULL };
-/* Toggles a floating st-wl centred on the focused monitor (the "modal" rule
- * above), for control popups. Each popup's size and command are set by name
- * in modules/features/dwl/scripts/dwl-modal.sh, which the bar's click
- * regions use too. Pressing the same bind again closes it. */
+/* Toggles a control popup: a centred floating st-wl (the "modal" rule).
+ * Size and command per name are in modules/features/dwl/scripts/dwl-modal.sh,
+ * shared with the bar's click regions. */
 #define MODAL(name) { .v = (const char*[]){ "dwl-modal", name, NULL } }
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL  WLR_MODIFIER_CTRL
 #define ALT   WLR_MODIFIER_ALT
 
-/* Ported from home/modules/hyprland/binds.lua. dwl has no pseudotiling or
- * pinning, so those are not carried over. Master/layout binds are dwl-only
- * and live on Ctrl, which Hyprland leaves free. */
 /* The only binds that still fire while the session is locked
- * (80-locked-keys.patch); the rest of `keys` stays dead behind the locker. */
+ * (80-locked-keys.patch). */
 static const xkb_keysym_t lockedkeys[] = {
 	XKB_KEY_XF86AudioRaiseVolume,
 	XKB_KEY_XF86AudioLowerVolume,
@@ -249,15 +242,17 @@ static const xkb_keysym_t lockedkeys[] = {
 	XKB_KEY_XF86AudioNext,
 	XKB_KEY_XF86MonBrightnessUp,
 	XKB_KEY_XF86MonBrightnessDown,
-	/* Super+= / Super+- / Super+Shift+= / Super+Shift+-. Matched by keysym
-	 * only, but a bind still needs its modifiers, so bare = and - still reach
-	 * the locker. */
+	/* Super+= / Super+- and their Shift forms. Matched by keysym only, but the
+	 * bind still needs its modifiers, so bare = and - reach the locker. */
 	XKB_KEY_equal,
 	XKB_KEY_minus,
 	XKB_KEY_plus,
 	XKB_KEY_underscore,
 };
 
+/* Ported from home/modules/hyprland/binds.lua, minus pseudotiling and
+ * pinning (dwl has neither). dwl-only master/layout binds live on Ctrl,
+ * which Hyprland leaves free. */
 static const Key keys[] = {
 	/* modifier                  key                  function          argument */
 	/* Essentials */
@@ -327,8 +322,8 @@ static const Key keys[] = {
 	{ MODKEY|CTRL,               XKB_KEY_a,           toggleautoswallow,{0} },
 
 	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland. Directional
-	 * (88-focusdir), crossing to the next output at the edge and wrapping
-	 * around; monocle steps the stack instead */
+	 * (88-focusdir), crossing outputs at the edge and wrapping; monocle
+	 * steps the stack instead */
 	{ MODKEY,                    XKB_KEY_n,           focusdir,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY,                    XKB_KEY_i,           focusdir,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY,                    XKB_KEY_u,           focusdir,         {.i = WLR_DIRECTION_UP} },
@@ -423,11 +418,10 @@ static const Axis axes[] = {
 	{ MODKEY, AxisDown, spawn, SHCMD(VOLCMD("1%-")) },
 };
 
-/* Scrolling over the bar's status text outside a ^us()/^ds() region
- * (35-bar-status-volume.patch); the rest of the bar cycles tags. Nothing
- * bound: the volume section's regions in pkgs/slstatus/config.h handle
- * volume. C forbids an empty array, so it holds one NULL-func entry, which
- * the lookup skips. */
+/* Scrolling over the status text outside a ^us()/^ds() region
+ * (35-bar-status-volume.patch). Nothing bound: slstatus's own regions handle
+ * volume. C forbids an empty array, so one NULL-func entry, which the lookup
+ * skips. */
 static const Axis statusaxes[] = {
 	{ 0, AxisUp, NULL, {0} },
 };

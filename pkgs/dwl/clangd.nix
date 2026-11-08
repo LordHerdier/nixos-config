@@ -2,16 +2,14 @@
 #
 # A .clangd for editing ./config.h with working LSP.
 #
-# config.h has no #includes of its own: dwl.c pastes it in after the includes,
-# typedefs and prototypes it needs (`#include "config.h"`), so on its own
-# clangd sees Rule, Layout, Key, tile, WLR_ERROR... as undefined. This builds
-# the missing context: dwl.c cut off at that include line becomes a preamble
-# header, alongside the generated *-protocol.h headers and the pkg-config
-# include flags dwl's Makefile would use.
+# config.h has no #includes: dwl.c pastes it in (`#include "config.h"`) after
+# the includes, typedefs and prototypes it relies on, so alone clangd sees
+# Rule, Key, tile, WLR_ERROR... as undefined. This supplies that context:
+# dwl.c up to that line as a preamble header, the generated *-protocol.h
+# headers, and the pkg-config flags dwl's Makefile would use.
 #
-# Built from the patched dwl source, so patches in ./patches that touch dwl.c
-# are reflected. Install the result with `nix run .#dwl-clangd`, which writes
-# it to pkgs/dwl/.clangd (gitignored: it holds store paths).
+# Built from the patched source. `nix run .#dwl-clangd` (parts/dev.nix)
+# installs it as pkgs/dwl/.clangd (gitignored: it holds store paths).
 
 {
   lib,
@@ -24,8 +22,7 @@ stdenv.mkDerivation {
   pname = "dwl-clangd";
   inherit (dwl) version src patches;
 
-  # Same inputs dwl itself builds with: wlroots, wayland, xkbcommon, libinput,
-  # xcb, wayland-protocols, plus wayland-scanner and pkg-config.
+  # Same inputs dwl itself builds with (wlroots, pkg-config, wayland-scanner...).
   inherit (dwl) buildInputs nativeBuildInputs;
 
   dontConfigure = true;

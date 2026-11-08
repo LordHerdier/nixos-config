@@ -1,10 +1,9 @@
 # dwl-screenshot
 #
-# Region screenshot, standing in for `hyprshot -z --mode region` (which calls
-# hyprctl to clamp the selection, so it fails outside Hyprland). Same result:
-# the screen freezes while you drag, the PNG lands in ~/Pictures/Screenshots
-# under hyprshot's naming, is copied to the clipboard, and a notification
-# shows it. Esc in slurp cancels without saving.
+# Region screenshot (Super+Shift+S), standing in for `hyprshot -z --mode
+# region`, which calls hyprctl and so fails outside Hyprland. Same result:
+# frozen screen while you drag, PNG in ~/Pictures/Screenshots under
+# hyprshot's naming, copied to the clipboard, notification. Esc cancels.
 
 dir="$HOME/Pictures/Screenshots"
 file="$dir/$(date +'%Y-%m-%d-%H%M%S')_screenshot.png"

@@ -1,29 +1,26 @@
 # pkgs/st-wl
 #
 # st-wl (https://github.com/marchaesen/st-wl), the Wayland-native flexipatch
-# build of st, with this repo's config.h and patches.h -- the same shape as
-# pkgs/dwl. Used as the terminal for the dwl session.
+# build of st, with this repo's config.h and patches.h. The dwl session's
+# terminal.
 #
 # CONFIG. ./config.h and ./patches.h replace upstream's config.def.h and
-# patches.def.h at build time. After a version bump, diff them against the
-# new defaults and port new options across. Note that flexipatch also gates
-# Makefile-level libraries (sixel/kitty graphics need imlib2, ligatures need
-# harfbuzz) in config.mk, so a patch flipped on in patches.h may need a
-# buildInputs / config.mk change here too.
+# patches.def.h; after a bump, diff them against the new defaults. Some
+# flexipatch patches also need libraries enabled in config.mk (sixel and
+# kitty graphics: imlib2; ligatures: harfbuzz), so flipping one on in
+# patches.h may need a buildInputs / config.mk change here too.
 #
-# COLOURS ARE PARAMETERS (`colours`, attrs of #rrggbb), passed as -DCOL_* string-literal flags
-# (config.h keeps matching fallbacks so it stays valid C), but only as the
-# fallback: patches/20-theme-colours.patch has st-wl read the active palette
-# from ~/.local/state/theme/active/st-colors at startup and on SIGUSR1, which
-# the dwl module's st-colors theme fragment writes and signals. Defaults are
-# the OneShot palette.
+# COLOURS (`colours`, attrs of #rrggbb) reach config.h as -DCOL_* string
+# literals, but only as the fallback: patches/20-theme-colours.patch reads
+# the active palette from $XDG_STATE_HOME/theme/active/st-colors at startup
+# and on SIGUSR1, which the dwl module's st-colors fragment writes. Defaults
+# are the OneShot palette.
 #
-# FONT. st-wl's default lives in wl.c rather than config.h, so postPatch
-# rewrites it to kitty's font. Override at runtime with -f.
+# FONT. st-wl's default lives in wl.c, not config.h, so postPatch rewrites
+# it (to kitty's font). Override at runtime with -f.
 #
-# ADDING A PATCH. Anything beyond flexipatch's own set: drop a `.patch` file
-# in ./patches (applied in filename order, before config.h/patches.h are
-# copied over the defaults).
+# PATCHES beyond flexipatch's own go in ./patches, applied in filename order
+# before config.h/patches.h are copied in.
 
 {
   lib,

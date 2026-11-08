@@ -1,18 +1,11 @@
 # pkgs/oneshot-wallpaper/default.nix
 #
-# The 1920x1080 "navigate" wallpaper from OneShot's World Machine desktop
-# -- a near-black starfield with a glowing blue trail. Extracted game art
-# (c) Future Cat / Komodo, vendored so a rebuild doesn't need the game
-# installed; re-extract with `nix run .#extract` in
-# ~/documents/code/oneshot-twm-rice, then copy
+# The 1920x1080 "navigate" wallpaper (starfield with a blue trail) from
+# OneShot's World Machine desktop. Extracted game art (c) Future Cat /
+# Komodo, vendored so a rebuild doesn't need the game installed; re-extract
+# with `nix run .#extract` in ~/documents/code/oneshot-twm-rice and copy
 # out/the_world_machine/wallpaper/navigate.png over navigate.png here.
-#
-# Note this is specifically navigate.png, NOT the game's default.png --
-# that one is a different in-fiction wallpaper (purple monitors/clover
-# motif), still black and purple but not the starfield.
-#
-# Ships at native 1920x1080 with no upscaling; the game's wallpapers are
-# already full resolution, unlike its pixel-art icons and cursors.
+# (Not the game's default.png, which is a different wallpaper.)
 
 { lib, runCommandLocal }:
 

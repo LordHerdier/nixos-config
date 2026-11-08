@@ -1,22 +1,15 @@
 # dwl-settings [network | --toggle-wifi | --toggle-bluetooth]
 #
-# General settings menu in a centred st-wl popup (Super+/, via dwl-modal),
-# standing in for Noctalia's control centre. The top level lists one row per
-# page, each with a live summary; Escape goes back a level, then closes.
-# Every page is a file in ./settings, concatenated ahead of this one by
-# scripts.nix, so a page only has to define its functions and be added to
-# the list below; common.sh holds what they share (pick, pause).
+# Settings menu in a centred st-wl popup (Super+/), standing in for
+# Noctalia's control centre: one row per page with a live summary; Escape
+# goes back a level, then closes. Each page is a file in ./settings that
+# scripts.nix concatenates ahead of this one (after common.sh, the shared
+# helpers), so a new page needs its functions, an entry in scripts.nix's
+# `pages`, and rows in the cases below.
 #
-# Pages so far: network (Wi-Fi, Bluetooth, power profile, airplane mode,
-# Ethernet, VPN), sound, display, appearance, input (keyboard layout),
-# notifications (with power), system (read-only info).
-#
-# A page name (network, sound, display, appearance, input,
-# notifications, system) opens that page
-# directly: Super+Alt+A and the bar's net block use `network`, through
-# dwl-modal's "network" entry. --toggle-wifi and --toggle-bluetooth are for the
-# bar block: right clicking the Wi-Fi name or the Bluetooth entry toggles that
-# one without opening the popup. --swatch is the palette picker's preview.
+# A page name opens that page directly (dwl-modal's "network": Super+Alt+A
+# and the bar's net block). --toggle-wifi / --toggle-bluetooth are the bar
+# block's right clicks; --swatch is the palette picker's preview.
 
 case ${1:-} in
   --toggle-wifi) toggle_wifi; exit 0 ;;

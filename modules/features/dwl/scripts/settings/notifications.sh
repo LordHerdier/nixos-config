@@ -3,8 +3,8 @@
 # Concatenated into dwl-settings by scripts.nix; relies on common.sh and on
 # network.sh's power_menu.
 #
-# Idle and lock timeouts are not here: hypridle's are fixed in Nix
-# (home/modules/hyprland/hypridle.nix), so there is nothing to change at runtime.
+# No idle/lock timeouts: hypridle's are fixed in
+# home/modules/hyprland/hypridle.nix.
 
 dnd_on() { [[ $(makoctl mode) == *do-not-disturb* ]]; }
 

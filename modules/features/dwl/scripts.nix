@@ -1,12 +1,10 @@
 # modules/features/dwl/scripts.nix
 #
 # The dwl-* helpers behind config.h's binds and the bar's click regions,
-# standing in for what Noctalia does under Hyprland. Each NAME here is
-# ./scripts/dwl-NAME.sh, built with its runtime inputs as `dwl-NAME`; the
-# script's own header says what it does and which bind runs it.
-#
-# They all go on PATH (default.nix), since config.h and slstatus call them
-# by name from plain shell commands.
+# standing in for Noctalia under Hyprland. Each NAME is ./scripts/dwl-NAME.sh
+# built with its runtime inputs as `dwl-NAME`; the script's header says what
+# it does. All go on PATH (default.nix), as config.h and slstatus call them
+# by name.
 
 {
   lib,

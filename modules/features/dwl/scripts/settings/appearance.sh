@@ -2,9 +2,9 @@
 # dwl-settings by scripts.nix; relies on common.sh.
 #
 # Palettes go through `theme-set`, which recolours every my.theme app (mako,
-# st-wl, ...) and hands dwl its palette; bare dwl-theme would only recolour
-# dwl and the bar. theme-set comes from the user's Home Manager profile, so
-# it is looked up on PATH rather than being a runtime input.
+# st-wl, ...) and dwl; bare dwl-theme would only do dwl and the bar.
+# theme-set comes from the Home Manager profile, so it is found on PATH, not
+# a runtime input.
 
 have_theme_set() { command -v theme-set >/dev/null; }
 

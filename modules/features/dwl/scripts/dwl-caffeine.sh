@@ -1,12 +1,10 @@
 # dwl-caffeine [--off]
 #
-# Toggles keeping the screen awake (Super+Shift+I), standing in for Noctalia's
-# caffeine-toggle. Holds a systemd idle inhibitor, which hypridle honours
-# (ignore_systemd_inhibit is off), rather than stopping hypridle: locking
-# before suspend keeps working. The bar shows a cup while it's on.
-#
-# --off only turns it off; dwl-startup runs that on exit so the inhibitor
-# doesn't outlive the session into the next one.
+# Toggles keeping the screen awake (Super+Shift+I), standing in for
+# Noctalia's caffeine-toggle. Holds a systemd idle inhibitor, which hypridle
+# honours, rather than stopping hypridle, so locking before suspend still
+# works. The bar shows a cup while it's on. dwl-startup runs --off on exit
+# so the inhibitor doesn't outlive the session.
 
 # systemd-inhibit stays up as long as its child; killing the child releases
 # the inhibitor without leaving the sleep behind.
