@@ -9,7 +9,7 @@
 
 {
   programs.zsh.initContent = lib.mkAfter ''
-    motd() { ${pkgs.zsh}/bin/zsh ${../motd.sh}; }
+    motd() { MOTD_UPTIME=${../uptime.zsh} ${pkgs.zsh}/bin/zsh ${../motd.sh}; }
 
     zmodload zsh/datetime
     _motd_stamp="''${XDG_STATE_HOME:-$HOME/.local/state}/motd-last-shown"

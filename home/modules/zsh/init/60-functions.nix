@@ -16,6 +16,8 @@
       ssh -t "$1" docker exec -it "''${2:-sh}" "''${3:-sh}"
     }
 
+    ${builtins.readFile ../uptime.zsh}
+
     theme() {
       if [[ -z "$1" ]]; then
         echo "Usage: omp-theme <theme>"

@@ -8,7 +8,8 @@ print -P "%F{cyan}%B$(date '+%A, %d %B %Y')%b%f"
 curl -s --max-time 3 "wttr.is/?0pq" || true
 print ""
 
-print -P "%F{8}up:%f $(uptime | sed -E 's/.*up +([^,]+),.*/\1/')"
+source "${MOTD_UPTIME:?}"  # uptime -p, which coreutils' uptime lacks
+print -P "%F{8}up:%f ${$(uptime -p)#up }"
 # print -P "%F{8}load:%f $(cut -d' ' -f1-3 /proc/loadavg)"
 
 disk="$(df -h --output=used,size,pcent / | tail -1 | awk '{print $1 " / " $2 " (" $3 ")"}')"
