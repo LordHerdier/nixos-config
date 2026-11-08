@@ -64,7 +64,7 @@ inputs, known in-flight work). start at [`docs/README.md`](docs/README.md).
 | **charlie-laptop** | nixos-wsl                                  | windows wsl — dev shell environment                                                                       |
 | **nico**           | nixos-wsl                                  | windows wsl — minimal shell setup                                                                         |
 | **work-laptop**    | native nixos                               | laptop — hyprland desktop, replaces the windows + wsl setup on the work machine                           |
-| **builder**        | nixos lxc (proxmox), headless              | remote build server + binary cache + ci for this repo; the one host that doesn't go through `mkHost`      |
+| **builder**        | nixos lxc (proxmox), headless              | remote build server + binary cache + ci for this repo; `mkHost` with `withHome = false`                   |
 
 see [`docs/hosts.md`](docs/hosts.md) for what each host actually turns on.
 
@@ -86,9 +86,9 @@ terminal tabs and a reference doc:
 ├── modules/
 │   ├── common/         # baseline every host gets (users, nix, packages, security, time; ssh/fonts/printing are opt-in)
 │   ├── features/       # opt-in capabilities (steam, tailscale, sunshine, ollama, syncthing, parental-controls, ...)
-│   ├── profiles/       # module bundles (laptop, desktop-hyprland, desktop-gnome, dev-docker, wsl)
+│   ├── profiles/       # module bundles (laptop, desktop-hyprland, desktop-gnome, dev-docker, wsl, server, proxmox-vm/lxc)
 │   └── users/          # host-scoped extra system users (kiddo)
-├── hosts/              # per-machine nixos configs (incl. the standalone Builder)
+├── hosts/              # per-machine nixos configs (incl. the headless Builder)
 └── home/
     ├── charlotte.nix   # base home-manager entry point
     ├── kiddo.nix       # kiddo's home-manager entry point (index only)

@@ -1,7 +1,7 @@
 # hosts
 
-seven `nixosConfigurations`; six are built by the same `mkHost` function (see
-[architecture.md](architecture.md)), the seventh (`Builder`) is standalone. what follows is what each one
+seven `nixosConfigurations`, all built by the same `mkHost` function (see
+[architecture.md](architecture.md)); `Builder` passes `withHome = false`. what follows is what each one
 actually turns on — the feature/profile names below are all under
 `modules/` unless noted, and link to [features.md](features.md) for
 detail on any one of them.
@@ -155,16 +155,20 @@ machine. `hosts/Work-Laptop/default.nix`.
 
 **not a workstation** — a headless nixos LXC (CT 407) on the proxmox host
 twm, at `10.0.10.8` on the infra VLAN. 8 cores, 16 GiB, 120 GiB rootfs.
-`hosts/Builder/default.nix`. the only `nixosConfiguration` that doesn't go
-through `mkHost`: no home-manager, no desktop, no `home/hosts/` file.
+`hosts/Builder/default.nix`. built by `mkHost` with `withHome = false`: no
+home-manager, no desktop, no `home/hosts/` file. imports
+`profiles/server.nix` + `profiles/proxmox-lxc.nix`, so it gets
+`modules/common/*` like every other host. in inframanagement's inventory as
+`builder`, in the `infra` and `nixos` groups.
 
 - pine and index offload builds to it via `features/remote-builder.nix`;
   all six hosts use it as a binary cache via `features/builder-cache.nix`
   (see [features.md](features.md#compute--ai))
 - unprivileged container with `nesting=1`, which is what lets the nix
   build sandbox work inside it
-- ssh: root (key only, for `nixos-rebuild --target-host`) and `nixbuild`
-  (the user clients build as, a nix `trusted-user`)
+- ssh: root (key only — charlotte's key for `--target-host`, semaphore's
+  for the read-only playbooks), charlotte (key only, no sudo) and
+  `nixbuild` (the user clients build as, a nix `trusted-user`)
 - `min-free`/`max-free` are set so it garbage-collects mid-build rather
   than filling the 120 GiB disk
 - serves its store as a signed binary cache (harmonia, port 5000)

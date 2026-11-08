@@ -18,8 +18,11 @@ every nixos module in this repo is one of:
   `desktop-common.nix` (audio/display-manager/polkit infra shared by
   every graphical session), `desktop-hyprland.nix` and
   `desktop-gnome.nix` (compositor-specific on top of that), `laptop.nix`
-  (bluetooth, libinput), `dev-docker.nix`, `wsl.nix`. profiles compose
-  modules; they don't define new capabilities themselves.
+  (bluetooth, libinput), `dev-docker.nix`, `wsl.nix`, and the homelab
+  ones: `server.nix` (headless baseline: hardened sshd, root by key for
+  admin and Semaphore, python for Ansible's read-only playbooks) plus
+  `proxmox-vm.nix` / `proxmox-lxc.nix` (which kind of guest on twm).
+  profiles compose modules; they don't define new capabilities themselves.
 
 `modules/users/` (`kiddo.nix`, `rivian.nix`) is a fourth, narrower category:
 host-scoped extra *system users*, both index-only. They're not under
@@ -44,7 +47,7 @@ modules). the shared desktop/shell stack lives in
 the overlay `mkHost` registers lives in `parts/overlay.nix`.
 
 every `nixosConfigurations.<Name>` is built by one function,
-`mkHost { hostName, isWsl, hostPath, extraModules, extraHomeUsers }`.
+`mkHost { hostName, isWsl, hostPath, extraModules, extraHomeUsers, withHome }`.
 what it does, in order:
 
 1. sets `nixpkgs.hostPlatform` and registers the overlay in
@@ -58,8 +61,9 @@ what it does, in order:
 3. imports `hostPath` — the host's own `default.nix` — which is where
    that host's `modules/features/*.nix` and `modules/profiles/*.nix`
    picks happen.
-4. wires up `home-manager.nixosModules.home-manager`, always configuring
-   a `charlotte` user from `home/charlotte.nix` + `home/hosts/<hostName>.nix`.
+4. unless `withHome = false` (headless servers), wires up
+   `home-manager.nixosModules.home-manager`, always configuring a
+   `charlotte` user from `home/charlotte.nix` + `home/hosts/<hostName>.nix`.
 5. if `isWsl`, appends `nixos-wsl.nixosModules.wsl` and
    `modules/profiles/wsl.nix`.
 6. appends `extraModules` (host-specific nixos modules that don't belong
@@ -77,8 +81,8 @@ what it does, in order:
 `home/modules/files.nix` can reach into the `dotfiles` flake input for
 `bin/`, oh-my-posh themes, and yazi config.
 
-the `nixosConfigurations` at the bottom of `parts/hosts.nix` are six short
-calls to `mkHost` plus the standalone `Builder` — that's the full list of
+the `nixosConfigurations` at the bottom of `parts/hosts.nix` are seven short
+calls to `mkHost` (`Builder` with `withHome = false`) — that's the full list of
 hosts this flake knows about; see [hosts.md](hosts.md) for what each one turns on.
 
 ## adding a host
@@ -93,6 +97,20 @@ hosts this flake knows about; see [hosts.md](hosts.md) for what each one turns o
 
 that's it — `modules/common/*.nix` and `home/charlotte.nix` apply
 automatically; nothing else needs to know a new host exists.
+
+### adding a homelab server (on twm)
+
+1. `hosts/<Name>/default.nix` importing `modules/profiles/server.nix` and
+   one of `proxmox-vm.nix` / `proxmox-lxc.nix`, plus its features. if it
+   needs runtime secrets, `modules/features/infisical-runner.nix`.
+2. no `home/hosts/` file — call `mkHost { ...; withHome = false; }`.
+3. for a VM, build the image with
+   `nix build .#nixosConfigurations.<Name>.config.system.build.VMA` and
+   `qmrestore` it on twm (details in `proxmox-vm.nix`'s header).
+4. in `~/documents/code/inframanagement`, add the host to its network
+   group **and** the `nixos` group in `inventory/hosts.yml`. every playbook
+   that changes a host excludes `nixos`, so Ansible keeps the outside of
+   the guest (vm/ct, caddy routes) and this repo owns the inside.
 
 ## why the split instead of one big per-host file
 

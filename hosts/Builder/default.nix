@@ -1,49 +1,34 @@
 # hosts/Builder/default.nix — headless remote build server, LXC 407 on twm (Proxmox)
 #
-# Not built through mkHost: no home-manager, no desktop, no per-user config.
+# Built through mkHost with withHome = false: no home-manager, no desktop.
 # Clients point at it with modules/features/remote-builder.nix.
 
-{ modulesPath, ... }:
+{ ... }:
 
 let
   # Dedicated key the clients' nix-daemons (root) use to reach `nixbuild`.
   # Public half only; the private half lives at /etc/nix/builder_ed25519
   # on each client.
   builderKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBpfQeupDsnUW+8O3JTGa3h/DhbbkrbgOFdtYsFvkXZn nix-remote-builder";
-
-  # Charlotte's interactive key, for root so `nixos-rebuild --target-host`
-  # works against this box.
-  adminKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMkOTHjuB7f+raL44rpjdwHWlbiODQGdqj3fpVmX9VUu charlotte@pine";
 in
 {
   imports = [
-    "${modulesPath}/virtualisation/proxmox-lxc.nix"
-    ../../modules/common/nix.nix
+    ../../modules/profiles/server.nix
+    ../../modules/profiles/proxmox-lxc.nix
     ./ci.nix
   ];
 
+  # Lower-case on purpose: it's the CT's existing hostname, which the
+  # nixos-config attribute (`Builder`) doesn't have to match.
   networking.hostName = "builder";
   system.stateVersion = "25.11";
-  time.timeZone = "America/Chicago";
 
   # Network config comes from the CT's net0 (10.0.10.8/24 on the infra
   # bridge); Proxmox applies it, so nothing is declared here.
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      PermitEmptyPasswords = false;
-      PermitRootLogin = "prohibit-password";
-      AllowUsers = [
-        "root"
-        "nixbuild"
-      ];
-    };
-  };
-
-  users.users.root.openssh.authorizedKeys.keys = [ adminKey ];
+  # profiles/server.nix covers sshd and root's keys; just let the build
+  # user in too.
+  services.openssh.settings.AllowUsers = [ "nixbuild" ];
 
   users.users.nixbuild = {
     isNormalUser = true;

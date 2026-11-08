@@ -23,6 +23,9 @@ let
       # anyone here is configured purely from what's listed
       # (so a full-stack user lists their per-host file too).
       extraHomeUsers ? { },
+      # false for headless servers: no home-manager at all, so neither
+      # charlotte's per-host home file nor extraHomeUsers is read.
+      withHome ? true,
     }:
     nixpkgs.lib.nixosSystem {
       modules = [
@@ -40,7 +43,8 @@ let
 
         # Host-specific bits
         hostPath
-
+      ]
+      ++ nixpkgs.lib.optionals withHome [
         # Home Manager
         home-manager.nixosModules.home-manager
         {
@@ -128,11 +132,10 @@ in
     };
 
     # Headless build server (LXC on twm) -- see hosts/Builder.
-    "Builder" = nixpkgs.lib.nixosSystem {
-      modules = [
-        { nixpkgs.hostPlatform = system; }
-        ../hosts/Builder/default.nix
-      ];
+    "Builder" = mkHost {
+      hostName = "Builder";
+      hostPath = ../hosts/Builder/default.nix;
+      withHome = false;
     };
   };
 }
