@@ -42,7 +42,7 @@ desktop/shell stack as charlotte.
 - `features/fingerprint-reader.nix`, `features/gvfs.nix`,
   `features/cifs-mounts.nix`, `features/games-mount.nix`,
   `features/usbmuxd.nix`, `features/librepods.nix` (AirPods control),
-  `features/nix-ld.nix`, `features/syncthing.nix`, `features/zram.nix`,
+  `features/nix-ld.nix`, `features/zram.nix`,
   `features/framework-kmod-fix.nix` (workaround for the framework kmod
   package missing its `.ko.cer`), `features/remote-builder.nix`,
   `common/fonts.nix`
@@ -224,7 +224,7 @@ home-manager, no desktop, no `home/hosts/` file. imports
 | kmonad | yes | yes | yes | no | no | no |
 | steam | yes | yes | yes (alongside sunshine) | no | no | no |
 | tailscale | yes | yes | yes | no | no | no |
-| syncthing | no | yes | yes | yes | no | no |
+| syncthing | no | no | yes | yes | no | no |
 | docker | dev-docker | dev-docker | dev-docker | wsl docker-desktop | wsl docker-desktop | dev-docker |
 | extra users | no | kiddo, rivian | no | no | no | no |
 | theme | kanagawa | halloween | kanagawa (gtk rice: oneshot) | kanagawa | kanagawa | kanagawa |

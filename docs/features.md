@@ -38,7 +38,8 @@ gotcha each one's header comment exists to warn about. see
   fancier; `open-webui.nix` and `ollama-vulkan.nix` build on top of it
   for tailnet-only exposure.
 - **`syncthing.nix`** — syncs `~/documents` and `~/Pictures` between
-  hosts listed in its `allDevices` (currently index and apthos;
+  hosts listed in its `allDevices` (currently only apthos, so nothing
+  syncs; index no longer imports it and its ID is commented out;
   charlie-laptop imports the module but has no entry, so it has no peers). device IDs
   are hardcoded per host in the module (`allDevices`), and the module
   derives each host's *peer* list by filtering out its own `hostName` —

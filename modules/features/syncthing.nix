@@ -1,8 +1,9 @@
 # modules/features/syncthing.nix
 #
 # Syncs charlotte's ~/documents and ~/Pictures between the hosts that import
-# this and have an entry in allDevices (Index, Apthos). Charlie-Laptop
-# imports it but has no entry, so it syncs nothing.
+# this and have an entry in allDevices. Only Apthos is listed right now, so
+# nothing syncs; Charlie-Laptop imports it but has no entry. Index no longer
+# imports it — its device ID is kept commented below for re-enabling.
 
 { hostName, lib, ... }:
 
@@ -15,7 +16,7 @@ let
   # storing that host's REST API key in `pass` as syncthing/keys/<HostName>
   # — see secretspec.toml), then add it below and redeploy everywhere.
   allDevices = {
-    Index = "WUNK6WK-DTXJXYT-CSCXB3Q-UADN6GB-UJJGSUM-4Y3P55P-VC7YX2V-45FMYAZ";
+    # Index = "WUNK6WK-DTXJXYT-CSCXB3Q-UADN6GB-UJJGSUM-4Y3P55P-VC7YX2V-45FMYAZ";
     Apthos = "7EZSYLY-EZNJMXC-UDCRDVK-FP5UDUH-FAT4RBI-Q63LYH3-VNTPKLO-KX2VDQH";
   };
 

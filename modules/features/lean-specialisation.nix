@@ -40,7 +40,6 @@
 {
   specialisation.lean.configuration = {
     services = {
-      syncthing.enable = lib.mkForce false;
       avahi.enable = lib.mkForce false;
       # bolt comes from the GNOME profile (mkDefault); fwupd from its default.
       hardware.bolt.enable = lib.mkForce false;

@@ -36,7 +36,6 @@
     ../../modules/features/librepods.nix
     ../../modules/features/nix-ld.nix
     ../../modules/common/fonts.nix
-    ../../modules/features/syncthing.nix
     ../../modules/features/zram.nix
     ../../modules/features/framework-kmod-fix.nix
     ../../modules/features/lean-specialisation.nix
