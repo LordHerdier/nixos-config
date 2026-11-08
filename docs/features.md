@@ -88,8 +88,9 @@ gotcha each one's header comment exists to warn about. see
   `pkgs/pelican-wings` builds it from source, since it isn't
   in nixpkgs. `my.pelican.wings.settings` is the node's `config.yml`
   (`uuid` and `remote` are required, copied from the panel's node
-  Configuration tab), written to `/etc/pelican/config.yml` on every start,
-  so changes made in the panel only last until the next restart. the node
+  Configuration tab), written to `/etc/pelican/config.yml` on every start.
+  config pushes from the panel are refused (`ignore_panel_config_updates`),
+  so node settings are changed here, not in the panel's UI. the node
   token stays out of the store and comes in as `WINGS_TOKEN_ID`/`WINGS_TOKEN`
   through `my.infisical.envFiles`. it also turns on docker, declares the
   `pelican` user (uid 988, so wings never runs `useradd`), rotates its log

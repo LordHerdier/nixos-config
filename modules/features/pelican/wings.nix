@@ -5,9 +5,9 @@
 #
 # - config.yml is generated from `my.pelican.wings.settings` and copied to
 #   /etc/pelican/config.yml on every start. It's a writable copy, not a
-#   store symlink, because wings rewrites it on boot and the panel can push
-#   node-setting changes into it. Those pushes last until the next restart,
-#   then Nix's version wins, so make node changes here and not in the panel.
+#   store symlink, because wings rewrites it on boot. Config pushes from the
+#   panel are refused (`ignore_panel_config_updates`), so node settings
+#   changed in the panel's UI don't reach wings: change them here instead.
 # - the node token isn't in config.yml at all. Wings reads WINGS_TOKEN_ID
 #   and WINGS_TOKEN from its environment instead, so the host feeds them in
 #   with an EnvironmentFile, normally from Infisical:
@@ -74,6 +74,10 @@ in
 
   config = {
     my.pelican.wings.settings = {
+      # This file is the source of truth; refuse the panel's config pushes
+      # (wings answers them with applied=false) instead of letting them
+      # live until the next restart.
+      ignore_panel_config_updates = lib.mkDefault true;
       api = {
         host = lib.mkDefault "0.0.0.0";
         port = lib.mkDefault 8080;
