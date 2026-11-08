@@ -177,6 +177,8 @@ in
   environment.systemPackages = lib.attrValues scripts ++ [
     dwl
     session
+    # Wayland-native st (pkgs/st-wl), an alternative to the kitty config.h launches.
+    pkgs.st-wl
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.

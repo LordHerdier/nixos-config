@@ -24,6 +24,9 @@ inputs: final: prev: {
   # slstatus feeding dwl's bar -- see pkgs/slstatus.
   slstatus = final.callPackage ../pkgs/slstatus { inherit (prev) slstatus; };
 
+  # st-wl, the Wayland st the dwl session launches -- see pkgs/st-wl.
+  st-wl = final.callPackage ../pkgs/st-wl { };
+
   # Pelican game panel's node daemon -- see pkgs/pelican-wings.
   pelican-wings = final.callPackage ../pkgs/pelican-wings { };
 

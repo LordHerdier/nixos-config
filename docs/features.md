@@ -174,7 +174,8 @@ per host, not part of a "what kind of desktop is this" bundle:
   is `pkgs/slstatus`. this module holds the session entry, `dwl-startup`,
   the `dwl-session` systemd target, the `dwl-*` helper scripts behind the
   popups, mako and portal routing; colours come from charlotte's
-  `my.theme`. gotchas: it needs the desktop-hyprland profile for the
+  `my.theme`. it also installs `st-wl` (`pkgs/st-wl`, the Wayland st
+  with this repo's config.h/patches.h; its colours are build-time). gotchas: it needs the desktop-hyprland profile for the
   kitty/wofi it launches, and if hyprland is already running on another
   VT, `dwl-startup` leaves the shared systemd user services
   (`graphical-session.target`, portals) alone, so the two sessions don't
