@@ -20,6 +20,7 @@
     psmisc
     ncdu
     usbutils
+    man-pages
   ];
 
   services.atd.enable = true;
