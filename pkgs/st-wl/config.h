@@ -218,7 +218,7 @@ static int bellvolume = 0;
 char *termname = "st-256color";
 
 /* default class */
-char *termclass = "terminal";
+char *termclass = "st-wl";
 
 /*
  * spaces per tab

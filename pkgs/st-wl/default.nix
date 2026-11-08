@@ -26,6 +26,11 @@
 {
   lib,
   stdenv,
+  makeWrapper,
+  imagemagick,
+  bc,
+  python3,
+  coreutils,
   fetchFromGitHub,
   pkg-config,
   wayland-scanner,
@@ -113,6 +118,7 @@ stdenv.mkDerivation {
     pkg-config
     wayland-scanner
     ncurses
+    makeWrapper
   ];
 
   buildInputs = [
@@ -149,6 +155,23 @@ stdenv.mkDerivation {
     (define "BRIGHT_CYAN" c.brightCyan)
     (define "BRIGHT_WHITE" c.brightWhite)
   ];
+
+  # icat-mini: upstream's image viewer (kitty graphics + unicode placeholders),
+  # which the dwl popups use for previews in place of `kitty icat`. It shells
+  # out to ImageMagick, bc, python3 (cell size ioctl) and tput.
+  postInstall = ''
+    install -Dm755 icat-mini.sh $out/bin/icat-mini
+    wrapProgram $out/bin/icat-mini \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          imagemagick
+          bc
+          python3
+          coreutils
+          ncurses
+        ]
+      }
+  '';
 
   makeFlags = [
     "PREFIX=${placeholder "out"}"

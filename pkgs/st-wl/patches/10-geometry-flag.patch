@@ -1,0 +1,18 @@
+--- a/wl.c
++++ b/wl.c
+@@ -3659,6 +3659,15 @@
+ 		case 'f':
+ 			opt_font = EARGF(usage());
+ 			break;
++		case 'g': {
++			/* COLSxROWS, in cells */
++			unsigned int gc, gr;
++			if (sscanf(EARGF(usage()), "%ux%u", &gc, &gr) != 2)
++				usage();
++			cols = gc;
++			rows = gr;
++			break;
++		}
+ 		case 'o':
+ 			opt_io = EARGF(usage());
+ 			break;
