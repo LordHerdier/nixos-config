@@ -40,10 +40,10 @@
 
 let
   # null until step 5; until then only the panel runs.
-  wingsNodeUuid = null;
+  wingsNodeUuid = "90ee80c9-dedc-455c-8632-6cc431eb7917";
 
   # TODO(step 1): Infisical project ID of the `pelican` project.
-  infisicalProject = "REPLACE-WITH-PELICAN-PROJECT-ID";
+  infisicalProject = "73139db9-4682-48b6-8d71-5cb61fbd9683";
 
   panelUrl = "https://pelican.svc.lorscapa.com";
   caddyServices = "10.0.20.249";
