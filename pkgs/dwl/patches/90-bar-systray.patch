@@ -2134,7 +2134,7 @@ new file mode 100644
 index 0000000..7f9b1b0
 --- /dev/null
 +++ b/systray/tray.c
-@@ -0,0 +1,237 @@
+@@ -0,0 +1,238 @@
 +#include "tray.h"
 +
 +#include "icon.h"
@@ -2278,6 +2278,7 @@ index 0000000..7f9b1b0
 +void
 +destroytray(Tray *tray)
 +{
++	wl_list_remove(&tray->link);
 +	if (tray->image)
 +		pixman_image_unref(tray->image);
 +	if (tray->font)
