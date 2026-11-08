@@ -31,6 +31,7 @@
     ./20-settings.nix
     ./30-extensions.nix
     ./40-appearance.nix
+    ./45-pywalfox.nix
     ./50-search.nix
     ./60-bookmarks.nix
     ./70-containers.nix
