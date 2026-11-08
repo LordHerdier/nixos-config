@@ -11,8 +11,10 @@
 # last rebuild set. A rebuild that changes my.theme.default recolours dwl
 # the same way (see default.nix), but only when no override is in place.
 #
-# Only dwl's own drawing follows this: slstatus, mako and the apps
-# keep the colours they were built with until the next rebuild and restart.
+# This only recolours what dwl draws, which includes slstatus's blocks since
+# they print dwl's colour names. mako, st-wl and the other apps follow
+# `theme-set` instead, through their my.theme fragments (home/modules/theme/
+# runtime.nix), whose dwl hook calls this script.
 
 themes="${DWL_THEMES:?}"
 system=/etc/dwl/colors
