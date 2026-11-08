@@ -12,8 +12,8 @@
 
     bind-key -T copy-mode-vi 'C-\' select-pane -l
 
-    # Smart scrolling - PageUp/PageDown only when not in vim
+    # Smart scrolling - PageUp enters copy-mode unless in vim
+    # (PageDown needs no root binding: it passes through by default)
     bind-key -n PageUp if-shell "$is_vim" 'send-keys PageUp' 'copy-mode -u'
-    bind-key -n PageDown if-shell "$is_vim" 'send-keys PageDown' 'send-keys PageDown'
   '';
 }
