@@ -18,10 +18,7 @@ in
         # hyprlock-colors seeds the color file if noctalia has never
         # rendered it (else hyprlock won't start); a no-op otherwise. Runs
         # before the `pidof` guard so a lock can't race the seeding.
-        lock_cmd = [
-          "${config.my.hyprlock-colors.package}/bin/hyprlock-colors; pidof hyprlock || hyprlock"
-          "pidof mpvpaper || mpvpaper"
-        ];
+        lock_cmd = "${config.my.hyprlock-colors.package}/bin/hyprlock-colors; pidof hyprlock || hyprlock";
         before_sleep_cmd = "loginctl lock-session";
         after_sleep_cmd = dpms "on";
       };
