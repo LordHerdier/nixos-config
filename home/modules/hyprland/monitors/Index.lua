@@ -1,4 +1,4 @@
--- home/modules/hyprland/monitors.lua
+-- home/modules/hyprland/monitors/Index.lua
 --
 -- Monitor layout and workspace rules, switched on whether the Anker USB-C
 -- hub is plugged in. Real Lua rather than Nix attrs because the layout is

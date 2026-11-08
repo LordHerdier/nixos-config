@@ -1,0 +1,7 @@
+-- home/modules/hyprland/monitors/default.lua
+--
+-- Fallback for hosts without their own monitors/<hostName>.lua. Declares
+-- nothing on purpose: with no rules Hyprland applies its own default to
+-- every output (preferred mode, auto position, auto scale), which is right
+-- for a laptop on its own. Add monitors/<hostName>.lua, or set
+-- my.hyprland.monitorsFile, for anything host-specific.
