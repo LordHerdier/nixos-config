@@ -32,9 +32,23 @@
     };
 
     # UUIDs from https://zen-browser.app/mods; restart to take effect.
-    # mods = [
-    #   "e122b5d9-d385-4bf8-9971-e137809097d0" # No Top Sites
-    # ];
+    mods = [
+      "ad97bb70-0066-4e42-9b5f-173a5e42c6fc" # SuperPins
+      "642854b5-88b4-4c40-b256-e035532109df" # Transparent Zen
+    ];
+
+    # Mod options are plain prefs (Settings > Zen Mods writes the same
+    # keys). Only values that differ from each mod's preferences.json
+    # defaults are listed.
+    settings = {
+      # SuperPins
+      "uc.essentials.position" = "bottom";
+      "uc.pins.legacy-layout" = true;
+
+      # Transparent Zen -- needs both for the window itself to go clear.
+      "browser.tabs.allow_transparent_browser" = true;
+      "zen.widget.linux.transparency" = true;
+    };
 
     # Mutually exclusive with `mods` above.
     # sine = {

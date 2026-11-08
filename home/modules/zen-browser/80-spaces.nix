@@ -18,35 +18,35 @@
 
 {
   programs.zen-browser.profiles.default = {
-    # spacesForce = true; # delete spaces not declared here
-    # spaces = {
-    #   "Personal" = {
-    #     id = "00000000-0000-0000-0000-000000000000"; # uuidgen
-    #     position = 1000;
-    #     icon = "🏠";
-    #   };
-    #   "Work" = {
-    #     id = "00000000-0000-0000-0000-000000000001";
-    #     position = 2000;
-    #     icon = "💼";
-    #     container = 2; # a container id from 70-containers.nix
-    #     theme = {
-    #       type = "gradient";
-    #       colors = [
-    #         {
-    #           red = 100;
-    #           green = 150;
-    #           blue = 200;
-    #           algorithm = "floating";
-    #           type = "explicit-lightness";
-    #           lightness = 50;
-    #         }
-    #       ];
-    #       opacity = 0.8;
-    #       texture = 0.5;
-    #     };
-    #   };
-    # };
+    spacesForce = true; # delete spaces not declared here
+    spaces = {
+      "Personal" = {
+        id = "26755e29-5217-4db7-8f92-d56a33e3eb71";
+        position = 1000;
+        icon = "🏠";
+      };
+      "Work" = {
+        id = "c566e3e8-bf68-432e-a679-e735569c12b7";
+        position = 2000;
+        icon = "💼";
+        container = 2; # a container id from 70-containers.nix
+        theme = {
+          type = "gradient";
+          colors = [
+            {
+              red = 100;
+              green = 150;
+              blue = 200;
+              algorithm = "floating";
+              type = "explicit-lightness";
+              lightness = 50;
+            }
+          ];
+          opacity = 0.8;
+          texture = 0.5;
+        };
+      };
+    };
 
     # Routing. `openIn` / `defaultExternalRoute` take a space id (without
     # braces) or the literal "most-recent-space". Undeclared routes Zen
