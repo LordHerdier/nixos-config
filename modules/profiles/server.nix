@@ -1,15 +1,14 @@
 # modules/profiles/server.nix — headless homelab server baseline
 #
-# For hosts built with `mkHost { withHome = false; }` that live on twm
-# alongside the Ansible-managed fleet (~/documents/code/inframanagement).
-# Ansible owns the VM/CT from the outside (clone, resources, Caddy routes);
-# everything inside is declared here and in the host file. Those hosts sit
-# in Ansible's `nixos` inventory group, which every mutating playbook skips.
+# For `mkHost { withHome = false; }` guests on twm. Ansible
+# (~/documents/code/inframanagement) owns the VM/CT from the outside (clone,
+# resources, Caddy routes); everything inside is declared here and in the
+# host file. These hosts sit in Ansible's `nixos` inventory group, which
+# every mutating playbook skips.
 #
-# Admin access is root over SSH by key (same as Ansible's `ansible_user:
-# root`, and what `nh os switch --target-host root@<ip>` uses). charlotte
-# exists via modules/common/users.nix but has no password here, so she
-# can't sudo; that's deliberate rather than an oversight.
+# Admin access is root over SSH by key (Ansible's `ansible_user: root`, and
+# `nh os switch --target-host root@<ip>`). charlotte has no password here,
+# so she deliberately can't sudo.
 #
 # Pair with modules/profiles/proxmox-vm.nix or proxmox-lxc.nix.
 

@@ -21,10 +21,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Set the timezone
   time.timeZone = "America/Chicago";
 
-  # Set console language
   console = {
     keyMap = "colemak";
   };

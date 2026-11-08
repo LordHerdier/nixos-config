@@ -22,12 +22,8 @@
 
   system.stateVersion = "25.11";
 
-  # laptop-only stuff (wifi, bluetooth, graphics, etc) goes here
-
-  # Set the timezone
   time.timeZone = "America/Chicago";
 
-  # Set console language
   console = {
     keyMap = "colemak";
   };

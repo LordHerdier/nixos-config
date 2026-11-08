@@ -2,12 +2,10 @@
 #
 # Mounts the SMB/CIFS shares from the NAS at 192.168.50.50.
 #
-# These use on-demand automount: nothing is mounted at boot, and the share is
-# mounted transparently on first access to its mountpoint. Boot never blocks if
-# the NAS is offline.
+# Automounted on first access, so boot never blocks on the NAS.
 #
-# Credentials live OUTSIDE the Nix store (which is world-readable) in a
-# root-only file at /etc/nixos-secrets/smb-creds. Create it once with:
+# Credentials live outside the world-readable store in a root-only file.
+# Create it once with:
 #
 #   sudo install -d -m 700 /etc/nixos-secrets
 #   sudo install -m 600 /dev/null /etc/nixos-secrets/smb-creds

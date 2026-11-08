@@ -1,10 +1,9 @@
 # modules/profiles/desktop-common.nix
 #
-# Desktop infrastructure shared by every graphical session on a host,
-# independent of which compositor/DE actually renders it: audio, the
-# display manager, polkit/rtkit, GPU accel, keyring unlock at login,
-# and power management. Hyprland- and GNOME-specific bits live in their
-# own desktop-*.nix profile alongside this one.
+# Desktop infrastructure shared by every graphical session, whatever the
+# compositor/DE: audio, display manager, polkit/rtkit, GPU accel, keyring
+# unlock at login, power management. Compositor-specific bits live in the
+# other desktop-*.nix profiles.
 
 { pkgs, ... }:
 
@@ -25,15 +24,13 @@
 
   programs.dconf.enable = true;
 
-  # Provides the org.freedesktop.secrets D-Bus service (keyring). Apps like
-  # ProtonVPN need this to store credentials. Note: enabling this alone does
-  # NOT unlock the login keyring — pam_gnome_keyring must be wired into the
-  # authenticating PAM service too (see enableGnomeKeyring below / per host).
+  # org.freedesktop.secrets (e.g. for ProtonVPN's credentials). This alone
+  # does NOT unlock the login keyring; that needs pam_gnome_keyring on the
+  # authenticating PAM service, below.
   services.gnome.gnome-keyring.enable = true;
 
-  # Hand the login password to gnome-keyring at SDDM login so the login
-  # keyring is unlocked automatically. Hosts that swap SDDM for another
-  # greeter (e.g. greetd on Index) must enable this on that PAM service.
+  # Unlock the login keyring at SDDM login. Hosts that swap SDDM for another
+  # greeter (greetd on Index, GDM on Apthos) must set this on that service.
   security.pam.services.sddm.enableGnomeKeyring = true;
 
   services = {

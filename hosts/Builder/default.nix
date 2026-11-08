@@ -36,10 +36,10 @@ in
     openssh.authorizedKeys.keys = [ builderKey ];
   };
 
-  # Serves this box's /nix/store as a binary cache for the clients that use
-  # modules/features/remote-builder.nix. The signing key is generated once
-  # on the CT (`nix-store --generate-binary-cache-key builder-1 ...`) and
-  # never leaves it; the public half is in builder-cache.nix.
+  # Binary cache for clients importing builder-cache.nix (which has the
+  # public key). The signing key was generated once on the CT
+  # (`nix-store --generate-binary-cache-key builder-1 ...`) and never
+  # leaves it.
   services.harmonia.cache = {
     enable = true;
     signKeyPaths = [ "/var/lib/harmonia/cache-sk" ];

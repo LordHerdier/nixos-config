@@ -1,34 +1,30 @@
 # modules/features/pelican/wings.nix — Pelican Wings (game server node daemon)
 #
-# Runs pkgs.pelican-wings as root next to Docker, the way upstream's
-# systemd unit does. What's different from a hand install:
+# Runs pkgs.pelican-wings as root next to Docker, like upstream's unit.
+# Differences from a hand install:
 #
-# - config.yml is generated from `my.pelican.wings.settings` and copied to
-#   /etc/pelican/config.yml on every start. It's a writable copy, not a
-#   store symlink, because wings rewrites it on boot. Config pushes from the
-#   panel are refused (`ignore_panel_config_updates`), so node settings
-#   changed in the panel's UI don't reach wings: change them here instead.
-# - the node token isn't in config.yml at all. Wings reads WINGS_TOKEN_ID
-#   and WINGS_TOKEN from its environment instead, so the host feeds them in
-#   with an EnvironmentFile, normally from Infisical:
+# - config.yml is generated from `my.pelican.wings.settings` and copied
+#   (writable; wings rewrites it on boot) to /etc/pelican/config.yml on
+#   every start. Panel config pushes are refused, so change node settings
+#   here, not in the panel's UI.
+# - the node token isn't in config.yml: wings reads WINGS_TOKEN_ID and
+#   WINGS_TOKEN from an EnvironmentFile, normally from Infisical:
 #
 #     my.infisical.envFiles.wings = {
 #       path = "/pelican-wings";   # holds WINGS_TOKEN_ID and WINGS_TOKEN
 #       services = [ "wings" ];
 #     };
 #
-# - the `pelican` system user is declared here. Otherwise wings tries to
-#   create it with useradd, which NixOS reverts on the next switch.
-# - log rotation goes through services.logrotate. Wings' own logrotate
-#   setup writes /etc/logrotate.d, which NixOS doesn't read.
+# - the `pelican` user is declared here; wings would otherwise useradd it,
+#   which NixOS reverts on the next switch.
+# - log rotation goes through services.logrotate; wings' own writes
+#   /etc/logrotate.d, which NixOS doesn't read.
 #
-# Getting the settings: create the node in the panel, open its
-# Configuration tab, and copy `uuid` and `remote` into the host file. The
-# token_id and token values go into Infisical.
+# Settings: copy `uuid` and `remote` from the node's Configuration tab in
+# the panel into the host file; token_id and token go into Infisical.
 #
-# Firewall: the API and SFTP ports are opened here. Game server ports are
-# published by Docker, whose own iptables rules bypass the NixOS firewall,
-# so allocations are reachable without listing them anywhere.
+# Firewall: API and SFTP ports are opened here. Game ports are published by
+# Docker, whose iptables rules bypass the NixOS firewall.
 
 {
   config,
@@ -74,9 +70,8 @@ in
 
   config = {
     my.pelican.wings.settings = {
-      # This file is the source of truth; refuse the panel's config pushes
-      # (wings answers them with applied=false) instead of letting them
-      # live until the next restart.
+      # This file is the source of truth; otherwise panel pushes would
+      # apply until the next restart.
       ignore_panel_config_updates = lib.mkDefault true;
       api = {
         host = lib.mkDefault "0.0.0.0";
@@ -97,9 +92,9 @@ in
 
     virtualisation.docker.enable = true;
 
-    # Pinned to the UID wings uses inside its own container image, so files
-    # under /var/lib/pelican/volumes keep the same owner across rebuilds of
-    # the VM. (Wings also re-chowns them on boot, via check_permissions_on_boot.)
+    # Pinned to the UID wings uses inside its container image, so server
+    # volumes keep the same owner across VM rebuilds.
+    # (Wings also re-chowns them on boot, via check_permissions_on_boot.)
     users.users.pelican = {
       isSystemUser = true;
       group = "pelican";

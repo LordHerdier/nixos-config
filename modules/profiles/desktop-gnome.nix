@@ -1,16 +1,10 @@
 # modules/profiles/desktop-gnome.nix
 #
-# Plain GNOME Wayland session. Imports desktop-common.nix for the
-# audio/display-manager/polkit/etc. infrastructure every desktop host
-# needs, regardless of compositor — see that file for why those live
-# separately from Hyprland's profile.
+# Plain GNOME Wayland session, on top of desktop-common.nix.
 #
-# Index imports this alongside desktop-hyprland.nix (GNOME for kiddo,
-# Hyprland for Charlotte) and disables the SDDM this pulls in
-# (services.displayManager.sddm.enable = lib.mkForce false) in favor of
-# greetd + tuigreet, which is what lets its F3 picker offer both
-# sessions. Apthos imports this alone and swaps SDDM for GDM (see its
-# host file).
+# Index imports this alongside desktop-hyprland.nix (GNOME for kiddo) and
+# replaces the SDDM it pulls in with greetd + tuigreet, whose F3 picker
+# offers every session. Apthos imports this alone and swaps SDDM for GDM.
 
 { ... }:
 

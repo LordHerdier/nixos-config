@@ -7,12 +7,10 @@
     enable = true;
     enableOnBoot = false;
 
-    # Keep container stdout out of the system journal. The upstream NixOS
-    # default is "journald", which sends every line a container prints into
-    # journald -- a chatty test suite can push tens of thousands of entries
-    # in a single second, starve the rest of the system and bloat the
-    # journal. "local" keeps `docker logs` working but writes to Docker's
-    # own rotated, compressed per-container files instead.
+    # Keep container stdout out of the system journal: the NixOS default
+    # "journald" lets a chatty test suite push tens of thousands of entries
+    # a second. "local" keeps `docker logs` working via Docker's own
+    # rotated, compressed per-container files.
     logDriver = "local";
   };
 

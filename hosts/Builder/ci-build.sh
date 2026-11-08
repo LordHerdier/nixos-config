@@ -1,16 +1,12 @@
-# Build the hosts in $CI_HOSTS for main and for every open PR of $CI_REPO that
-# comes from a branch of that repo itself (never a fork),
-# skipping any commit that has already been tried. Results are kept as gc
-# roots under $STATE_DIRECTORY/roots, so harmonia keeps serving them.
+# Build the hosts in $CI_HOSTS for main and every open same-repo (never
+# fork) PR of $CI_REPO, skipping commits already tried. Results are gc
+# roots under $STATE_DIRECTORY/roots, so harmonia keeps serving them: one
+# per host for main and per open PR, dropped when the PR closes.
 #
-# Retention is bounded by construction: one root per host for main, one per
-# host for each *open* PR (re-pointed on every new commit, dropped when the
-# PR closes).
-#
-# If a GitHub token is present ($RUNTIME_DIRECTORY/github-token, copied from
-# /var/lib/nixos-ci-token by the unit), each commit also gets a commit
-# status per host (context nixos-ci/<host>) and the token is used for the
-# API and for flake input fetches. Without it, everything still builds.
+# With a GitHub token ($RUNTIME_DIRECTORY/github-token, copied in by the
+# unit), each commit also gets a per-host status (nixos-ci/<host>) and the
+# token is used for API and flake fetches. Without it, everything still
+# builds.
 
 set -euo pipefail
 

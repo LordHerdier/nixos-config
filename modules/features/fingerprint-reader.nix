@@ -11,20 +11,14 @@
     tod.driver = pkgs.libfprint-2-tod1-goodix;
   };
 
-  # Deliberately NOT adding libfprint-2-tod1-goodix to services.udev.packages.
-  # The rules file it ships only matches Goodix 538c/533c/530c/5840; the sensor
-  # in this machine is 27c6:609c, so every line is inert here and the only
-  # effect is four "Failed to resolve group 'plugdev'" warnings per device
-  # event (plugdev is a Debian convention that does not exist on NixOS).
-  # tod.driver above is what actually provides the driver .so.
+  # Deliberately NOT in services.udev.packages: its rules only match Goodix
+  # 538c/533c/530c/5840, not this 27c6:609c, so all they'd add is
+  # "Failed to resolve group 'plugdev'" warnings. tod.driver provides the .so.
 
   services.udev.extraRules = ''
-    # Keep the Goodix fingerprint reader (27c6:609c) from autosuspending.
-    # systemd's hwdb ships ID_AUTOSUSPEND=1 for this device, so the stock
-    # 60-autosuspend.rules leaves power/control at "auto"; a negative
-    # autosuspend delay is what actually stops it from suspending.
-    # power/persist is deliberately not set here -- hwdb already carries
-    # ID_PERSIST=0 for 27C6:609C, so 60-autosuspend.rules writes it for us.
+    # Keep the Goodix reader (27c6:609c) from autosuspending. hwdb sets
+    # ID_AUTOSUSPEND=1 (power/control "auto"), so a negative delay is what
+    # stops it. power/persist comes from hwdb's ID_PERSIST=0 already.
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="27c6", ATTR{idProduct}=="609c", ATTR{power/autosuspend}="-1"
   '';
 

@@ -51,11 +51,10 @@ in
     };
   };
 
-  # font-rendering.nix exports QT_STYLE_OVERRIDE=adwaita-dark for widget apps,
-  # but Qt Quick Controls reads the same variable as a QML style module name.
-  # No such module exists, so LibrePods' Main.qml fails to load (and the app
-  # never opens the socket librepods-ctl talks to). QT_QUICK_CONTROLS_STYLE
-  # does not take precedence, so override the variable for LibrePods itself.
+  # home/modules/font-rendering.nix sets QT_STYLE_OVERRIDE=adwaita-dark, but
+  # Qt Quick Controls reads it as a QML style name; none exists, so Main.qml
+  # fails to load (and librepods-ctl's socket never opens).
+  # QT_QUICK_CONTROLS_STYLE doesn't take precedence, so override it here.
   #
   # The package is the harveywuk fork, not upstream: the airpods Noctalia
   # plugin needs its status file and the ca:/onebud:/adaptive: verbs. The fork

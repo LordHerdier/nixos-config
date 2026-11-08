@@ -1,26 +1,20 @@
 # modules/features/pelican/panel.nix — Pelican panel (web UI), as upstream's image
 #
-# Runs ghcr.io/pelican/panel through virtualisation.oci-containers on the
-# Docker daemon that wings.nix already needs. The panel is PHP/Laravel with
-# a frontend build, a queue worker and a scheduler, and the image bundles
-# all of them (php-fpm, supervisord, supercronic, and Caddy on :80). The
-# image is pinned by digest, so a rebuild never picks up a different panel
-# without a change here.
+# Runs ghcr.io/pelican/panel via oci-containers on Docker (shared with
+# wings.nix). The image bundles php-fpm, the queue worker, the scheduler
+# and Caddy on :80. Pinned by digest.
 #
-# Database: SQLite, under dataDir. That's the panel's own default, and the
-# right size for one panel with a handful of servers: no MariaDB or Redis to
-# run, secure and back up. DB_CONNECTION is pinned so the web installer
-# can't switch it away.
+# Database: SQLite under dataDir, the panel's default; no MariaDB/Redis to
+# run and back up. DB_CONNECTION is pinned so the installer can't change it.
 #
 # Where settings live:
 # - Set here, as container env: APP_URL, proxy settings, DB_CONNECTION and
 #   anything in `environment`. Laravel prefers real env vars over .env, so
 #   these win over whatever the panel's settings page writes.
-# - The panel's own .env, at <dataDir>/.env: everything else, edited from the
-#   settings page (mail, captcha, OAuth, ...). It also holds APP_KEY, which
-#   is generated on first start and encrypts things in the database. Lose it
-#   and those are unreadable, so back up dataDir as a whole, or put APP_KEY
-#   in Infisical and pass it in through `secretEnvVars`:
+# - <dataDir>/.env: everything else, from the settings page (mail, captcha,
+#   OAuth, ...), plus APP_KEY, generated on first start, which encrypts
+#   database fields. Back up dataDir, or put APP_KEY in Infisical and pass
+#   it via `secretEnvVars`:
 #
 #     my.pelican.panel.secretEnvVars = [ "APP_KEY" ];
 #     my.infisical.envFiles.pelican-panel = {
@@ -28,9 +22,8 @@
 #       services = [ "docker-pelican-panel" ];
 #     };
 #
-# First start: browse to `url`/installer and go through the web installer
-# (pick SQLite when it asks). It writes APP_INSTALLED=true into .env, and
-# after that each start runs the database migrations first.
+# First start: run the web installer at `url`/installer (pick SQLite).
+# After that each start runs the migrations first.
 #
 # Upgrading: bump `image` together with pkgs/pelican-wings (panel and wings
 # release in step). The digest is the multi-arch index's:

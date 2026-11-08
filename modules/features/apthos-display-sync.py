@@ -1,22 +1,14 @@
-# Sync the Sony TV's refresh rate / HDR / VRR to whatever a connecting
-# Sunshine (Moonlight) client actually asked for, then restore the native
-# mode when the stream ends.
+# Sync the Sony TV's refresh rate / HDR / VRR to a connecting Sunshine
+# (Moonlight) client, then restore the native mode when the stream ends.
 #
-# Sunshine only tells prep-cmd scripts the client's requested width,
-# height and fps (SUNSHINE_CLIENT_WIDTH/HEIGHT/FPS) plus whether it's
-# HDR-capable (SUNSHINE_CLIENT_HDR); there's no VRR signal at all. The
-# TV's supported modes are a fixed EDID list (4096x2160, 3840x2160,
-# 1920x1080, ...) that will essentially never contain a laptop panel's
-# exact resolution (e.g. 2880x1920), so matching resolution isn't
-# attempted -- Sunshine's own encoder already scales to whatever the
-# client asked for regardless of the TV's active mode. What actually
-# matters for stream quality/correctness:
+# Sunshine passes SUNSHINE_CLIENT_WIDTH/HEIGHT/FPS/HDR; no VRR signal.
+# Resolution isn't matched: the TV's EDID modes (4096x2160, 3840x2160,
+# 1920x1080, ...) never contain a laptop's (e.g. 2880x1920), and the
+# encoder scales anyway. What matters:
 #   - refresh rate: match it so frame pacing doesn't judder
-#   - HDR: a non-HDR client shown raw PQ/HDR pixels gets washed-out
-#     colors, so drop to SDR unless the client says SUNSHINE_CLIENT_HDR=1
-#   - VRR: always off while streaming -- a variable-refresh desktop
-#     confuses the screencast capture pipeline's frame pacing, and
-#     Sunshine gives no way to know if the client even wants it
+#   - HDR: raw PQ looks washed out on a non-HDR client, so SDR unless
+#     SUNSHINE_CLIENT_HDR=1
+#   - VRR: always off while streaming; it confuses screencast frame pacing
 import json
 import os
 import sys
@@ -26,9 +18,8 @@ import gi
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
 
-# The TV has been moved between the GPU's HDMI and DisplayPort outputs
-# before, and that changes the connector name mutter reports. Try these in
-# order and use whichever is actually attached.
+# The TV has moved between the GPU's HDMI and DP outputs; use whichever of
+# these is attached.
 CONNECTORS = ["HDMI-1", "DP-1"]
 STATE_FILE = os.path.expanduser("~/.local/state/sunshine-display-sync.json")
 METHOD_TEMPORARY = 1

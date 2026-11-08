@@ -1,9 +1,8 @@
 # modules/features/builder-cache.nix — use the `builder` CT on twm as a binary cache
 #
-# The builder (hosts/Builder) builds every host on each push and serves its
-# store with harmonia, so anything it has built is a download here. This only
-# adds a substituter; features/remote-builder.nix imports it and adds build
-# offloading on top.
+# The builder (hosts/Builder) builds every host for main and open PRs and
+# serves its store with harmonia. This only adds the substituter;
+# remote-builder.nix imports it and adds build offloading.
 
 { ... }:
 

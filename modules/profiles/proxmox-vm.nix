@@ -8,14 +8,13 @@
 #   scp result/*.vma.zst root@192.168.50.116:/var/lib/vz/dump/
 #   qmrestore /var/lib/vz/dump/<file>.vma.zst <vmid> --unique true
 #
-# After that first boot, the VM is updated in place with
+# After first boot, update in place with
 # `nh os switch --target-host root@<ip> -H <Name> /etc/nixos`, not by
 # restoring a new image. Pair with profiles/server.nix.
 #
-# UEFI (OVMF), as on Apthos. Per-host size/cores/
-# memory go in the host file under `proxmox.qemuConf` and only affect the
-# image's embedded VM config (change a live VM's with `qm set` / Ansible's
-# configure_vm.yml).
+# UEFI (OVMF). Per-host size/cores/memory go under `proxmox.qemuConf` in
+# the host file and only affect the image's embedded VM config (change a
+# live VM's with `qm set` / Ansible's configure_vm.yml).
 
 {
   hostName,
@@ -32,10 +31,9 @@
     name = lib.mkDefault hostName;
   };
 
-  # proxmox-image.nix turns cloud-init on by default, which force-blanks
-  # networking.hostName and hands the network to cloud-init. Hosts here
-  # declare their own address and name in Nix, so leave Proxmox's
-  # cloud-init drive out of it.
+  # proxmox-image.nix enables cloud-init by default, which force-blanks
+  # networking.hostName and takes over the network. Hosts here declare both
+  # in Nix.
   proxmox.cloudInit.enable = false;
 
   # proxmox-image.nix already puts the kernel console on ttyS0 (Proxmox's

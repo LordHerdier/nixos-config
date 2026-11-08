@@ -3,12 +3,10 @@
 # https://docs.openwebui.com/getting-started/quick-start) talking to the
 # Ollama server on this same host (see ollama-vulkan.nix).
 #
-# The container only publishes to 127.0.0.1 -- not reachable on any network
-# interface at all -- and `tailscale serve` fronts it with a proper HTTPS
-# cert at https://apthos.tailc769e7.ts.net/, tailnet-only (no funnel). This
-# also sidesteps Docker's `-p` publishing installing its own iptables
-# DNAT/FORWARD rules ahead of the NixOS firewall's INPUT chain: binding to
-# loopback means there's no published port for those rules to ever expose.
+# The container publishes only on 127.0.0.1 and `tailscale serve` fronts it
+# with HTTPS at https://apthos.tailc769e7.ts.net/ (tailnet-only, no
+# funnel). Binding to loopback also means Docker's own DNAT rules, which
+# bypass the NixOS firewall, have nothing to expose.
 
 { pkgs, ... }:
 
@@ -21,9 +19,8 @@ in
     "d ${dataDir}/data 0750 root root -"
   ];
 
-  # WEBUI_SECRET_KEY signs session cookies; generate it once and keep it out
-  # of the Nix store (world-readable) so rebuilds don't invalidate sessions
-  # or leak it.
+  # WEBUI_SECRET_KEY signs session cookies: generated once, outside the
+  # world-readable store, so it persists across rebuilds.
   systemd.services.open-webui-secret = {
     description = "Generate a persistent Open WebUI session secret";
     before = [ "docker-open-webui.service" ];
@@ -48,10 +45,8 @@ in
     extraOptions = [ "--add-host=host.docker.internal:host-gateway" ];
   };
 
-  # Registers the mapping with tailscaled, which persists it in its own
-  # state and keeps serving it across reboots -- this unit just makes that
-  # declared in config instead of a one-off imperative command, and reapplies
-  # it if tailscaled's state ever gets reset.
+  # tailscaled persists serve config itself; this declares it and reapplies
+  # it if tailscaled's state is ever reset.
   systemd.services.tailscale-serve-open-webui = {
     description = "Expose Open WebUI over Tailscale Serve";
     after = [

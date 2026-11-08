@@ -12,12 +12,11 @@
     networkmanager.enable = true;
   };
 
-  # tailscale runs with --accept-routes, so the 192.168.50.0/24 route that
-  # the subnet router advertises lands in tailscale's table 52 (rule 5270)
-  # and apthos starts sending replies for its *own* LAN into tailscale0.
-  # Connections arriving via the subnet router (SNATed to its LAN IP) then
-  # never get an answer. Look the LAN up in `main` first so it stays
-  # on-link; the private VLAN routes in table 52 are untouched.
+  # tailscale runs with --accept-routes (set imperatively), so the subnet
+  # router's 192.168.50.0/24 route lands in table 52 (rule 5270) and replies
+  # to apthos's own LAN go into tailscale0; connections via the subnet
+  # router then never get an answer. Look the LAN up in `main` first; the
+  # VLAN routes in table 52 are untouched.
   systemd.services.lan-policy-rule = {
     description = "Prefer the local LAN over tailscale-accepted routes";
     wantedBy = [ "multi-user.target" ];

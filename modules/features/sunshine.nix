@@ -1,25 +1,16 @@
 # modules/features/sunshine.nix
 # Sunshine self-hosted game stream host, for Moonlight clients to connect to.
 #
-# Runs as a per-user systemd unit tied to graphical-session.target, so it
-# only comes up once a Wayland/X session (e.g. GNOME via GDM) is
-# actually logged in and running.
+# Runs as a user unit tied to graphical-session.target, so it only comes up
+# once a session is logged in.
 #
-# Never let an RDP session share this session's Mutter. Confirmed on this
-# box back when rdp.nix ran gnome-remote-desktop in headless mode: with an
-# RDP client connected (so Mutter had a virtual monitor up alongside the
-# TV's real one) and Sunshine also attached, a monitor reconfig -- the exact
-# ApplyMonitorsConfig call apthos-display-sync makes below -- segfaulted
-# GNOME Shell itself (crashed in mutter's
-# meta_stage_view_inhibit_cursor_overlay, via on_monitors_changed), taking
-# down the whole session: Sunshine, the portals, everything running under
-# graphical-session.target.
-#
-# rdp.nix now runs in system mode, where GDM gives each RDP client a
-# separate session with its own Mutter, so the two never share a compositor
-# and the service can stay always-on. That's the property to preserve: if
-# RDP is ever moved back to a mode that attaches to the logged-in session,
-# this crash comes back with it.
+# Never let an RDP session share this session's Mutter. With RDP attached
+# to it (rdp.nix's old headless mode: a virtual monitor next to the TV) and
+# Sunshine streaming, apthos-display-sync's ApplyMonitorsConfig segfaulted
+# GNOME Shell (meta_stage_view_inhibit_cursor_overlay via
+# on_monitors_changed), taking Sunshine and the portals down with it.
+# rdp.nix's system mode gives each RDP client its own GDM session and
+# Mutter; keep it that way.
 
 {
   config,
@@ -29,9 +20,9 @@
 }:
 
 let
-  # Matches the TV's refresh rate / HDR to whatever a connecting Moonlight
-  # client asked for, and restores the native mode when it disconnects.
-  # See the script itself for why resolution and VRR aren't part of this.
+  # Matches the TV's refresh rate / HDR to the connecting Moonlight client
+  # (VRR off while streaming) and restores the native mode afterwards. The
+  # script explains why resolution isn't matched.
   displaySync = pkgs.writers.writePython3Bin "apthos-display-sync" {
     libraries = [ pkgs.python3Packages.pygobject3 ];
     flakeIgnore = [
@@ -41,10 +32,9 @@ let
   } (builtins.readFile ./apthos-display-sync.py);
 
   streamPortBase = config.services.sunshine.settings.port;
-  # Video/control/audio/mic/RTSP-setup ports -- same offsets used for the
-  # firewall rules in nixpkgs' sunshine module. Sunshine only has these UDP
-  # sockets bound while a client is actually streaming, so their absence is
-  # a reliable "no one's connected" signal.
+  # The UDP stream ports, same offsets as nixpkgs' sunshine firewall rules.
+  # They're only bound while a client is streaming, so their absence means
+  # no one's connected.
   streamPortOffsets = [
     9
     10
@@ -53,13 +43,10 @@ let
     21
   ];
 
-  # Sunshine's global_prep_cmd "undo" is supposed to revert the display when
-  # a session ends, but in practice it's unreliable across reconnects/drops
-  # (see e.g. github.com/LizardByte/Sunshine/issues/3481 and #1456) -- it
-  # fired once and then silently never again on this box. This timer is an
-  # independent backstop: if we've switched away from native and no client
-  # is actually connected any more, revert regardless of whether Sunshine
-  # ever calls undo.
+  # Sunshine's global_prep_cmd "undo" is unreliable across reconnects/drops
+  # (github.com/LizardByte/Sunshine/issues/3481 and #1456); here it fired
+  # once and never again. Backstop: if the display was switched and no
+  # client is connected, revert.
   displayWatchdog = pkgs.writeShellApplication {
     name = "apthos-display-watchdog";
     runtimeInputs = [
@@ -82,39 +69,26 @@ let
     '';
   };
 
-  # nixpkgs builds Sunshine with SUNSHINE_ENABLE_CUDA=false unless cudaSupport
-  # is set (pkgs/by-name/su/sunshine/package.nix), and config.cudaSupport is
-  # off by default. Without it SUNSHINE_BUILD_CUDA is never defined, so
-  # make_avcodec_encode_device() has no CUDA branch to take and falls through
-  # to a plain software encode device -- while the PipeWire capture side still
-  # negotiates DMA-BUF buffers, because that decision only tests
-  # `mem_type == cuda && display_is_nvidia` and is *not* behind the same
-  # #ifdef. The software path then assigns a GPU buffer straight to
-  # sws_input_frame->data[0], so every single frame dies in sws_scale with
-  # "Couldn't scale frame: Invalid argument" / "Could not convert image":
-  # Moonlight connects, input works (that's a separate path), and the picture
-  # is black forever while Sunshine rebuilds the encoder per failed frame and
-  # leaks its way to several GB of RSS. Enabling CUDA gives the DMA-BUF import
-  # the encode device it has already negotiated for.
+  # nixpkgs builds Sunshine with SUNSHINE_ENABLE_CUDA=false unless
+  # cudaSupport is set. Without CUDA, make_avcodec_encode_device() falls back
+  # to a software encode device while PipeWire capture still negotiates
+  # DMA-BUF (that check isn't behind the same #ifdef), so every frame fails
+  # in sws_scale ("Couldn't scale frame: Invalid argument"): black picture,
+  # working input, and several GB of leaked RSS from encoder rebuilds.
   sunshinePackage =
     (pkgs.sunshine.override {
       cudaSupport = true;
       cudaPackages = pkgs.cudaPackages;
     }).overrideAttrs
       (_: {
-        # ffmpeg's NVENC path dlopen()s libcuda.so.1 at runtime instead of
-        # linking it, and on NixOS that library lives only under the driver
-        # symlink -- it is never on the default loader path (`ldconfig -p |
-        # grep libcuda` comes back empty). Without it every nvenc probe died
-        # on "Cannot load libcuda.so.1" / "Failed to create a CUDA device:
-        # Operation not permitted", and the `encoder = "nvenc"` pin below then
-        # silently fell through Sunshine's probe order to hevc_vulkan -- i.e.
-        # straight into the flaky Vulkan path that pin exists to avoid.
+        # NVENC dlopen()s libcuda.so.1, which on NixOS lives only under the
+        # driver runpath. Without it every nvenc probe fails ("Cannot load
+        # libcuda.so.1") and the `encoder = "nvenc"` pin below silently
+        # falls through to the flaky hevc_vulkan it exists to avoid.
         #
-        # This has to ride in the wrapper rather than in the unit's
-        # environment: nixpkgs' own cudaSupport postFixup wraps sunshine with
-        # `--set LD_LIBRARY_PATH <vulkan-loader>`, which would discard
-        # anything systemd put there.
+        # Must be in the wrapper, not the unit's environment: nixpkgs'
+        # cudaSupport postFixup does `--set LD_LIBRARY_PATH <vulkan-loader>`,
+        # discarding anything systemd set.
         postFixup = ''
           wrapProgram $out/bin/sunshine \
             --set LD_LIBRARY_PATH ${
@@ -131,28 +105,21 @@ in
     openFirewall = true;
     autoStart = true;
 
-    # GNOME (mutter) captures via the xdg-desktop-portal ScreenCast
-    # interface + PipeWire rather than raw DRM/KMS, so no CAP_SYS_ADMIN
-    # is needed here (that was only for Hyprland's wlroots capture path).
+    # GNOME captures via the portal's ScreenCast + PipeWire, not KMS, so no
+    # CAP_SYS_ADMIN.
     #
-    # NOTE: the portal's first ScreenCast request needs someone logged
-    # in locally to click "Share" once — there's no headless bypass. On
-    # an autologin/streaming box like this, log in once after a rebuild
-    # (e.g. via the Proxmox console) and approve the prompt before
-    # expecting Moonlight to show a picture; GNOME remembers the grant
-    # after that.
+    # NOTE: the first ScreenCast request needs someone to click "Share"
+    # locally once (no headless bypass). After a rebuild, approve it from
+    # the Proxmox console before expecting a picture; GNOME remembers it.
     capSysAdmin = false;
 
     settings = {
       sunshine_name = "Apthos";
 
-      # Sunshine's default encoder probe order tries Vulkan-Video (hevc_vulkan)
-      # before NVENC. FFmpeg's Vulkan Video encode path is still flaky on
-      # NVIDIA/Linux: it can succeed on the very first session and then fail
-      # every session after with "Device does not support the
-      # VK_KHR_video_encode_queue extension!", even though the GPU and driver
-      # both support it fine via NVENC directly. Pin to nvenc to skip the
-      # Vulkan path entirely.
+      # The default probe order tries hevc_vulkan before NVENC, and FFmpeg's
+      # Vulkan encode on NVIDIA works for the first session then fails every
+      # later one ("Device does not support the VK_KHR_video_encode_queue
+      # extension!").
       encoder = "nvenc";
 
       # Runs for every app/session, not just a specific one. Sunshine passes
@@ -165,13 +132,11 @@ in
       ];
     };
 
-    # The sunshine systemd user service runs with no PATH (see nixpkgs'
-    # sunshine module — needed for its tray icon links to work), so every
-    # command below must be an absolute store path.
+    # The user service runs with no PATH (nixpkgs' module, for its tray
+    # links), so commands must be absolute store paths.
     #
-    # Big Picture uses Steam's own "detached" launch: it's fired once and
-    # not tracked, so Sunshine just streams the desktop underneath it same
-    # as the "Desktop" app, and disconnecting doesn't kill Steam.
+    # Big Picture is "detached": fired once and not tracked, so Sunshine
+    # streams the desktop under it and disconnecting doesn't kill Steam.
     applications.apps = [
       { name = "Desktop"; }
       {

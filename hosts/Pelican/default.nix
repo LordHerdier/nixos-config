@@ -1,16 +1,15 @@
 # hosts/Pelican/default.nix — Pelican game panel + Wings, VM 220 on twm (Proxmox)
 #
-# Replaces the AMP box (192.168.50.227). Headless: built by mkHost with
-# withHome = false. Panel at https://pelican.svc.lorscapa.com and the node
-# API at https://wings.svc.lorscapa.com, both through caddy-services (LAN /
-# tailnet only). Game ports reach it by router port-forward via OPNsense.
+# Replaces the AMP box (192.168.50.227). Panel at
+# https://pelican.svc.lorscapa.com and node API at
+# https://wings.svc.lorscapa.com, both via caddy-services (LAN / tailnet
+# only). Game ports are port-forwarded by OPNsense.
 #
-# Disks: virtio0 is the root disk from the image; virtio1 is a separate data
-# disk mounted at /srv/pelican holding everything stateful (the panel's
-# .env, APP_KEY and SQLite database, wings' server volumes and backups), so
-# the VM can be rebuilt from a fresh image without touching game data.
+# Disks: virtio0 is the image's root disk; virtio1 is a data disk at
+# /srv/pelican holding everything stateful (panel .env/APP_KEY/SQLite,
+# wings' volumes and backups), so the VM can be rebuilt from a fresh image.
 #
-# Bring-up, in order. Steps 1-3 are on twm / in Infisical, before first boot:
+# Bring-up, in order. Steps 1-2 are on twm / in Infisical:
 #
 # 1. Infisical: create a `pelican` project and put its ID in
 #    `infisicalProject` below. Create the folders /pelican-panel and
@@ -42,7 +41,7 @@ let
   # null until step 5; until then only the panel runs.
   wingsNodeUuid = "90ee80c9-dedc-455c-8632-6cc431eb7917";
 
-  # TODO(step 1): Infisical project ID of the `pelican` project.
+  # Infisical project ID of the `pelican` project (step 1).
   infisicalProject = "73139db9-4682-48b6-8d71-5cb61fbd9683";
 
   panelUrl = "https://pelican.svc.lorscapa.com";
@@ -82,11 +81,10 @@ in
           net0 = "virtio=00:00:00:00:00:00,bridge=services,firewall=1";
         };
 
-        # Data disk. autoFormat makes a fresh ext4 on first boot and leaves
-        # an existing filesystem alone. Deliberately not `nofail`: that would
-        # let local-fs.target (and tmpfiles, which creates the panel's dirs)
-        # run before the mount and put state on the root disk. A missing disk
-        # drops boot into the emergency shell, reachable with `qm terminal 220`.
+        # Data disk; autoFormat only formats a blank disk. Deliberately not
+        # `nofail`: tmpfiles could then create the panel's dirs on the root
+        # disk before the mount. A missing disk drops boot into the
+        # emergency shell (`qm terminal 220`).
         fileSystems.${dataRoot} = {
           device = "/dev/vdb";
           fsType = "ext4";

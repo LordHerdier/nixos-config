@@ -17,11 +17,9 @@ let
       isWsl ? false,
       hostPath,
       extraModules ? [ ],
-      # Extra Home Manager users beyond charlotte, as
-      # username -> list of HM modules. charlotte is always
-      # configured from ./home/charlotte.nix + her per-host file;
-      # anyone here is configured purely from what's listed
-      # (so a full-stack user lists their per-host file too).
+      # Extra Home Manager users beyond charlotte, as username -> list of
+      # HM modules. Only what's listed is imported (so a full-stack user
+      # lists their per-host file too).
       extraHomeUsers ? { },
       # false for headless servers: no home-manager at all, so neither
       # charlotte's per-host home file nor extraHomeUsers is read.

@@ -1,9 +1,8 @@
 # modules/features/infisical-runner.nix — Infisical token refresh + secret injection
 #
 # NixOS port of inframanagement's playbooks/deployment/infisical_runner.yml,
-# so NixOS hosts pull runtime secrets from the same Infisical (10.0.10.5)
-# as the Ansible-managed fleet instead of growing a second secrets system.
-# Same shape as the Ansible version:
+# pulling runtime secrets from the same Infisical (10.0.10.5) as the
+# Ansible-managed fleet. Same shape:
 #
 #   /etc/infisical/service.env   machine-identity credentials, written by hand
 #                                (the Ansible Vault step's equivalent; see below)
@@ -12,11 +11,9 @@
 #   infisical-run <cmd>          `infisical run` with the token, refreshing it
 #                                first if it's over 50 minutes old
 #
-# Plus one thing the Ansible version doesn't need: `my.infisical.envFiles`,
-# which exports a folder of secrets to a dotenv file under /run before a
-# given systemd service starts and points the service's EnvironmentFile at
-# it — the shape NixOS service modules expect (services.newt,
-# oci-containers, ...). Re-exported every time the service (re)starts.
+# Plus `my.infisical.envFiles`: exports a secrets folder to a dotenv file
+# under /run before a service starts and sets it as that service's
+# EnvironmentFile. Re-exported on every (re)start.
 #
 # Bootstrap, once per host (the bit Ansible Vault does for other hosts):
 #   1. create a machine identity for the host in Infisical, with access to
@@ -29,9 +26,9 @@
 #        EOF
 #   3. systemctl start infisical-token && infisical-run env | grep -c .
 #
-# Note OPNsense's documented intent only allows DNS/NTP from vmbr20 into
-# infra; the Ansible-managed vmbr20 hosts that already use Infisical
-# (authentik, actual, ...) mean 10.0.10.5:8080 is reachable in practice.
+# OPNsense's documented intent only allows DNS/NTP from vmbr20 into infra,
+# but 10.0.10.5:8080 is reachable in practice (authentik, actual, ... on
+# vmbr20 already use it).
 
 {
   config,
@@ -232,10 +229,9 @@ in
     }
 
     {
-      # One oneshot exporter per env file. No RemainAfterExit: it goes back
-      # to inactive once done, so every (re)start of a consumer re-runs it
-      # and picks up rotated secrets. It Requires infisical-token (also a
-      # plain oneshot) for the same reason: always a fresh token.
+      # One oneshot exporter per env file. No RemainAfterExit, so every
+      # (re)start of a consumer re-runs it (and infisical-token) and picks
+      # up rotated secrets.
       systemd.services = lib.mkMerge (
         lib.mapAttrsToList (
           name: ef:

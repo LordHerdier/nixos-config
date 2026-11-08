@@ -22,8 +22,8 @@
   # WSL2 creates /dev/kvm with a GID that doesn't match NixOS's kvm group
   systemd.tmpfiles.rules = [ "z /dev/kvm 0660 root kvm -" ];
 
-  # WSL2 creates /dev/kvm well after systemd boots (and the tmpfiles rule above
-  # has already run), so keep its group correct once it appears
+  # WSL2 creates /dev/kvm after the tmpfiles rule above has run, so keep
+  # fixing its group once it appears
   systemd.services.kvm-device-group = {
     wantedBy = [ "multi-user.target" ];
     path = [ pkgs.coreutils ];

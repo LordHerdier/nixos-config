@@ -1,12 +1,8 @@
 # modules/features/syncthing.nix
 #
-# Syncs charlotte's ~/documents and ~/Pictures between every host that
-# imports this module and has an entry in allDevices (currently Index and
-# Apthos; Charlie-Laptop imports it too but has no entry, so it has no
-# peers and syncs nothing).
-#
-# hostName is used so each host only lists its *peers* as devices, never
-# itself.
+# Syncs charlotte's ~/documents and ~/Pictures between the hosts that import
+# this and have an entry in allDevices (Index, Apthos). Charlie-Laptop
+# imports it but has no entry, so it syncs nothing.
 
 { hostName, lib, ... }:
 
@@ -34,8 +30,7 @@ in
     dataDir = "/home/charlotte";
     configDir = "/home/charlotte/.config/syncthing";
 
-    # GUI only on localhost; reach it via `ssh -L 8384:localhost:8384` from
-    # elsewhere rather than exposing it on the tailnet.
+    # Localhost only; use `ssh -L 8384:localhost:8384` from elsewhere.
     guiAddress = "127.0.0.1:8384";
 
     settings = {

@@ -1,7 +1,6 @@
 # modules/users/rivian.nix
 #
-# Admin account mirroring charlotte's. Host-scoped on purpose — imported by
-# Index only, not by modules/common/users.nix, same as kiddo.
+# Admin account mirroring charlotte's. Imported by Index only, like kiddo.
 
 { pkgs, ... }:
 

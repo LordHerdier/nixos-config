@@ -13,26 +13,16 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
 
-    # Dedicated gamescope Steam session for a console-like experience.
-    # Registers a "Steam" Wayland session (share/wayland-sessions/steam.desktop)
-    # that display managers can launch. It runs:
-    #   gamescope --steam -- steam -tenfoot -pipewire-dmabuf
-    # i.e. Steam Big Picture inside gamescope as its own compositor.
-    # This also enables programs.gamescope (grants cap_sys_nice).
-    #
-    # Pine (SDDM) lists this automatically. Index (greetd + tuigreet) needs
-    # tuigreet pointed at the session dir to offer it — see hosts/Index.
+    # A "Steam" Wayland session (Big Picture inside gamescope). Also enables
+    # programs.gamescope, whose cap_sys_nice --rt uses. SDDM/GDM list it by
+    # themselves; Index's tuigreet is pointed at the session dir.
     gamescopeSession = {
       enable = true;
-      # --rt: realtime scheduling for smoother frame pacing (uses the
-      #       cap_sys_nice that programs.gamescope grants).
-      # --adaptive-sync: VRR / FreeSync / G-Sync passthrough on capable displays.
       args = [
         "--rt"
         "--adaptive-sync"
       ];
-      # Spawn the MangoHud overlay (mangoapp) with the session. It's off by
-      # default and toggled at runtime with Shift_R+F12 — not a rebuild.
+      # Spawn mangoapp with the session; the overlay starts hidden.
       env.STEAM_USE_MANGOAPP = "1";
     };
   };

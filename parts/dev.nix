@@ -1,6 +1,5 @@
 { inputs, ... }:
 {
-  # perSystem is where devShells/packages/checks/formatter go
   perSystem =
     { lib, pkgs, ... }:
     let
