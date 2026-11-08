@@ -106,7 +106,27 @@ in
           trustedProxies = [ caddyServices ];
           # Absent from Infisical on first boot, so the panel generates one;
           # once copied there (step 4) it's the source of truth.
-          secretEnvVars = [ "APP_KEY" ];
+          secretEnvVars = [
+            "APP_KEY"
+            # Proton SMTP submission token, Infisical /pelican-panel.
+            "MAIL_PASSWORD"
+          ];
+          # Proton Mail SMTP submission. Set here, so the panel's mail
+          # settings page can't override it.
+          environment = {
+            MAIL_MAILER = "smtp";
+            MAIL_HOST = "smtp.protonmail.ch";
+            MAIL_PORT = "587";
+            # Plain `smtp` + port 587 = STARTTLS (Symfony upgrades and
+            # verifies the cert). `smtps` would be implicit TLS, i.e. 465;
+            # the panel derives smtps from MAIL_ENCRYPTION=tls, so this
+            # is pinned explicitly.
+            MAIL_SCHEME = "smtp";
+            MAIL_USERNAME = "no-reply@lorscapa.com";
+            # Proton only sends as the authenticated address.
+            MAIL_FROM_ADDRESS = "no-reply@lorscapa.com";
+            MAIL_FROM_NAME = "Lorscapa Pelican";
+          };
         };
       }
     ]
