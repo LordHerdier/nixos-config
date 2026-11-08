@@ -274,6 +274,7 @@ static const Key keys[] = {
 
 	/* Launchers */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            SHCMD("wofi --show drun") },
+	{ MODKEY,                    XKB_KEY_slash,       spawn,            MODAL("binds") },
 	{ MODKEY,                    XKB_KEY_h,           spawn,            SHCMD("~/bin/binds-menu") },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_t,           spawn,            {.v = floatterm} },

@@ -33,12 +33,22 @@ let
       | grep -v 'skin tone' > $out
   '';
 
+  # "combo<TAB>action" for every bind in config.h's key table.
+  bindsList = pkgs.runCommand "dwl-binds-list" { nativeBuildInputs = [ pkgs.gawk ]; } ''
+    awk -f ${./scripts/dwl-binds.awk} ${../../../pkgs/dwl/config.h} > $out
+  '';
+
   scripts = lib.mapAttrs mkScript {
     airpods.deps = with pkgs; [
       jq
       libnotify
       librepods
     ];
+
+    binds = {
+      deps = with pkgs; [ fzf ];
+      env.DWL_BINDS_LIST = bindsList;
+    };
 
     bar-refresh.deps = [ pkgs.procps ];
 

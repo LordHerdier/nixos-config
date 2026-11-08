@@ -16,6 +16,7 @@ name=${1:-}
 
 case $name in
   # name             cols rows  command
+  binds)         set -- 100 30 dwl-binds ;;
   calendar)      set -- 66 11 dwl-calendar ;;
   clipboard)     set -- 120 30 dwl-clipboard ;;
   emoji)         set -- 80 24 dwl-emoji ;;
