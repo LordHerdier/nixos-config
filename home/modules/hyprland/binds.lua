@@ -28,7 +28,9 @@ local menu = ipc .. "panel-toggle launcher"
 
 -- Commands
 local colorpicker = "hyprpicker -qaf rgb"
-local lock = "qylock-lock"
+-- qylock-lock exists only on hosts that load modules/features/qylock.nix;
+-- elsewhere fall back to hypridle's lock_cmd (hyprlock) via logind.
+local lock = "sh -c 'command -v qylock-lock >/dev/null && exec qylock-lock || exec loginctl lock-session'"
 local screenshot = "hyprshot -z --mode region --output-folder ~/Pictures/Screenshots"
 local bindsMenu = "~/bin/binds-menu"
 
