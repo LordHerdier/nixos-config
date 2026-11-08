@@ -112,7 +112,9 @@ let
         "sound"
         "display"
         "appearance"
+        "input"
         "notifications"
+        "system"
       ];
       deps = with pkgs; [
         bluez
@@ -137,6 +139,7 @@ let
         scripts.modal
         scripts.nightlight
         scripts.powersave
+        scripts.xkb-switch
       ];
       env.DWL_THEMES = themes;
     };

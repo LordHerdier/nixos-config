@@ -146,7 +146,7 @@ index 420aa51..239d05d 100644
  void
  startdrag(struct wl_listener *listener, void *data)
  {
-@@ -4225,6 +4287,27 @@ xytonode(double x, double y, struct wlr_surface **psurface,
+@@ -4225,6 +4287,37 @@ xytonode(double x, double y, struct wlr_surface **psurface,
  	toplevel_from_wlr_surface(surface, pc, pl);
  }
  
@@ -154,18 +154,28 @@ index 420aa51..239d05d 100644
 +xkblayoutchanged(void)
 +{
 +	/* Write the active layout's name (e.g. "English (Colemak)") to
-+	 * $XDG_RUNTIME_DIR/dwl-xkb-layout for the status bar, then run
++	 * $XDG_RUNTIME_DIR/dwl-xkb-layout for the status bar and every layout's
++	 * name, in index order, to dwl-xkb-layouts for dwl-settings, then run
 +	 * xkblayoutcmd */
 +	struct wlr_keyboard *kb = &kb_group->wlr_group->keyboard;
 +	const char *name;
 +	char path[PATH_MAX];
 +	FILE *f;
++	xkb_layout_index_t i;
 +
 +	xkblayout = kb->modifiers.group;
 +	name = xkb_keymap_layout_get_name(kb->keymap, xkblayout);
 +	snprintf(path, sizeof(path), "%s/dwl-xkb-layout", getenv("XDG_RUNTIME_DIR"));
 +	if ((f = fopen(path, "w"))) {
 +		fprintf(f, "%s\n", name ? name : "");
++		fclose(f);
++	}
++	snprintf(path, sizeof(path), "%s/dwl-xkb-layouts", getenv("XDG_RUNTIME_DIR"));
++	if ((f = fopen(path, "w"))) {
++		for (i = 0; i < xkb_keymap_num_layouts(kb->keymap); i++) {
++			name = xkb_keymap_layout_get_name(kb->keymap, i);
++			fprintf(f, "%s\n", name ? name : "");
++		}
 +		fclose(f);
 +	}
 +	spawn(&(Arg){.v = xkblayoutcmd});

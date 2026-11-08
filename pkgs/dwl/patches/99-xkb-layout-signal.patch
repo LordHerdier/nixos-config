@@ -18,17 +18,36 @@ index ea7d1ea..9bc574e 100644
  	for (i = 0; i < NUM_LAYERS; i++)
  		layers[i] = wlr_scene_tree_create(&scene->tree);
  	drag_icon = wlr_scene_tree_create(&scene->tree);
-@@ -4394,6 +4396,16 @@ spawn(const Arg *arg)
+@@ -4394,6 +4396,35 @@ spawn(const Arg *arg)
  	}
  }
  
 +/* SIGUSR1 steps the layout forward, so the bar's click region can reach
-+ * switchxkblayout from a shell (dwl-xkb-switch) */
++ * switchxkblayout from a shell (dwl-xkb-switch). If
++ * $XDG_RUNTIME_DIR/dwl-xkb-set holds a layout index (dwl-settings' input
++ * page), it goes to that layout instead and the file is removed; an index
++ * that is out of range changes nothing */
 +int
 +sigswitchxkb(int signo, void *data)
 +{
++	struct wlr_keyboard *kb = &kb_group->wlr_group->keyboard;
++	int n = xkb_keymap_num_layouts(kb->keymap), want = -1, requested = 0;
++	char path[PATH_MAX];
++	FILE *f;
++
 +	(void)signo; (void)data;
-+	switchxkblayout(&(Arg){.i = +1});
++	snprintf(path, sizeof(path), "%s/dwl-xkb-set", getenv("XDG_RUNTIME_DIR"));
++	if ((f = fopen(path, "r"))) {
++		requested = 1;
++		if (fscanf(f, "%d", &want) != 1)
++			want = -1;
++		fclose(f);
++		unlink(path);
++	}
++	if (!requested)
++		switchxkblayout(&(Arg){.i = +1});
++	else if (want >= 0 && want < n && want != (int)kb->modifiers.group)
++		switchxkblayout(&(Arg){.i = ((want - (int)kb->modifiers.group) % n + n) % n});
 +	return 0;
 +}
 +
