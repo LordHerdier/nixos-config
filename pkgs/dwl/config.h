@@ -250,6 +250,13 @@ static const xkb_keysym_t lockedkeys[] = {
 	XKB_KEY_XF86AudioNext,
 	XKB_KEY_XF86MonBrightnessUp,
 	XKB_KEY_XF86MonBrightnessDown,
+	/* Super+= / Super+- / Super+Shift+= / Super+Shift+-. Matched by keysym
+	 * only, but a bind still needs its modifiers, so bare = and - still reach
+	 * the locker. */
+	XKB_KEY_equal,
+	XKB_KEY_minus,
+	XKB_KEY_plus,
+	XKB_KEY_underscore,
 };
 
 static const Key keys[] = {
@@ -376,6 +383,13 @@ static const Key keys[] = {
 	{ 0, XKB_KEY_XF86AudioNext,          spawn, SHCMD("playerctl next") },
 	{ 0, XKB_KEY_XF86MonBrightnessUp,    spawn, SHCMD("brightnessctl set 5%+; dwl-bar-refresh") },
 	{ 0, XKB_KEY_XF86MonBrightnessDown,  spawn, SHCMD("brightnessctl set 5%-; dwl-bar-refresh") },
+
+	/* Super+= / Super+- volume, Super+Shift+= / Super+Shift+- brightness. With
+	 * Shift held the keysyms are the shifted ones, plus and underscore. */
+	{ MODKEY,                    XKB_KEY_equal,       spawn,            SHCMD(VOLCMD("5%+")) },
+	{ MODKEY,                    XKB_KEY_minus,       spawn,            SHCMD(VOLCMD("5%-")) },
+	{ MODKEY|SHIFT,              XKB_KEY_plus,        spawn,            SHCMD("brightnessctl set 5%+; dwl-bar-refresh") },
+	{ MODKEY|SHIFT,              XKB_KEY_underscore,  spawn,            SHCMD("brightnessctl set 5%-; dwl-bar-refresh") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
