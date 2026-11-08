@@ -37,7 +37,7 @@
     ns = "nix shell";
     nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)";
     nix-update-dotfiles = "sudo nix flake lock --update-input dotfiles /etc/nixos";
-    nrb = "nix-rebuild";
+    nrb = "nh os switch /etc/nixos#$(hostname)";
 
     # Tools
     ls = "eza -gh --group-directories-first";
