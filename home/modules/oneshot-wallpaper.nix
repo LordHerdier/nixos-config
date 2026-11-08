@@ -3,18 +3,11 @@
 # The OneShot World Machine starfield wallpaper (pkgs/oneshot-wallpaper),
 # set as both the desktop background and the lock screen.
 #
-# picture-uri and picture-uri-dark both have to be set: GNOME picks
-# between them based on the interface color-scheme, and oneshot-gtk.nix
-# forces that to prefer-dark, so picture-uri alone would be ignored. The
-# file:// prefix is required -- these keys are URIs, not paths, and a
-# bare path is silently treated as "no wallpaper" rather than erroring.
+# picture-uri-dark is needed too: oneshot-gtk.nix sets prefer-dark. The
+# file:// prefix is required; a bare path silently means no wallpaper.
 #
-# primary-color is what shows through in the letterboxed areas if the
-# aspect ratio ever mismatches (the image is 1920x1080 and Apthos drives
-# a 4K display at 200%, so "zoom" scales it up rather than tiling); it
-# comes from the same palette the GTK theme is built from, so the
-# letterbox matches the desktop chrome instead of GNOME's default
-# blue-grey.
+# primary-color fills any letterboxing, from the same palette as the GTK
+# theme rather than GNOME's default blue-grey.
 
 {
   config,
@@ -34,10 +27,8 @@ in
   options.my.oneshot-wallpaper = {
     palette = mkOption {
       type = types.enum (lib.attrNames config.my.theme.palettes);
-      # Same reasoning as my.oneshot-gtk.palette: this is the rice's
-      # palette, not the system one. Kept as its own option rather than
-      # shared with the GTK module so neither import depends on the
-      # other.
+      # Pinned like my.oneshot-gtk.palette; separate so neither module
+      # depends on the other.
       default = "oneshot";
       description = "Which my.theme palette the letterbox fill comes from.";
     };

@@ -16,11 +16,9 @@
       desc = "Search & replace in project";
     }
     {
-      # Literal `:` rather than <cmd> so Vim prefixes the '<,'> range, which
-      # is what GrugFarWithin needs to scope itself to the selection.
-      #
-      # These two commands are also the only ones nvf lazy-loads grug-far on,
-      # so mapping GrugFarWithVisualSelection here would never load it.
+      # Literal `:` rather than <cmd> so Vim prefixes the '<,'> range
+      # GrugFarWithin needs. (nvf lazy-loads grug-far only on GrugFar and
+      # GrugFarWithin, so other commands wouldn't load it.)
       mode = "x";
       key = "<leader>sr";
       action = ":GrugFarWithin<CR>";

@@ -1,28 +1,22 @@
 -- home/modules/hyprland/binds.lua
 --
--- Keybinds, ported from the hyprlang `bind`/`bindm` lists. Written as
--- real Lua rather than Nix attrs because the `_args` + mkLuaInline
--- encoding home-manager needs for hl.bind() is unreadable at ~90 binds,
--- and because loops collapse the workspace and focus blocks. The
--- generated hypr/.luarc.json points lua_ls at Hyprland's own stubs, so
--- this file gets completion and type checking in nvim.
+-- Keybinds. Real Lua rather than Nix attrs: the `_args` + mkLuaInline
+-- encoding home-manager needs for hl.bind() is unreadable at this size,
+-- and loops collapse the workspace and focus blocks. The generated
+-- hypr/.luarc.json points lua_ls at Hyprland's stubs for completion.
 --
--- Everything here is resolved from PATH, exactly as the hyprlang version
--- was; nothing needs substituting from Nix.
+-- Commands are resolved from PATH (binds-menu from ~/bin); nothing is
+-- substituted from Nix.
 
 local mainMod = "SUPER"
 
 -- Noctalia shell IPC (routed through the shell for OSD feedback).
--- v5 replaced `noctalia-shell ipc call <namespace> <verb>` with a flat
--- `noctalia msg <verb>`, so the verbs below are nothing like the v4
--- ones; see https://docs.noctalia.dev/noctalia/ipc/.
+-- v5 verbs, see https://docs.noctalia.dev/noctalia/ipc/.
 local ipc = "noctalia msg "
 
--- Apps. browser, calculator, fileManager and mailApp were declared as
--- hyprlang variables but never actually bound, and music/fileManager
--- disagreed with the literals the binds used (spotify vs
--- spotify-launcher, nautilus vs thunar). Carried over verbatim so the
--- discrepancy stays visible rather than being silently resolved.
+-- Apps. browser, calculator, fileManager, mailApp and music are unused:
+-- the binds below use literals (zen-beta, nautilus, spotify) instead.
+-- Left as-is so the discrepancy stays visible.
 local browser = "zen"
 local calculator = "qalculate-gtk"
 local fileManager = "thunar"
@@ -75,11 +69,8 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("spotify"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(ipc .. "panel-toggle clipboard"))
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd(ipc .. 'panel-toggle launcher "/emo "'))
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(ipc .. "window-switcher"))
--- v4's "command" launcher mode has no v5 equivalent -- there is no
--- shell-command provider any more. Pointed at the Panels provider, which
--- is the nearest thing v5 has to a command palette: it fuzzy-matches
--- every registered panel and control-center tab. Retarget if you wanted
--- the run-a-command behaviour specifically; nothing built in offers it.
+-- Noctalia v5 has no run-a-command launcher mode; the Panels provider
+-- (fuzzy-matches panels and control-center tabs) is the nearest thing.
 hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.exec_cmd(ipc .. 'panel-toggle launcher "/pan "'))
 
 -- Noctalia panels & menus
@@ -122,22 +113,20 @@ for _, d in ipairs({
   hl.bind(mainMod .. " + " .. d[2], hl.dsp.focus({ direction = d[2] }))
 end
 
--- Workspaces. Keys 1-9 map to 1-9, key 0 to workspace 10; workspace 11
--- has a monitor rule in 20-monitors.nix but no bind, as before.
+-- Workspaces. Keys 1-9 map to 1-9, key 0 to workspace 10.
 for i = 1, 10 do
   local key = i % 10
   hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
   hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
--- Mouse binds, was `bindm`
+-- Mouse binds
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 hl.bind(mainMod .. " + SHIFT + mouse:272", hl.dsp.window.resize(), { mouse = true })
 
--- Hardware keys. `locked = true` is new: it lets volume and brightness
--- work while hyprlock is up, which the hyprlang binds could not express
--- and which matches Hyprland's own example config.
+-- Hardware keys. `locked = true` keeps volume and brightness working
+-- while the lock screen is up.
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. "volume-up 5"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. "volume-down 5"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. "volume-mute"), { locked = true })

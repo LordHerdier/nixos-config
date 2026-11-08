@@ -3,12 +3,11 @@
 # Git beyond gitsigns' gutter marks: a status/commit UI (neogit), diff and
 # history review (diffview), and conflict resolution (git-conflict).
 #
-# Deliberately NOT setting `vim.git.enable`, which is a suite switch that
-# would also drag in vim-fugitive, hunk-nvim, gitlinker and octo-nvim (the
-# last of which wants the `gh` CLI). The pieces are enabled individually.
+# Not `vim.git.enable`: that suite also pulls in vim-fugitive, hunk-nvim,
+# gitlinker and octo-nvim (which wants `gh`).
 #
-# Namespaces in use, none of which collide: gitsigns owns <leader>h* and
-# [c/]c, neo-tree owns <leader>ge, this file adds <leader>g* and <leader>c*.
+# Namespaces: gitsigns owns <leader>h* and [c/]c, neo-tree <leader>ge,
+# this file <leader>g* and <leader>c*.
 
 { ... }:
 
@@ -24,8 +23,7 @@
   config.vim.git.git-conflict = {
     enable = true;
 
-    # nvf's defaults have these two backwards ("]x" = prev, "[x" = next).
-    # Restore the usual vim direction: [ goes back, ] goes forward.
+    # nvf's defaults are backwards ("]x" = prev, "[x" = next).
     mappings = {
       prevConflict = "[x";
       nextConflict = "]x";
@@ -34,8 +32,7 @@
     };
   };
 
-  # diffview ships no mappings of its own; these are the commands nvf
-  # lazy-loads it on.
+  # diffview has no global mappings; nvf lazy-loads it on these commands.
   config.vim.keymaps = [
     {
       mode = "n";

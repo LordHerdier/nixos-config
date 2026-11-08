@@ -2,26 +2,17 @@
 #
 # https://extensions.gnome.org/extension/19/user-themes/
 #
-# GNOME Shell's own stylesheet ships inside a GResource bundle compiled
-# into gnome-shell, and nothing in Settings or dconf can point the Shell
-# at a different one -- org/gnome/desktop/interface accent-color only
-# picks one of nine fixed hues, and gtk-theme doesn't reach the Shell at
-# all. This extension is the supported way to override it: it looks for
-# `<dir>/<name>/gnome-shell/gnome-shell.css` under ~/.themes and every
-# XDG_DATA_DIRS entry's themes/ (so ~/.nix-profile/share/themes, where
-# a theme package in home.packages lands), and hands the match to
-# Main.setThemeStylesheet().
+# The supported way to replace GNOME Shell's compiled-in stylesheet. It
+# looks for `<name>/gnome-shell/gnome-shell.css` under ~/.themes and each
+# XDG_DATA_DIRS themes/ (so a theme package in home.packages works).
 #
-# Setting `name` to a theme that isn't installed is a silent no-op: the
-# extension logs "loading default theme (Adwaita)" and the Shell stays
-# stock. If a shell theme doesn't appear to apply, that journal line is
-# the first thing to check:
+# An uninstalled `name` silently logs "loading default theme (Adwaita)";
+# check for that first:
 #
 #   journalctl --user -b -u org.gnome.Shell@wayland.service | grep -i theme
 #
-# The theme name itself isn't set here -- whichever module ships the
-# theme package owns it, so the package and the name that selects it
-# stay in one place. On Apthos that's home/modules/oneshot-gtk.nix.
+# The theme name is set by whichever module ships the theme (on Apthos,
+# home/modules/oneshot-gtk.nix).
 
 {
   config,

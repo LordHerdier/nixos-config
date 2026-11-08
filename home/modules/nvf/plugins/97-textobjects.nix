@@ -1,15 +1,11 @@
 # home/modules/nvf/plugins/97-textobjects.nix
 #
-# Treesitter textobjects: operate on functions, classes and parameters as
-# units rather than by line count.
+# Treesitter textobjects: functions, classes, parameters and loops.
 #
-# The keymaps are written out by hand rather than handed to nvf's
-# `treesitter.textobjects.setupOpts`. That option predates the plugin's
-# rewrite: nvf feeds it to `require("nvim-treesitter.config").setup()`,
-# whose main-branch implementation is a plain tbl_deep_extend over
-# `{ install_dir }` -- the `textobjects` key is swallowed without error and
-# no mapping is ever created. Enabling the option is still worthwhile, as
-# that is what puts the plugin on the runtimepath.
+# Keymaps are set by hand: nvf feeds `treesitter.textobjects.setupOpts` to
+# nvim-treesitter's main-branch config.setup(), which silently ignores the
+# `textobjects` key. `enable` is still needed to put the plugin on the
+# runtimepath.
 #
 # Movement keys avoid [c/]c (gitsigns hunks) and [x/]x (git-conflict).
 
@@ -27,8 +23,7 @@
 
       textobjects.setup({
         select = {
-          -- Jump forward to the next match when the cursor is not already
-          -- inside one, so `cif` works from the blank line above a function.
+          -- Jump ahead to the next match, so `cif` works from above.
           lookahead = true,
         },
         move = { set_jumps = true },
@@ -37,10 +32,8 @@
       local select = require("nvim-treesitter-textobjects.select")
       local move = require("nvim-treesitter-textobjects.move")
 
-      -- Note: ../90-keymaps.nix maps `i` to `l` in visual and
-      -- operator-pending modes, which shadows bare inner-textobjects such as
-      -- `ciw`. These mappings are longer than that one key, so vim's
-      -- longest-match rule still resolves them correctly.
+      -- ../90-keymaps.nix maps `i` to `l` in visual mode; these longer
+      -- mappings still win by longest match, so `vif` works there.
       local objects = {
         f = "@function",
         c = "@class",

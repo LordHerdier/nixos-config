@@ -1,13 +1,13 @@
 # hypr-session start|stop
 #
-# Replaces home-manager's wayland.windowManager.hyprland.systemd hooks, which
-# stop and start hyprland-session.target unconditionally. That target
-# propagates its stop to graphical-session.target, so a Hyprland launched
-# next to another session (dwl on a different VT) tore the other session's
-# user services down, and overwrote the XDG_CURRENT_DESKTOP it had imported.
+# Replaces home-manager's hyprland.systemd hooks, which start/stop
+# hyprland-session.target unconditionally. Its stop propagates to
+# graphical-session.target, so a Hyprland next to another session (dwl on
+# another VT) tore that session's user services down and overwrote its
+# XDG_CURRENT_DESKTOP.
 #
-# Only the session that finds graphical-session.target down takes ownership,
-# and records itself in a marker file so only it stops the target on exit.
+# Only the session that finds graphical-session.target down takes
+# ownership, recorded in a marker file so only it stops the target.
 
 marker="${XDG_RUNTIME_DIR:?}/hypr-session-owner"
 

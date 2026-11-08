@@ -12,11 +12,7 @@
     ../modules/oneshot-wallpaper.nix
   ];
 
-  # Single 4K display (Sony TV over DP-1), captured by Sunshine for
-  # Moonlight streaming, wants 200% scaling. GNOME keeps its monitor
-  # layout/scaling in ~/.config/monitors.xml, keyed by the display's
-  # real EDID vendor/product/serial — there's no clean way to pre-seed
-  # that from Nix without those values, so set it by hand once in
-  # Settings > Displays after the first login; mutter writes the file
-  # itself from then on and it survives reboots/rebuilds.
+  # The 4K Sony TV on DP-1 (Sunshine-captured) wants 200% scaling. GNOME
+  # keys ~/.config/monitors.xml on the display's EDID, so set it once by
+  # hand in Settings > Displays after the first login; mutter persists it.
 }

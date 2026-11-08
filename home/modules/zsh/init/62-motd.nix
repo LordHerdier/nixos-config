@@ -1,9 +1,8 @@
 # home/modules/zsh/init/62-motd.nix
 #
-# Once-a-day MOTD that works in long-lived tmux sessions.
-# A precmd hook fires at the first prompt after any activity; if today's stamp
-# file is missing, it asks whether to show the MOTD. The stamp is written
-# *before* asking so concurrent shells/panes don't all prompt at once.
+# Once-a-day MOTD that works in long-lived tmux sessions: a precmd hook
+# asks at the first prompt of the day. A 30 s shared snooze is written
+# *before* asking so other panes don't all prompt at once.
 
 { lib, pkgs, ... }:
 

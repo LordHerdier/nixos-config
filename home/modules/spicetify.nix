@@ -1,28 +1,19 @@
 # home/modules/spicetify.nix
 #
-# The Spotify desktop client is a bundled Chromium app: it ignores the
-# GTK/Qt theme entirely, so the only way to color it is to patch its
-# `xpui` bundle. spicetify-nix does that at build time and hands back a
-# patched `spotify` derivation, which is the only route that works here
-# -- plain `spicetify apply` rewrites files inside the installed client,
-# and the store is read-only.
+# Spotify ignores GTK/Qt themes, so it's colored by patching its `xpui`
+# bundle; spicetify-nix does that at build time (`spicetify apply` can't
+# touch the read-only store).
 #
-# SCOPE: colors, nothing else. The upstream `theme` option stays at
-# spicetify's own `default`, which is a bare color.ini with no layout or
-# CSS changes, and `customColorScheme` merges a [custom] section into it
-# built from my.theme. Swapping in a real theme later is one line --
+# Colors only: `theme` stays at spicetify's bare `default`, and
+# `customColorScheme` merges a my.theme [custom] section into whichever
+# theme's color.ini is in play, so a real theme is a one-line swap:
 #
 #   programs.spicetify.theme =
 #     inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system}.themes.sleek;
 #
-# -- and the colors below keep applying, because they are merged into
-# whichever theme's color.ini is in play.
-#
-# VERSION COUPLING worth knowing before a flake update: the patched
-# build records the Spotify version it was built against, so the
-# spicetify-nix input and nixpkgs have to move roughly together. A
-# mismatch shows up as a blank or broken client window at runtime, not
-# as an eval failure.
+# VERSION COUPLING: spicetify-nix and nixpkgs' Spotify must move roughly
+# together; a mismatch shows as a blank/broken window at runtime, not an
+# eval failure.
 
 {
   config,
@@ -81,8 +72,7 @@ in
         card = noHash r.surfaceAlt;
         shadow = noHash p.bg;
 
-        # The now-playing row and the progress/volume bars, i.e. the two
-        # places Spotify normally spends its green.
+        # Where Spotify normally spends its green.
         selected-row = noHash r.accent;
         button = noHash r.accent;
         button-active = noHash r.accent;

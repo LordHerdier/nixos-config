@@ -1,10 +1,10 @@
 # home/modules/nvf/plugins/55-dap.nix
 #
-# Debugging. The adapters and per-filetype launch configurations come from
-# `vim.languages.enableDAP` in ../20-lsp.nix, not from here -- this module
-# only turns on nvim-dap itself and its UI.
+# Debugging. Adapters and launch configurations come from
+# `vim.languages.enableDAP` in ../20-lsp.nix; this only enables nvim-dap
+# and its UI.
 #
-# nvf's default mappings, all free in the colemak scheme:
+# nvf's default mappings:
 #   <leader>dc  continue / start      <leader>db  toggle breakpoint
 #   <leader>dR  restart               <leader>dq  terminate
 #   <leader>du  toggle dap-ui         <leader>dr  toggle REPL
@@ -22,8 +22,7 @@
 
     ui = {
       enable = true;
-      # Open the scopes/breakpoints/stacks panels on session start and tear
-      # them down on exit, rather than leaving them up permanently.
+      # Open the panels on session start, close them on exit.
       autoStart = true;
     };
   };

@@ -3,18 +3,12 @@
 # Test runner: run the test under the cursor, the file, or the suite, with
 # results in the sign column and failure output in a float.
 #
-# nvf has no neotest module -- there is nothing under modules/plugins for it
-# at all -- so this goes in through extraPlugins, the same route as
-# 45-zen-mode.nix and 50-peek.nix. extraPlugins is a DAG, so `after` is what
-# guarantees the adapters are on the runtimepath before neotest's setup runs.
+# nvf has no neotest module, so this uses extraPlugins; `after` makes sure
+# the adapters load before neotest's setup. plenary and nvim-treesitter
+# are already start plugins.
 #
-# neotest needs plenary and nvim-treesitter too; both are already start
-# plugins (plenary via neogit/diffview/telescope), so they are not repeated
-# here.
-#
-# Adapters are matched to the languages enabled in ../20-lsp.nix. nixpkgs
-# also carries neotest-bash, neotest-nix, neotest-go, neotest-rust,
-# neotest-jest, neotest-gtest and others if the set needs widening.
+# Adapters match the languages in ../20-lsp.nix; nixpkgs has more
+# (neotest-bash, -nix, -go, -rust, -jest, -gtest, ...).
 
 { pkgs, ... }:
 
@@ -42,8 +36,7 @@
         ''
           local adapters = {}
 
-          -- Skip an adapter rather than aborting the whole setup if it fails
-          -- to load; one broken adapter would otherwise take neotest with it.
+          -- Skip an adapter that fails to load rather than abort setup.
           local function add(name, opts)
             local ok, adapter = pcall(require, name)
             if not ok then
@@ -52,8 +45,7 @@
             table.insert(adapters, opts and adapter(opts) or adapter)
           end
 
-          -- justMyCode=false so breakpoints inside library code are honoured
-          -- when a test is debugged through nvim-dap (see 55-dap.nix).
+          -- justMyCode=false: honour breakpoints in library code under dap.
           add("neotest-python", { dap = { justMyCode = false } })
           add("neotest-plenary")
           add("neotest-vitest")
@@ -62,8 +54,7 @@
           require("neotest").setup({
             adapters = adapters,
             quickfix = {
-              -- Trouble is the diagnostics UI here; don't also hijack the
-              -- quickfix list on every run.
+              -- Trouble is the diagnostics UI; leave quickfix alone.
               enabled = false,
             },
           })
@@ -99,8 +90,7 @@
       desc = "Stop running test";
     }
     {
-      # Runs the nearest test under nvim-dap, reusing the adapters from
-      # ../20-lsp.nix rather than a separate debug configuration.
+      # Uses the DAP adapters from ../20-lsp.nix.
       mode = "n";
       key = "<leader>Td";
       action = "<cmd>lua require('neotest').run.run({ strategy = 'dap' })<CR>";

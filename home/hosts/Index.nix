@@ -13,8 +13,8 @@
   my.easyeffects.enable = true;
   my.easyeffects.presets.enable = true;
 
-  # Main GPG key for Index (uploaded to GitHub). This file is also imported by
-  # rivian (parts/hosts.nix), who doesn't have the key, hence the guard.
+  # Index's GPG key (uploaded to GitHub). rivian imports this file too
+  # (parts/hosts.nix) but doesn't have the key, hence the guard.
   programs.git.signing = lib.mkIf (config.home.username == "charlotte") {
     key = "1C58EC2D89AD092C";
     signByDefault = true;

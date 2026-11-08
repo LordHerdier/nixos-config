@@ -11,9 +11,8 @@ let
   p = theme.palette;
   r = theme.roles;
 
-  # fzf takes one flat --color argument. Spelled out rather than built
-  # with a helper because the mapping from fzf's slot names to our roles
-  # is the interesting part.
+  # Spelled out rather than via my.theme.lib.fzfColors so the slot ->
+  # role mapping is readable.
   fzfColors = lib.concatStringsSep "," [
     "bg:${r.surface}"
     "bg+:${r.surfaceAlt}"
@@ -64,10 +63,8 @@ in
     text = ''
       #!${pkgs.bash}/bin/bash
       PLAYER="spotify_player,spotify"
-      # Kept short on purpose: this chunk shares status-right with a
-      # neovim statusline (see ../nvf/plugins/96-tpipeline.nix), and the
-      # branch / line:col segments are the ones that get truncated away
-      # when the track title runs long.
+      # Short: it shares status-right with a neovim statusline (see
+      # ../nvf/plugins/96-tpipeline.nix).
       MAX_LEN=18
       status=$(${pkgs.playerctl}/bin/playerctl --player="$PLAYER" status 2>/dev/null)
       case "$status" in

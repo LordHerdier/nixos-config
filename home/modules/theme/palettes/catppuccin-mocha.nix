@@ -1,20 +1,13 @@
 # home/modules/theme/palettes/catppuccin-mocha.nix
 #
-# Catppuccin Mocha, as kitty was actually configured -- which is not
-# stock Mocha, and the differences are preserved here rather than
-# silently corrected, so adopting this file changes nothing:
+# Catppuccin Mocha as kitty was configured, which is not stock Mocha:
 #
-#   bg            #161926, not Mocha's base #1e1e2e. A hand-picked darker
-#                 blue-black.
+#   bg            #161926, not Mocha's base #1e1e2e (darker blue-black).
 #   selectionBg   #44475a is Dracula's selection, not Mocha's surface2.
 #   cursor/url/
-#   borderInactive  plain greys and a Windows-ish link blue, off-palette
-#                 entirely.
+#   borderInactive  plain greys and a Windows-ish link blue, off-palette.
 #
-# Those four are flagged rather than fixed because tokenizing is supposed
-# to surface them, not quietly rewrite how the terminal looks. They are
-# the obvious candidates to drop back onto palette colors once the
-# terminal/editor/TUI stack is unified.
+# Kept deliberately; candidates to move back onto palette colors.
 
 {
   name = "catppuccin-mocha";
@@ -51,7 +44,7 @@
     surface = "#45475a";
     surfaceAlt = "#585b70";
 
-    # off-palette holdovers from kitty.nix
+    # off-palette, see header
     borderInactive = "#777777";
     selectionBg = "#44475a";
     cursor = "#bbbbbb";

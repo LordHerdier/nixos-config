@@ -1,9 +1,9 @@
 # home/modules/wofi.nix
 #
-# Launcher styling from `my.theme` (see home/modules/theme). Only the
-# stylesheet and the drun defaults live here; the package is the system
-# one from modules/profiles/desktop-hyprland.nix, which is what the dwl
-# and Hyprland binds actually launch.
+# Launcher styling from `my.theme`. Only the stylesheet and drun defaults
+# live here; the package is the system one from
+# modules/profiles/desktop-hyprland.nix, which dwl's binds launch
+# (Hyprland uses noctalia's launcher).
 
 {
   config,
@@ -41,9 +41,9 @@ let
       ;
   };
 
-  # Following the runtime palette: the stylesheet names GTK colours
-  # (`@wofi_accent`) that the active palette's fragment defines. wofi reads
-  # its style each time it opens, so a switch needs no reload.
+  # Following the runtime palette: the stylesheet references GTK colours
+  # (`@wofi_accent`) defined by the active fragment. wofi re-reads its
+  # style on every open, so no reload hook.
   runtimeStyle =
     let
       names = lib.attrNames (colours theme);

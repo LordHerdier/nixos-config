@@ -3,8 +3,7 @@
 { ... }:
 
 {
-  # The binds themselves live in binds.lua -- see the header there for
-  # why they are not Nix attrs. home-manager writes it to
-  # ~/.config/hypr/binds.lua and generates the require() for it.
+  # Binds live in binds.lua (see its header); home-manager installs it
+  # as ~/.config/hypr/binds.lua and generates the require().
   wayland.windowManager.hyprland.extraLuaFiles."binds" = ./binds.lua;
 }

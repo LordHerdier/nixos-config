@@ -102,10 +102,9 @@ in
       }
     ];
 
-    # theme.toml — built from my.theme so it tracks the system palette.
-    # component_style below stays in spotify-player's own named-color
-    # terms (Magenta, Cyan, ...), which resolve through the palette above
-    # -- those are already role assignments, just spelled in ANSI names.
+    # theme.toml — from my.theme.default at build time (no runtime
+    # fragment). component_style names (Magenta, ...) resolve through
+    # this palette.
     themes = [
       {
         name = t.name;

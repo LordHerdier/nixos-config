@@ -1,4 +1,4 @@
-# home/modules/packages.nx
+# home/modules/packages.nix
 
 {
   pkgs,

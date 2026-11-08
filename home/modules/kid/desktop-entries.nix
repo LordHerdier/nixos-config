@@ -8,12 +8,9 @@
 
 {
   xdg.desktopEntries = {
-    # Steam's couch UI: huge tiles, controller-navigable, no desktop
-    # chrome. Plain `steam -tenfoot` rather than the gamescope session —
-    # nesting gamescope inside an existing GNOME Wayland session is a
-    # good way to get a black screen. The gamescope session is still
-    # there at the tuigreet prompt under F3 if you want the full
-    # console experience instead of GNOME.
+    # Big Picture via plain `steam -tenfoot`: nesting gamescope inside
+    # GNOME tends to give a black screen. The gamescope session is in
+    # tuigreet's F3 list instead.
     steam-big-picture = {
       name = "Games";
       comment = "Steam Big Picture";
@@ -25,8 +22,7 @@
       ];
     };
 
-    # One click straight to video, so she never has to type a URL or
-    # understand that Firefox and "videos" are different things.
+    # One click straight to video, no URL typing.
     kids-video = {
       name = "Videos";
       comment = "YouTube Kids";

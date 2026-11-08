@@ -1,23 +1,17 @@
 # home/modules/theme/palettes/kanagawa.nix
 #
-# Kanagawa (rebelot/kanagawa.nvim), dark. Transcribed verbatim from what
-# tmux and spotify-player were each carrying their own copy of, so
-# switching them onto this file is a no-op.
+# Kanagawa (rebelot/kanagawa.nvim), dark.
 #
-# The two sumiInk shades are the reason `surfaceAlt` is pinned below:
-# tmux uses sumiInk0 (#16161d) for the status bar and sumiInk4 (#2a2a37)
-# for pane borders, and neither is the brightBlack the generic role
-# default would pick.
+# `surface`/`surfaceAlt` are pinned to sumiInk0 (#16161d) and sumiInk4
+# (#2a2a37) rather than the role defaults (black/brightBlack).
 
 {
   name = "kanagawa";
   polarity = "dark";
 
-  # NOTE: green/brightGreen are swapped relative to upstream kanagawa's
-  # ANSI mapping, which has the bright slot (autumnGreen #76946a) darker
-  # than the base one (springGreen #98bb6c). Terminals and nightfox both
-  # expect bright to be the brighter of the pair, so the inversion read
-  # as a bug everywhere it showed up.
+  # NOTE: green/brightGreen are swapped relative to upstream kanagawa,
+  # whose bright slot (autumnGreen) is darker than the base
+  # (springGreen). Terminals and nightfox expect bright to be brighter.
 
   palette = {
     bg = "#1f1f28"; # sumiInk3
@@ -43,8 +37,7 @@
   };
 
   roles = {
-    # springBlue, not crystalBlue: this is the hue tmux already used for
-    # the active pane border, the current window and the clock.
+    # springBlue, not crystalBlue (tmux's long-standing accent hue).
     accent = "#7fb4ca";
     accentFg = "#16161d";
     border = "#7fb4ca";
@@ -52,14 +45,12 @@
     surface = "#16161d"; # status bar / popup background
     surfaceAlt = "#2a2a37"; # sumiInk4 -- inactive borders, fzf cursorline
 
-    # waveBlue2, which is what kanagawa.nvim itself uses for Visual. The
-    # generic role default would pick fujiGray, and a grey selection
-    # behind light text is unreadable.
+    # waveBlue2, kanagawa.nvim's own Visual. The role default (fujiGray)
+    # is unreadable behind light text.
     selectionBg = "#2d4f67";
 
-    # springGreen, not the base green the role default would take. A
-    # "this worked" marker wants the vivid green, and the green/
-    # brightGreen swap above moved that off the base slot.
+    # springGreen: the vivid green, which the swap above moved off the
+    # base slot the role default reads.
     success = "#98bb6c";
   };
 }

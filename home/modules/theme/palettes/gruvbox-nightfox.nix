@@ -1,20 +1,15 @@
 # home/modules/theme/palettes/gruvbox-nightfox.nix
 #
-# The gruvbox-derived palette nvf feeds to nightfox, transcribed from
-# home/modules/nvf/10-theme.nix.
+# The gruvbox-derived palette nvf's nightfox setup was written for.
+# Nightfox's base/bright pairs map onto the ANSI 16 one-to-one
+# (`red.base` = red, `red.bright` = brightRed; bg0/fg1 = bg/fg).
 #
-# Nightfox addresses colors as base/bright pairs, which maps onto the
-# ANSI 16 one-to-one -- `red.base` is `red`, `red.bright` is `brightRed`.
-# bg0/fg1 in nightfox's terms are bg/fg here.
+# Not gruvbox stock: bg is #181921 (cooler and darker than dark0
+# #282828) and several brights lean brighter/greener. Kept as-is.
 #
-# Two values are not gruvbox stock: bg is #181921 (a cooler, darker
-# background than gruvbox dark0 #282828) and several brights are pulled
-# toward brighter/greener variants. Kept as-is.
-#
-# brightBlack is gruvbox's own gray #928374. Nightfox was never given a
-# black.bright, so nothing reads this yet; it exists because the palette
-# schema requires all 16, and leaving it out would mean any future
-# consumer of this palette gets an eval error rather than a color.
+# brightBlack is gruvbox's gray #928374. nvf's nightfox palette doesn't
+# read it (paletteLua passes a single `black`), but the default roles
+# (muted, surfaceAlt, borderInactive, selectionBg) do.
 
 {
   name = "gruvbox-nightfox";
@@ -33,7 +28,7 @@
     cyan = "#689d6a";
     white = "#a89984";
 
-    brightBlack = "#928374"; # see header -- unused by nightfox
+    brightBlack = "#928374"; # see header
     brightRed = "#f42c3e";
     brightGreen = "#b8bb26";
     brightYellow = "#fabd2f";
@@ -44,7 +39,7 @@
   };
 
   roles = {
-    # The window separator color 10-theme.nix sets by hand.
+    # Neovim WinSeparator (10-theme.nix).
     border = "#458588";
     accent = "#458588";
   };

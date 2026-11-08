@@ -1,16 +1,10 @@
 # home/modules/tmux/30-colors.nix
 #
-# Colors come from `my.theme` (see home/modules/theme). The shell
-# variables below are kept as an indirection layer inside the generated
-# tmux.conf -- they make the `set -g` lines readable and they are named
-# for the role, not the hue, so swapping the palette does not leave the
-# config lying about what it is doing.
-#
-# Every color line lives in the `tmux` fragment (home/modules/theme/runtime.nix),
-# sourced from the active palette, so `theme-set` can recolour a running
-# server. What it leaves behind is layout. The status lines in
-# ./20-status-and-titles.nix reach the two colors they need through the
-# @tm_* user options the fragment sets, rather than through hex baked in.
+# Colors come from `my.theme`, via the `tmux` runtime fragment
+# (home/modules/theme/runtime.nix) so `theme-set` can recolour a running
+# server. The tm_* shell variables are named for the role, not the hue.
+# ./20-status-and-titles.nix reads its colors through the @tm_* user
+# options the fragment sets.
 
 {
   config,
@@ -20,18 +14,14 @@
 }:
 
 let
-  # Window labels. A focused neovim hands its whole lualine to this bar
-  # (see ../nvf/plugins/96-tpipeline.nix), which leaves the window list
-  # short of room, so while @nvim_active is set the labels drop their
-  # names and keep only the index. The bell/zoom markers survive both
-  # forms -- they are the part you cannot afford to miss.
+  # Window labels. While a focused neovim owns the bar (@nvim_active, see
+  # ../nvf/plugins/96-tpipeline.nix) labels shrink to the index; the
+  # bell/zoom markers survive both forms.
   markers = "#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}";
   gap = "#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}";
   named = " #I #W${gap}${markers} ";
   numbered = " #I${markers} ";
-  # Truthiness rather than `==` with 1: this reads correctly when the
-  # option is unset, 0, or 1, so a tmux that has never seen a neovim
-  # still gets full labels.
+  # Truthiness rather than `== 1`, so an unset option gives full labels.
   windowLabel = "#{?#{@nvim_active},${numbered},${named}}";
 
   colours =
@@ -50,8 +40,7 @@ let
       tm_accent_fg="${r.accentFg}"
       tm_attention="${p.yellow}"
 
-      # The status lines are laid out in ./20-status-and-titles.nix and
-      # read these as #{@tm_*} so the colors stay here.
+      # Read as #{@tm_*} by ./20-status-and-titles.nix.
       set -g @tm_surface "$tm_surface"
       set -g @tm_attention "$tm_attention"
       set -g @tm_magenta "${p.magenta}"
@@ -80,12 +69,9 @@ let
       setw -g window-status-activity-style "fg=default,bg=default,underscore"
       setw -g window-status-bell-style "fg=$tm_attention,bg=default,blink,bold"
 
-      # Both halves of the bar carry a neovim statusline (see
-      # ../nvf/plugins/96-tpipeline.nix), so their base style has to be the
-      # neutral one -- it is what `#[default]` resets back to after the
-      # session chunk, and painting the whole left yellow would bleed that
-      # colour across the embedded statusline. The session chunk therefore
-      # carries its colours inline in 20-status-and-titles.nix.
+      # Neutral base style: `#[default]` resets to it after the session
+      # chunk, and anything louder would bleed across the embedded neovim
+      # statusline. The session chunk carries its colours inline.
       set -g status-left-style "fg=$tm_muted,bg=$tm_surface"
       set -g status-right-style "fg=$tm_muted,bg=$tm_surface"
 
@@ -112,10 +98,8 @@ in
 
     source-file -q ${config.my.theme.runtime.active}/tmux.conf
 
-    # Declare the window-label flag off at source time. It is a session
-    # option, so it outlives the neovim that set it: without this reset
-    # a server that still remembers a long-gone neovim would keep the
-    # window list collapsed forever.
+    # Reset at source time: the option outlives the neovim that set it,
+    # and a stale 1 would keep the window list collapsed.
     set -g @nvim_active 0
 
     setw -g window-status-format "${windowLabel}"

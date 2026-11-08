@@ -1,28 +1,14 @@
 # home/modules/gnome-extensions/default.nix
 #
-# Plumbing for GNOME Shell extensions, plus one file per extension we
-# actually use. An extension needs three separate things to be live:
+# Plumbing for GNOME Shell extensions, plus one file per extension. A live
+# extension needs its package in home.packages, its UUID in org/gnome/shell
+# enabled-extensions, and disable-user-extensions off.
 #
-#   1. The package in home.packages, so the extension directory lands
-#      under ~/.nix-profile/share/gnome-shell/extensions, which is on
-#      XDG_DATA_DIRS and so is where gnome-shell looks for it.
-#   2. Its UUID listed in org/gnome/shell enabled-extensions. Shipping
-#      the files does nothing on its own -- the Shell only loads what
-#      this list names.
-#   3. disable-user-extensions off, which is the global kill switch for
-#      everything in that list.
-#
-# Steps 2 and 3 are the same two dconf keys for every extension, so they
-# can only be written once: two modules both defining
-# `dconf.settings."org/gnome/shell".enabled-extensions` is a conflict,
-# not a merge. That's what this file is for -- per-extension modules
-# append their package to `my.gnome-extensions.extensions` and leave the
-# shared keys alone.
-#
-# UUIDs come from the package itself (passthru.extensionUuid, set by
-# nixpkgs' buildGnomeExtension) rather than being written out by hand,
-# so there's no second place to update and no way to typo a UUID into a
-# silently-not-loaded extension.
+# Those two dconf keys are shared, and two modules setting
+# enabled-extensions conflict rather than merge -- so per-extension modules
+# append to `my.gnome-extensions.extensions` and this file writes the keys.
+# UUIDs come from passthru.extensionUuid (nixpkgs' buildGnomeExtension),
+# so they can't be typo'd.
 
 {
   config,
@@ -42,9 +28,7 @@ let
 
   cfg = config.my.gnome-extensions;
 
-  # Hand-packaged extensions (ones not generated from the e.g.o
-  # scrape) can lack extensionUuid; catch that at eval time instead of
-  # producing a broken enabled-extensions list.
+  # Hand-packaged extensions can lack extensionUuid; catch it at eval.
   missingUuid = filter (p: !(p ? extensionUuid)) cfg.extensions;
 in
 {

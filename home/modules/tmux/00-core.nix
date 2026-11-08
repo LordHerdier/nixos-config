@@ -3,11 +3,9 @@
 { lib, ... }:
 
 {
-  # Forward focus in/out to the running program. home-manager defaults
-  # this off. Neovim needs it to know it has stopped being the focused
-  # pane: without it a neovim that loses focus never clears its half of
-  # the status bar, and the @nvim_active flag that collapses the window
-  # list would latch on. See ../nvf/plugins/96-tpipeline.nix.
+  # Off by default in home-manager. Without focus events a neovim that
+  # loses focus never clears its half of the status bar and @nvim_active
+  # latches on. See ../nvf/plugins/96-tpipeline.nix.
   programs.tmux.focusEvents = true;
 
   programs.tmux.extraConfig = lib.mkAfter ''

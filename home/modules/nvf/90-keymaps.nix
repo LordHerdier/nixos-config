@@ -1,7 +1,6 @@
 # home/modules/nvf/90-keymaps.nix
 
-# Note: editing with nvim and auto formatter: might want to use
-# `:noautocmd w` since the formatting can get... weird with this one
+# Note: format-on-save mangles this file; save with `:noautocmd w`.
 
 { lib, ... }:
 
@@ -32,19 +31,13 @@ let
     }
   ];
 
-  # Horizontal movement deliberately skips operator-pending mode. There `i`
-  # and `a` introduce a textobject, so binding `i` -> `l` swallowed every
-  # inner textobject: `ciw` parsed as `cl` followed by a literal "w", and
-  # `ci(`, `yi{`, `di"` and friends were dead the same way. `a`-prefixed
-  # textobjects were unaffected, which is why `caw` kept working.
+  # Horizontal movement skips operator-pending mode: there `i` starts an
+  # inner textobject, and `i` -> `l` would turn `ciw` into `cl` + "w".
+  # (`dh` / `dl` still delete a character.)
   #
-  # Nothing is lost but `dn` / `di` (delete one character left/right);
-  # `dh` / `dl` still do that, since neither is mapped in this mode.
-  #
-  # Visual mode keeps the mapping on purpose, so `i` still extends a
-  # selection rightward. The cost is that `vi(` / `viw` stay unavailable --
-  # use the operator form (`ci(`) or the explicit treesitter textobjects
-  # from plugins/97-textobjects.nix instead.
+  # Visual mode keeps the mapping so `i` extends a selection rightward,
+  # at the cost of `vi(` / `viw` -- use `ci(` or the treesitter
+  # textobjects from plugins/97-textobjects.nix instead.
   horizontalMoves = [
     {
       key = "n";
@@ -58,9 +51,9 @@ let
     }
   ];
 
-  # "x" (Visual only), never "v": `:vmap` also covers Select mode, which is
-  # where luasnip parks the cursor after expanding a snippet. Mapping printable
-  # keys there makes `u`/`e`/`n`/`i` move instead of typing over the placeholder.
+  # "x" (Visual only), never "v": `:vmap` also covers Select mode, where
+  # luasnip parks the cursor on a placeholder, and u/e/n/i would move
+  # instead of typing over it.
   allModes = [
     "n"
     "x"
@@ -82,12 +75,9 @@ in
 
   config.vim = {
     keymaps = movementKeymaps ++ [
-      # vim-repeat defines its default maps lazily, in autoload/repeat.vim,
-      # the first time anything calls repeat#set (e.g. a snippet expansion).
-      # It guards them with hasmapto(), but we remap undo to `l`, so nothing
-      # referenced <Plug>(RepeatUndo) and it clobbered our `u` -> `k` with
-      # `nmap u <Plug>(RepeatUndo)`. These inert maps only exist so
-      # hasmapto() is true and vim-repeat leaves `u` / <C-r> alone.
+      # vim-repeat lazily maps `u` to <Plug>(RepeatUndo) on first
+      # repeat#set unless hasmapto() finds an existing map, clobbering
+      # `u` -> `k`. These inert maps make hasmapto() true.
       {
         mode = "n";
         key = "<Plug>(RepeatUndoGuard)";
@@ -211,8 +201,8 @@ in
         desc = "Visual select to end of line";
       }
 
-      # Explicit rather than relying on the builtin `gx`, which depended on
-      # netrw in older nvims. <cfile> keeps URL chars (?&=:%#) via 'isfname'.
+      # Explicit gx (the builtin once depended on netrw). <cfile> keeps URL
+      # chars (?&=:%#) via 'isfname'.
       {
         mode = "n";
         key = "gx";

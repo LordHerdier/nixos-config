@@ -1,20 +1,16 @@
 # home/modules/youtube-tui/default.nix
 #
-# youtube-tui (github.com/Siriusmart/youtube-tui): Colemak movement matching
-# nvf, kitty for anything that needs its own terminal, and mpv for playback
-# with yt-dlp reading YouTube cookies out of Firefox.
+# youtube-tui (github.com/Siriusmart/youtube-tui): Colemak movement, kitty
+# for anything that needs a terminal, mpv for playback with yt-dlp reading
+# cookies from Firefox.
 #
-# Colours come from my.theme, and follow `theme-set` (pywal included):
-# appearance.yml is a runtime fragment, see home/modules/theme/runtime.nix.
-# youtube-tui only reads it at startup; `:rc` re-reads it in a running one.
+# appearance.yml is a my.theme runtime fragment (pywal included), read at
+# startup; `:rc` re-reads it in a running instance.
 #
-# The managed files below are read-only store symlinks, so main.yml
-# sets `write_config: Dont`; otherwise youtube-tui tries to rewrite them on
-# every start. Anything not managed here (pages, search, cmdefine,
-# remaps) stays a normal file youtube-tui owns.
-#
+# Managed files are read-only symlinks, hence `write_config: Dont`.
+# Unmanaged ones (pages, search, cmdefine, remaps) stay youtube-tui's.
 # Careful: a file that fails to parse gets *renamed* to `<name>-<date>.yml`
-# and replaced with defaults, which would break the symlink.
+# and replaced with defaults, breaking the symlink.
 
 {
   config,
@@ -91,8 +87,8 @@ let
   # as a comment.
   renderAppearance = t: builtins.toJSON (appearance t) + "\n";
 
-  # Generated defaults were already sitting in ~/.config/youtube-tui, so
-  # take these paths over rather than tripping home-manager's clobber check.
+  # youtube-tui writes its own defaults on first run; take them over
+  # rather than tripping home-manager's clobber check.
   managed = src: {
     source = src;
     force = true;

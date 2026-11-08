@@ -6,10 +6,8 @@
   config.vim = {
     autocomplete.nvim-cmp.enable = true;
 
-    # Gates cmp's snippet support: nvf only registers the `luasnip` source and
-    # the cmp-luasnip plugin when this is on, so without it LSP completions
-    # that return snippet text insert literal $1/$0 placeholders instead of
-    # jumpable fields. Pulls friendly-snippets by default.
+    # Without it nvf registers no luasnip cmp source, and LSP snippet
+    # completions insert literal $1/$0 placeholders.
     snippets.luasnip.enable = true;
 
     lsp = {
@@ -30,19 +28,15 @@
       enableTreesitter = true;
       enableExtraDiagnostics = true;
 
-      # Per-language debug adapters *and* their launch configurations. The bare
-      # debugger.nvim-dap presets only register an adapter; this is what also
-      # fills in debugger.nvim-dap.configurations.<filetype>. Of the languages
-      # enabled below, python (debugpy) and clang (lldb) carry DAP support.
+      # Per-language debug adapters *and* launch configurations (bare
+      # nvim-dap presets only register adapters). Of the languages below,
+      # python (debugpy) and clang (lldb) have DAP support.
       enableDAP = true;
 
       assembly.enable = true;
       bash.enable = true;
-      # Previously disabled over a cpplint build failure. That no longer
-      # applies: clang's extraDiagnostics.types defaults to ["clangtidy"],
-      # and the cpplint preset is only switched on by naming it there, so
-      # pkgs.cpplint is never evaluated. Brings clangd, clang-format,
-      # clang-tidy, and -- via enableDAP above -- lldb for C/C++ debugging.
+      # cpplint (which once broke the build) is only pulled in if named in
+      # clang.extraDiagnostics.types; the default is clang-tidy only.
       clang.enable = true;
       cmake.enable = true;
       css.enable = true;

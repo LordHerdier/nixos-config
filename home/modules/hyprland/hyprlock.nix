@@ -7,8 +7,8 @@
     enable = true;
     extraConfig = ''
       # $foreground, $primary, $secondary, $tertiary and $error come from
-      # noctalia's current scheme -- see hyprlock-colors.nix, which
-      # regenerates this file before each lock.
+      # noctalia's current scheme (rendered by noctalia, seeded on a cold
+      # start by hyprlock-colors -- see hyprlock-colors.nix).
       source = ${config.my.hyprlock-colors.file}
 
       background {

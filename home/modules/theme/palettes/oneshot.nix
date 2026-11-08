@@ -4,16 +4,12 @@
 # pkgs/oneshot-gtk-theme: pure black surfaces, one saturated purple, no
 # gradients, inverted selection. Values read off the stylesheets.
 #
-# This is a UI-chrome palette, not a terminal one -- nothing in the
-# OneShot rice colors a terminal. The game UI has exactly one hue, so the
-# ANSI slots are collapsed onto the accent, which is the same choice
-# gtk-3.0/gtk.css already makes for success/warning/error. The `roles`
-# below are the part that actually carries meaning here.
+# A UI-chrome palette: the game UI has one hue, so the ANSI slots
+# collapse onto the accent and the `roles` carry the meaning.
 #
-# Consumed by home/modules/oneshot-gtk.nix and oneshot-wallpaper.nix,
-# which hand these six values to pkgs/oneshot-gtk-theme. The six that
-# matter are bg, fg, accent, accentDim, accentMuted (muted) and
-# surfaceAlt -- those are every distinct color the stylesheets use.
+# Consumed by oneshot-gtk.nix, oneshot-wallpaper.nix and
+# oneshot-console.nix. The stylesheets use six colors: bg, fg, accent,
+# accentDim, muted and surfaceAlt.
 
 {
   name = "oneshot";

@@ -1,8 +1,8 @@
 # home/rivian.nix
 #
 # Same desktop/shell stack as charlotte (home/desktop-user.nix), under
-# rivian's own identity. The per-host file (home/hosts/Index.nix) is listed
-# alongside this one in flake.nix, since only charlotte gets it implicitly.
+# rivian's own identity. home/hosts/Index.nix is listed alongside this in
+# parts/hosts.nix, since only charlotte gets her per-host file implicitly.
 
 { ... }:
 

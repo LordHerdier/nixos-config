@@ -3,29 +3,23 @@
 # `my.theme` -- one place that owns the colors, so an app module says
 # "the accent" instead of "#7fb4ca".
 #
-# SCOPE. This governs the terminal/editor/TUI stack and the GTK theme.
-# It deliberately does NOT govern the Hyprland desktop: noctalia derives
-# its colors from the wallpaper at runtime, and that is the source of
-# truth there. Two exceptions, both because noctalia cannot reach them:
-# a cold start -- see home/modules/hyprland/hyprlock-colors.nix, which
-# falls back to this palette only until noctalia has written its colors
-# once -- and the window border colors in
-# home/modules/hyprland/40-design.nix, which are declared from the
-# `border`/`accentDim`/`borderInactive` roles outright.
+# SCOPE. Terminal/editor/TUI stack and the GTK theme, not the Hyprland
+# desktop: noctalia derives those colors from the wallpaper at runtime.
+# Two exceptions noctalia can't reach: hyprlock's cold-start fallback
+# (hyprland/hyprlock-colors.nix) and the window borders
+# (hyprland/40-design.nix).
 #
-# WHAT A CONSUMER READS. `my.theme.palettes.<name>` is a resolved theme:
+# `my.theme.palettes.<name>` is a resolved theme:
 #
 #   .palette   the 16 ANSI colors plus bg/fg, lowercase #rrggbb
-#   .roles     semantic slots, role defaults derived from the palette and
-#              overridden where a palette has an opinion
-#   .name      the upstream theme's name, for apps that select by string
+#   .roles     semantic slots, derived from the palette unless the
+#              palette overrides them
+#   .name      upstream theme name, for apps that select by string
 #              (spotify-player's theme=, BAT_THEME, ...)
 #   .polarity  "dark" | "light"
 #
-# WHICH palette a consumer gets is per-app, defaulting to
-# `my.theme.default`. That indirection is not ceremony: any app can
-# pin its own palette (my.kitty.palette, my.nvim.palette) without
-# touching how the others look.
+# Each app reads `my.theme.default` unless it pins its own palette
+# (my.kitty.palette, my.nvim.palette).
 
 { config, lib, ... }:
 
@@ -42,10 +36,9 @@ in
 {
   imports = [ ./runtime.nix ];
 
-  # dwl is a system feature (modules/features/dwl) that keeps its own
-  # runtime colours; hand it the palette through its switcher. Not on
-  # PATH outside a dwl host, which is fine. wal has no named palette, so
-  # dwl is given the colours file (dwl-colors fragment, modules/features/dwl).
+  # dwl (modules/features/dwl) keeps its own runtime colours; hand it the
+  # palette through its switcher, which only exists on dwl hosts. wal has
+  # no named palette, so dwl gets the dwl-colors fragment file instead.
   config.my.theme.fragments.dwl.reload = ''
     if command -v dwl-theme >/dev/null; then
       if [ "''${THEME_NAME:-}" = wal ]; then
@@ -68,11 +61,8 @@ in
     };
 
     palettes = mkOption {
-      # Loosely typed on purpose. A submodule here would mean restating
-      # the 18 palette keys and 14 role keys in the type, in a module
-      # that already validates them: mkTheme asserts on a missing or
-      # misspelled key and names it. Palettes are data files, not
-      # user-facing configuration.
+      # Loosely typed on purpose: mkTheme already asserts on missing or
+      # misspelled palette keys, so a submodule would only restate them.
       type = types.attrsOf types.attrs;
       default = mapAttrs (_: themeLib.mkTheme) (import ./palettes);
       defaultText = "all palettes under home/modules/theme/palettes";

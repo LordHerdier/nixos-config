@@ -1,8 +1,7 @@
 # home/profiles/kid.nix
 #
-# Everything that makes the GNOME session kid-usable. Kept as its own
-# profile (rather than hung off desktop-hyprland) so the two desktops
-# never share state.
+# Everything that makes the kid's GNOME session usable. Separate from the
+# desktop profiles so her session shares no state with them.
 
 { ... }:
 

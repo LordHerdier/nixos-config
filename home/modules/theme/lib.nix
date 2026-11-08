@@ -1,22 +1,15 @@
 # home/modules/theme/lib.nix
 #
-# Pure helpers behind `my.theme`. Deliberately takes only `lib`, no `pkgs`
-# and no module-system `config`, so the palette files and the role
-# derivation can also be imported directly from a derivation in pkgs/
-# (which is what the GTK stylesheet substitution will need).
+# Pure helpers behind `my.theme`. Takes only `lib` (no `pkgs`, no module
+# `config`) so it can also be imported from outside the module system.
 #
-# Two layers, and the split is the whole point of this module:
+# Two layers, deliberately kept apart:
 #
-#   palette  the 16 ANSI colors plus bg/fg. What a terminal, a TUI or a
-#            colorscheme plugin wants, because those address colors by
-#            index or by ANSI name.
-#   roles    semantic slots -- accent, border, selection, ... What UI
-#            chrome wants, because "the accent" is a job, not a hue.
-#
-# Collapsing the two is what makes this kind of refactor rot: an app that
-# wants "the active border color" should not have to know that it happens
-# to be the palette's blue in one theme and an off-palette mauve in
-# another.
+#   palette  the 16 ANSI colors plus bg/fg -- what terminals, TUIs and
+#            colorscheme plugins address by index or ANSI name.
+#   roles    semantic slots (accent, border, selection, ...) -- what UI
+#            chrome wants. An app asking for "the active border" shouldn't
+#            need to know it's blue in one theme and mauve in another.
 
 { lib }:
 
@@ -116,11 +109,8 @@ let
       in
       "rgba(${toString c.r}, ${toString c.g}, ${toString c.b}, ${toString alpha})";
 
-    # Linear blend of two colors in sRGB. `t` is how much of `b` to take,
-    # so `mix accent bg 0.5` is the accent halfway to the background.
-    # Crude -- blending in sRGB rather than a perceptual space -- but it
-    # is enough for the one thing it is used for, which is deriving a
-    # dimmed accent for palettes that do not name one.
+    # Linear sRGB blend; `t` is how much of `b` to take. Crude, but it
+    # only derives accentDim for palettes that don't name one.
     mix =
       a: b: t:
       let
@@ -155,9 +145,8 @@ let
     # different ways in two apps stops being two different strings.
     normalize = hex: "#${self.noHash hex}";
 
-    # Role defaults, derived from the palette. Every one of these is
-    # overridable per palette -- they are a sane starting point, not a
-    # claim that e.g. the accent is always the blue.
+    # Role defaults, derived from the palette; each is overridable per
+    # palette via `roles`.
     defaultRoles =
       p:
       let
@@ -169,10 +158,8 @@ let
         surfaceAlt = p.brightBlack;
         muted = p.brightBlack;
         accentFg = p.black;
-        # A dimmed/pressed variant of the accent. Derived rather than
-        # pulled from a palette slot, because none of the ANSI 16 is
-        # "the accent, but quieter" -- a palette that cares should name
-        # it.
+        # No ANSI slot is "the accent, but quieter"; a palette that cares
+        # should name it.
         accentDim = self.mix accent p.bg 0.5;
         border = p.blue;
         borderInactive = p.brightBlack;
@@ -208,12 +195,9 @@ let
         inherit palette roles;
       };
 
-    # GNOME 47+ exposes its accent as a nine-value enum, not free-form
-    # hex, so a tokenized accent has to be mapped onto the nearest of
-    # them. Reference values are libadwaita's own accent definitions
-    # (src/stylesheet/_colors.scss). Nearest by squared distance in
-    # sRGB -- not perceptually correct, but the candidates are far
-    # enough apart in hue that it does not matter.
+    # GNOME 47+ accent is a nine-value enum, not free-form hex, so map
+    # onto the nearest one (libadwaita's src/stylesheet/_colors.scss
+    # values; squared sRGB distance is fine, they're far apart in hue).
     gnomeAccents = {
       blue = "#3584e4";
       teal = "#2190a4";

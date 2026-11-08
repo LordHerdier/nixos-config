@@ -3,15 +3,12 @@
 { ... }:
 
 {
-  # Everything that was a top-level hyprlang section now lives under
-  # `config`, which the modules merge into a single hl.config({ ... })
-  # call. See 40-design.nix for the rest of it.
+  # `settings.config` sections from every module merge into a single
+  # hl.config({ ... }) call; see also 40-design.nix.
   wayland.windowManager.hyprland.settings.config = {
     input = {
-      # Two layouts so the layout toggle in binds.lua can cycle between
-      # them with `hyprctl switchxkblayout`; Colemak first, so it is
-      # what you get at login. A single layout would leave nothing to
-      # switch to.
+      # Colemak (first, so it's the login default) and QWERTY, for the
+      # Super+Alt+K `switchxkblayout` toggle in binds.lua.
       kb_layout = "us,us";
       kb_variant = "colemak,";
       kb_rules = "";

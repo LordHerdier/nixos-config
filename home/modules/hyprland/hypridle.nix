@@ -3,12 +3,11 @@
 { config, pkgs, ... }:
 
 let
-  # Screen power goes through wlr-output-power-management rather than
-  # `hyprctl dispatch dpms`: hypridle also runs under dwl (it hangs off
-  # graphical-session.target in both sessions), which hyprctl can't reach,
-  # and Hyprland implements the protocol too. wlopm talks to the compositor
-  # on hypridle's own WAYLAND_DISPLAY, so it can't be pointed at the wrong
-  # session by stale environment left in the shared user manager.
+  # wlopm (wlr-output-power-management) rather than `hyprctl dispatch
+  # dpms`: hypridle also runs under dwl (both sessions start
+  # graphical-session.target), and wlopm talks to the compositor on
+  # hypridle's own WAYLAND_DISPLAY, so stale environment in the shared
+  # user manager can't point it at the wrong session.
   dpms = state: "${pkgs.wlopm}/bin/wlopm --${state} '*'";
 in
 {
@@ -16,12 +15,9 @@ in
     enable = true;
     settings = {
       general = {
-        # noctalia renders the generated color file itself now (see
-        # hyprlock-colors.nix), so this is only the guard against it not
-        # existing at all -- a host where noctalia has never run, where
-        # `source`-ing it would otherwise stop hyprlock from coming up.
-        # It is a no-op once the file is there, and runs before the
-        # `pidof` guard so a lock cannot race the seeding.
+        # hyprlock-colors seeds the color file if noctalia has never
+        # rendered it (else hyprlock won't start); a no-op otherwise. Runs
+        # before the `pidof` guard so a lock can't race the seeding.
         lock_cmd = [
           "${config.my.hyprlock-colors.package}/bin/hyprlock-colors; pidof hyprlock || hyprlock"
           "pidof mpvpaper || mpvpaper"

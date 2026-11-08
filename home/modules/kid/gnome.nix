@@ -9,25 +9,20 @@ let
   inherit (lib.hm.gvariant) mkArray mkTuple mkUint32;
 in
 {
-  # dash-to-dock is the one extension worth the upgrade-breakage risk
-  # disable-user-extensions otherwise guards against: it pins the dash
-  # to the desktop as a persistent taskbar, which is easier for her to
-  # navigate than diving into the Activities overview each time.
+  # dash-to-dock: a persistent taskbar is easier for her than the
+  # Activities overview, and worth the extension-breakage risk. Not via
+  # ../gnome-extensions, which only the desktop-gnome profile imports.
   home.packages = [ pkgs.gnomeExtensions.dash-to-dock ];
 
   dconf.settings = {
-    # The single most important setting in this file. The system default
-    # is colemak (services.xserver.xkb.variant in desktop-common.nix),
-    # which a six-year-old learning to read cannot use. GNOME takes its
-    # layout from dconf rather than the X server defaults, so this gives
-    # her plain QWERTY inside her session only.
+    # Most important setting here: the system default is colemak
+    # (xkb.variant in modules/profiles/desktop-common.nix). GNOME takes its
+    # layout from dconf, so this gives her QWERTY in her session only.
     #
-    # NOTE: this does NOT defeat kmonad. kmonad remaps the built-in
-    # laptop keyboard at the evdev layer, below X/Wayland, so the
-    # built-in keys stay colemak-with-homerow-mods no matter what dconf
-    # says. kmonad grabs specific boards only (the built-in one, a SEM
-    # USB keyboard and the Keychron K6; see modules/common/kmonad), so
-    # any other external keyboard is untouched and will be true QWERTY.
+    # NOTE: kmonad remaps at the evdev layer, so the built-in keyboard,
+    # the SEM USB keyboard and the Keychron K6 (modules/common/kmonad)
+    # stay colemak-with-homerow-mods regardless. Other keyboards get
+    # true QWERTY.
     "org/gnome/desktop/input-sources" = {
       sources = mkArray "(ss)" [
         (mkTuple [
@@ -39,16 +34,14 @@ in
     };
 
     "org/gnome/desktop/interface" = {
-      # Bigger everything. 1.25 is a real readability win at her age
-      # without breaking app layouts the way 1.5 starts to.
+      # 1.25: readable without breaking layouts the way 1.5 does.
       text-scaling-factor = 1.25;
       cursor-size = 32;
       clock-format = "12h";
       clock-show-weekday = true;
       color-scheme = "prefer-dark";
       enable-animations = true;
-      # No hot corner: brushing the top-left by accident and having the
-      # screen fly apart is confusing.
+      # Accidental hot-corner overviews are confusing.
       enable-hot-corners = false;
     };
 
@@ -61,8 +54,7 @@ in
         "tuxpaint.desktop"
         "org.gnome.Nautilus.desktop"
       ];
-      # She has no way to install extensions herself; this only lets
-      # dash-to-dock (configured below) run, not anything of her own.
+      # Only dash-to-dock; she can't install extensions herself.
       disable-user-extensions = false;
       enabled-extensions = [ "dash-to-dock@micxgx.gmail.com" ];
     };
@@ -75,9 +67,7 @@ in
       intellihide = false;
     };
 
-    # One workspace. Dynamic workspaces are the most common way to
-    # "lose" a window — you swipe, everything is gone, and there's no
-    # obvious way back.
+    # One workspace: dynamic ones are the easiest way to "lose" a window.
     "org/gnome/mutter" = {
       dynamic-workspaces = false;
       workspaces-only-on-primary = true;
@@ -87,8 +77,7 @@ in
       button-layout = "appmenu:close";
     };
 
-    # Never lock. If the screen locks mid-cartoon she needs an adult to
-    # type a password, which defeats the point of the account.
+    # Never lock: unlocking would need an adult.
     "org/gnome/desktop/screensaver" = {
       lock-enabled = false;
       idle-activation-enabled = false;
@@ -115,8 +104,7 @@ in
     };
     "org/gnome/nautilus/icon-view".default-zoom-level = "large";
 
-    # Search is a fast route to parts of the system she has no business
-    # in; keep it to apps and files.
+    # Keep search to apps and files.
     "org/gnome/desktop/search-providers".disabled = [
       "org.gnome.Software.desktop"
       "org.gnome.Settings.desktop"

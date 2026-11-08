@@ -1,26 +1,16 @@
 # home/modules/zen-browser/default.nix
 #
-# Zen Browser via the home-manager module from
-# github:0xc000022070/zen-browser-flake. The module is a reskin of
-# home-manager's mkFirefoxModule, so anything that works for
-# programs.firefox generally works here too.
+# Zen Browser via github:0xc000022070/zen-browser-flake's home-manager
+# module, built on home-manager's mkFirefoxModule (programs.firefox
+# options generally apply). Files are split by config domain:
 #
-# The files below are split by the config domain the upstream README
-# uses, because the domains are stored differently and have different
-# override semantics:
+#   10-policies.nix   policies.json  -- enforced, user can't change it
+#   20-settings.nix   prefs.js       -- defaults, user can change them
 #
-#   10-policies.nix   policies.json  -- enforced, the user cannot change it
-#   20-settings.nix   prefs.js       -- defaults, the user can change them
-#
-# Everything else is profile state the module writes into the profile
-# directory, or into zen-sessions.jsonlz4 / the other lz4 state files.
-#
-# STATE FILES. spaces, pins, containers, keyboardShortcuts,
-# extensionButtons, liveFolders and spaceRouting are written into
-# compressed state files that Zen holds open while it runs. Close Zen
-# before `nixos-rebuild switch` when any of those are declared;
-# activation warns and skips otherwise (the switch itself still
-# succeeds).
+# The rest is profile state. spaces, pins, containers, keyboardShortcuts,
+# extensionButtons, liveFolders and spaceRouting go into state files Zen
+# holds open while running: close Zen before a switch when any are
+# declared, or activation warns and skips them (the switch succeeds).
 { inputs, ... }:
 
 {

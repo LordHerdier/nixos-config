@@ -61,11 +61,8 @@ in
     configType = "lua";
     systemd.enable = false;
 
-    # Was `settings.exec-once`, which has no Lua equivalent: startup
-    # commands are a subscription to the hyprland.start event. A list
-    # rather than an attrset because home-manager emits its own
-    # hl.on("hyprland.start", ...) for the systemd/D-Bus activation
-    # environment, and both have to coexist.
+    # Each entry renders one hl.on(event, fn) call. hypr-session stands in
+    # for home-manager's systemd start/stop hooks (systemd.enable = false).
     settings.on = [
       {
         _args = [
@@ -95,8 +92,6 @@ in
               -- gnome-keyring is started by PAM at login via
               -- services.gnome.gnome-keyring.enable (system config).
 
-              -- Was `sleep 2 && <abs path to kitty>`: a real timer, and
-              -- kitty off PATH now that no shell is in the way.
               hl.timer(function()
                 hl.exec_cmd("kitty zsh -i -c t")
               end, { timeout = 2000, type = "oneshot" })

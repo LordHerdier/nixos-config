@@ -22,38 +22,30 @@ in
     my.gnome-extensions.extensions = [ pkgs.gnomeExtensions.dash-to-dock ];
 
     dconf.settings."org/gnome/shell/extensions/dash-to-dock" = {
-      # Position and reach: a full-width bar glued to the bottom edge
-      # (panel mode), with the icons themselves centred rather than
-      # left-aligned. always-center-icons only has an effect while
-      # extend-height is on.
+      # Full-width bottom panel, icons centred (always-center-icons only
+      # applies with extend-height).
       dock-position = "BOTTOM";
       extend-height = true;
       always-center-icons = true;
       multi-monitor = true;
 
-      # Visibility. dock-fixed keeps it on screen; intellihide is what
-      # pulls it out of the way of a window that would overlap it.
       dock-fixed = true;
       autohide = false;
       intellihide = true;
 
-      # Icons. 32px is a cap, not a fixed size — the dock still shrinks
-      # icons below this when the dash outgrows the screen width.
+      # A cap; icons still shrink when the dash outgrows the screen.
       dash-max-icon-size = 32;
       custom-theme-shrink = true;
 
       show-favorites = true;
       show-running = true;
 
-      # The overview is still the way to find an app that isn't pinned,
-      # so keep it on login rather than dropping straight to a bare
-      # desktop. The key is phrased negatively in the schema.
+      # Keep the overview on login: it's how to reach unpinned apps.
       disable-overview-on-startup = false;
 
       scroll-action = "switch-workspace";
 
-      # Per-window counter under each icon instead of the single default
-      # dot, so the dock shows how many windows an app has open.
+      # One segment per open window instead of a single dot.
       custom-theme-customize-running-dots = true;
       running-indicator-style = "SEGMENTED";
 

@@ -5,10 +5,8 @@
 let
   cursorSize = 32;
 
-  # The desktop's colors are noctalia's at runtime, but the window border
-  # is not something noctalia can reach -- see the README's theme note.
-  # So it is the one piece of Hyprland chrome that is declared, and it is
-  # declared from `my.theme` rather than from literals.
+  # Desktop colors are noctalia's at runtime, but it can't reach the
+  # window border, so that is declared from `my.theme`.
   r = config.my.theme.active.roles;
   inherit (config.my.theme.lib) rgbaCsv;
 in
@@ -25,8 +23,7 @@ in
   };
 
   wayland.windowManager.hyprland.settings = {
-    # hl.env takes the name and value as two arguments, so each entry is
-    # an `_args` list rather than the old "NAME,VALUE" string.
+    # hl.env takes name and value as two arguments, hence `_args`.
     env = [
       {
         _args = [
@@ -54,9 +51,8 @@ in
       }
     ];
 
-    # `bezier = "myBezier, 0, 1, 0.18, 1.0"` -- the four numbers were the
-    # two control points, which are now an explicit list of pairs.
-    # hl.curve can also take `type = "spring"`, which hyprlang could not.
+    # Bezier control points (0,1) and (0.18,1.0). hl.curve also accepts
+    # `type = "spring"`.
     curve = [
       {
         _args = [
@@ -78,7 +74,6 @@ in
       }
     ];
 
-    # Was "NAME, ONOFF, SPEED, CURVE[, STYLE]" per line.
     animation = [
       {
         leaf = "windows";
@@ -127,15 +122,9 @@ in
         gaps_out = 10;
         border_size = 4;
 
-        # The quoted dotted keys are gone: col is a real nested table, and
-        # a gradient is { colors, angle } instead of the hyprlang
-        # "rgba(..) rgba(..) 120deg" string -- which is what lets the
-        # roles below be dropped in with no string assembly.
-        #
-        # The gradient runs `border` -> `accentDim`, i.e. the border hue
-        # fading toward the background, because no role names "the other
-        # end of the active border" and inventing one for a single
-        # consumer would be worse than deriving it.
+        # Gradient runs `border` -> `accentDim` (the border hue fading
+        # toward the background): no role names "the other end of the
+        # active border", and one consumer doesn't justify inventing one.
         col = {
           active_border = {
             colors = [

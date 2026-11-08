@@ -8,12 +8,9 @@
       enable = true;
     };
 
-    # Custom header + buttons.
-    # nvf lazy-loads alpha-nvim (event = VimEnter / cmd), and it calls
-    # alpha.setup() itself using the "dashboard" theme. A top-level
-    # luaConfigRC runs at startup, before alpha is ever loaded, so
-    # `require("alpha")` there fails. Instead, hook into beforeSetup,
-    # which nvf runs after the plugin loads but before it calls setup().
+    # Custom header + buttons. nvf lazy-loads alpha-nvim and calls setup()
+    # itself, so a luaConfigRC `require("alpha")` would run too early;
+    # beforeSetup runs after load, before setup().
     lazy.plugins.alpha-nvim.beforeSetup = # lua
       ''
         local dashboard = require("alpha.themes.dashboard")

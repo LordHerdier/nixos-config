@@ -2,31 +2,23 @@
 #
 # Switching `my.theme` palettes without a rebuild.
 #
-# An app that wants to follow the runtime palette registers a *fragment*
-# under `my.theme.fragments.<app>`: a function from a resolved theme to the
-# text of the colour file that app reads. Every fragment is rendered for
-# every palette at build time, so the colours still come from one place and
-# there is nothing to keep in sync by hand:
+# An app that follows the runtime palette registers a *fragment* under
+# `my.theme.fragments.<app>`: a function from a resolved theme to the text
+# of its colour file. Every fragment is rendered for every palette at build
+# time:
 #
 #   ~/.config/theme/palettes/<palette>/<app>.<ext>     (store, read-only)
-#   ~/.local/state/theme/active -> ../../../.config/theme/palettes/<palette>
+#   ~/.local/state/theme/active -> ~/.config/theme/palettes/<palette>
+#                                  (or ~/.local/state/theme/wal-palette)
 #
-# The app's generated config includes `~/.local/state/theme/active/<app>.<ext>`
-# and `theme-set` repoints `active`, then runs each fragment's `reload` to
-# make the running app re-read it. `theme-set default` drops the override and
-# points `active` back at `my.theme.default`; a rebuild does the same when
-# there is no override (see the activation script), so changing the default
-# in Nix still recolours a live session.
+# The app's config includes `~/.local/state/theme/active/<app>.<ext>`;
+# `theme-set` repoints `active` and runs each fragment's `reload`. With no
+# override set, activation points `active` back at `my.theme.default`, so
+# changing the default in Nix still recolours a live session.
 #
-# PINS. An app that pins itself to a palette other than `my.theme.default`
-# (my.kitty.palette = ...) does not register a fragment and keeps its colours
-# inline, so it stays put. `follows` is the test for that.
-#
-# | Option                       | Purpose                                      |
-# | ---------------------------- | -------------------------------------------- |
-# | `my.theme.fragments.<app>`   | Per-app colour file renderer and reload hook |
-# | `my.theme.follows`           | Does a given palette name track the default  |
-# | `my.theme.runtime.active`    | Path apps include their fragment from        |
+# An app pinned to a palette other than the default (my.kitty.palette =
+# ...) registers no fragment and keeps its colours inline; `follows` is
+# the test for that.
 
 {
   config,
@@ -222,9 +214,8 @@ in
 
     home.packages = [ themeSet ];
 
-    # No override: `active` tracks my.theme.default, so a rebuild that
-    # changes it recolours. With one, leave it alone (the palettes dir it
-    # points through is updated in place by the generation switch).
+    # No override: `active` tracks my.theme.default. With one, leave it
+    # alone; the palettes dir it points through updates with the generation.
     home.activation.themeActive = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       run mkdir -p ${stateDir}
       if [ ! -e ${stateDir}/override ]; then

@@ -5,16 +5,14 @@
 { ... }:
 
 {
-  # Also revives the `fp` telescope mapping in ../20-telescope.nix: nvf only
-  # creates that keymap (and loads the `projects` extension) when this module
-  # is enabled, so until now `fp` was bound to nothing.
+  # nvf only creates the `fp` telescope mapping (./20-telescope.nix) and
+  # loads the `projects` extension when this is enabled.
   config.vim.projects.project-nvim = {
     enable = true;
 
     setupOpts = {
-      # nvf's default. Projects are detected and recorded, but the cwd is only
-      # changed on request -- via the `fp` picker or :ProjectRoot -- rather
-      # than silently moving out from under you on every buffer switch.
+      # (nvf's default.) Only change cwd on request -- `fp` or
+      # :ProjectRoot -- not on every buffer switch.
       manual_mode = true;
       detection_methods = [
         "lsp"
@@ -23,7 +21,6 @@
     };
   };
 
-  # <leader>qs loads the session for the cwd, <leader>ql picks from the list.
-  # Does not collide with `Q` (quit) from ../90-keymaps.nix.
+  # <leader>qs loads the session for the cwd, <leader>ql picks one.
   config.vim.session.persisted.enable = true;
 }

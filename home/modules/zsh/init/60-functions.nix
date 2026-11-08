@@ -48,7 +48,7 @@
     randomtheme() {
       local -a files names
       
-      # Grab all json/yaml theme files, silently failing if none exist (N flag)
+      # (N): empty list rather than an error when nothing matches
       files=(~/.oh-my-posh/themes/*.omp.(json|yaml)(N))
       
       if [[ ''${#files[@]} -eq 0 ]]; then
@@ -69,7 +69,6 @@
       # Select a random theme (ZSH arrays are 1-indexed)
       local random_theme="''${names[$((RANDOM % ''${#names[@]} + 1))]}"
       
-      # Pass the selected theme to your existing theme switcher
       theme "$random_theme"
     }
 

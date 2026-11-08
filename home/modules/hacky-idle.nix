@@ -1,14 +1,11 @@
 # home/modules/hacky-idle.nix
 #
-# Lazy lifecycle for the hacky-* quickshell popups. Their own toggle scripts
-# already start the popup on first use; nothing ever stops it. These wrappers
-# run the real toggle, then (re)arm a transient user timer that kills that
-# popup's quickshell after 5 minutes without a toggle. The next keypress
-# starts it again. If the popup is still open when the timer fires it is
-# closed along with the process -- 5 minutes without a toggle means idle.
+# Lazy lifecycle for the hacky-* quickshell popups, which start on first
+# toggle but never stop. These wrappers run the real toggle, then (re)arm a
+# transient user timer that kills the popup's quickshell after 5 minutes
+# without a toggle (even if it's still open).
 #
-# Binds call `hacky-tts-idle-toggle` / `hacky-launcher-idle-toggle`
-# (see hyprland/binds.lua).
+# Bound in hyprland/binds.lua.
 
 {
   config,

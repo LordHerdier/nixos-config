@@ -1,15 +1,11 @@
 # home/modules/nvf/plugins/80-devshell.nix
 #
-# Devshell integration, so language servers see the toolchain a project
-# pins rather than whatever happens to be on PATH.
+# Devshell integration, so language servers see the project's toolchain.
 #
-# nix-develop.nvim provides :NixDevelop / :NixShell / :FlakeShell, which
-# swap the running nvim's environment into the devshell -- LSPs started
-# afterwards inherit it. No daemon or per-project file needed.
-#
-# `vim.utility.direnv` (direnv.vim) syncs the environment on directory
-# change, so a project's `.envrc` (`use flake`) loads its devshell
-# automatically. direnv itself is set up in home/modules/direnv.nix.
+# nix-develop.nvim: :NixDevelop / :NixShell / :FlakeShell swap the running
+# nvim's environment into the devshell; LSPs started afterwards inherit it.
+# direnv.vim loads a project's `.envrc` on directory change (direnv itself
+# is set up in home/modules/direnv.nix).
 
 { ... }:
 

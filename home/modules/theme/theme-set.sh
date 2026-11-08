@@ -1,21 +1,17 @@
 # theme-set {NAME|wal [IMAGE]|next|prev|default|list|current|reload}
 #
-# Switches the palette every my.theme-following app reads, and tells the
-# running ones. See runtime.nix for how the pieces fit; this is the CLI.
+# CLI for runtime.nix (see its header). reload_all is appended by
+# runtime.nix.
 #
-# `NAME` records an override and repoints $THEME_STATE/active at that
-# palette's fragments. `default` removes the override and points back at
-# my.theme.default as built. `reload` re-runs the reload hooks and nothing
-# else. The hooks (reload_all) are appended by runtime.nix.
+# `NAME` records an override and repoints $THEME_STATE/active. `default`
+# drops the override. `reload` only re-runs the reload hooks.
 #
-# `wal [IMAGE]` derives a palette from IMAGE with pywal. Fragments that opt
-# in (`wal = true`) are rendered at build time with placeholder colours;
-# build_wal_palette swaps those for wal's real ones into
-# $THEME_STATE/wal-palette, which also holds the default palette's files for
-# every other fragment, and `active` is pointed there. wal itself recolours
-# open terminals (escape sequences) and keeps its output in ~/.cache/wal.
-# The image is remembered in $THEME_STATE/wal, so a bare `wal` re-runs the
-# last one, and any other `theme-set` command clears it.
+# `wal [IMAGE]` derives a palette with pywal. `wal = true` fragments are
+# built with placeholder colours; build_wal_palette substitutes wal's real
+# ones into $THEME_STATE/wal-palette (other fragments get the default
+# palette's files) and `active` points there. The image is remembered in
+# $THEME_STATE/wal so a bare `wal` re-runs it; picking a palette or
+# `default` clears it.
 
 override="$THEME_STATE/override"
 active="$THEME_STATE/active"

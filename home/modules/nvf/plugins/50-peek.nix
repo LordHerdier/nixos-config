@@ -3,26 +3,16 @@
 { pkgs, ... }:
 
 let
-  # peek.nvim's server serves its client bundle from Deno.mainModule's
-  # directory. Upstream generates that bundle via `deno task build`
-  # (main.ts/webview.ts/script.ts bundled with `deno emit`, plus a few
-  # CSS/JS assets fetched from CDNs) into `public/`, but nixpkgs packages
-  # the plugin without ever running that build step and instead patches
-  # app.lua to run the unbundled `app/src/main.ts` directly. That leaves
-  # `public/` with just index.html + style.css, so the server 404s on
-  # everything else index.html references ("Not Found" in the browser).
+  # nixpkgs packages peek.nvim without running its `deno task build`, so
+  # `public/` has only index.html + style.css and the preview server 404s
+  # on everything else ("Not Found" in the browser). Build the bundle and
+  # CDN assets here, as a fixed-output derivation since it needs network.
   #
-  # Fetched with network access (fixed-output derivation) since the build
-  # script pulls its Deno module graph and vendored assets from the internet.
-  #
-  # The CDN assets are version-pinned upstream, but upstream's deno.json maps
-  # `node:punycode` to an unpinned https://deno.land/x/punycode/punycode.js,
-  # and the bundler is whatever `pkgs.deno` currently is, so main.bundle.js
-  # drifts whenever either moves. Expect this hash to need refreshing after a
-  # nixpkgs bump; the build never fails on its own (scripts/build.js only
-  # console.errors rejected downloads), so sanity-check that $out still has
-  # index.html, *.bundle.js, webview.js, the two CSS files, mermaid.min.js and
-  # 20 fonts/ woff2 files before trusting a new hash.
+  # The hash drifts with `pkgs.deno` and an unpinned deno.land punycode
+  # import; expect to refresh it after a nixpkgs bump. scripts/build.js
+  # never fails on a rejected download, so before trusting a new hash
+  # check $out has index.html, *.bundle.js, webview.js, the two CSS
+  # files, mermaid.min.js and 20 fonts/ woff2 files.
   peekAssets = pkgs.stdenvNoCC.mkDerivation {
     pname = "peek-nvim-assets";
     version = pkgs.vimPlugins.peek-nvim.version;

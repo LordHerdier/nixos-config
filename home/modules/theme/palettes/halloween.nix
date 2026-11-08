@@ -4,15 +4,13 @@
 # (art by ICED): a purple-black town silhouetted against an orange
 # dusk sky, lit by a yellow crescent moon and yellow windows.
 #
-# Surfaces are the image's dominant shadow purples (#120c16, #24121a);
-# the accent is the dusk sky orange. The secondary chrome -- inactive
-# borders, selection, cursor, muted text -- leans on the reds (devil
-# eyes, brick wall) so the scheme is not just orange-on-purple. Hues the image only has
-# in small spots are taken from them: red from the devil eyes, cyan
-# from the skull's eye glow, magenta from the plum boots and pink shirt.
-# Green and blue barely exist in the picture, so they are dusky picks
-# chosen to stay distinct from cyan and from each other on the purple
-# background.
+# Surfaces are the shadow purples (#120c16, #24121a); the accent is the
+# dusk orange. Secondary chrome (inactive borders, selection, cursor,
+# muted text) leans on the reds (devil eyes, brick wall) so it isn't
+# just orange-on-purple. Small-spot hues: cyan from the skull's eye
+# glow, magenta from the plum boots and pink shirt. Green and blue
+# barely exist in the picture, so they're dusky picks kept distinct
+# from cyan and each other.
 
 {
   name = "halloween";

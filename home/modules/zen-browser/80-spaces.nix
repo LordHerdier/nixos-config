@@ -29,7 +29,7 @@
         id = "c566e3e8-bf68-432e-a679-e735569c12b7";
         position = 2000;
         icon = "💼";
-        container = 2; # a container id from 70-containers.nix
+        container = 2; # 70-containers.nix (its examples are commented out)
         theme = {
           type = "gradient";
           colors = [
