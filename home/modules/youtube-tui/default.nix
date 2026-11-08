@@ -2,7 +2,7 @@
 #
 # youtube-tui (github.com/Siriusmart/youtube-tui): Colemak movement, kitty
 # for anything that needs a terminal, mpv for playback with yt-dlp reading
-# cookies from Firefox.
+# cookies from Zen's managed profile.
 #
 # appearance.yml is a my.theme runtime fragment (pywal included), read at
 # startup; `:rc` re-reads it in a running instance.
@@ -25,7 +25,10 @@ let
   cfg = config.my.youtube-tui;
   follows = config.my.theme.follows cfg.palette;
 
-  ytdlRawOptions = "cookies-from-browser=firefox";
+  # yt-dlp has no Zen name; Zen is a Firefox fork, so point the firefox
+  # reader at the home-manager-managed profile (zen-browser/default.nix).
+  # No spaces or commas allowed: mpv splits this option on both.
+  ytdlRawOptions = "cookies-from-browser=firefox:${config.home.homeDirectory}/.config/zen/default";
 
   yaml = pkgs.formats.yaml { };
 
