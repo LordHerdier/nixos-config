@@ -58,6 +58,19 @@ gotcha each one's header comment exists to warn about. see
   (index), pre-seeded with a `kiddo`-owned subdirectory so Steam's "Add
   Library Folder" has somewhere obvious to point at for her account.
 
+## homelab
+
+- **`infisical-runner.nix`** — nixos port of inframanagement's
+  `infisical_runner.yml`: the same `/etc/infisical/service.env` →
+  `infisical-refresh` → `/run/infisical/token` (hourly timer) →
+  `infisical-run <cmd>` chain, against the same infisical (10.0.10.5).
+  per-host `my.infisical.projectId` (no default, like the ansible
+  host_vars). `my.infisical.envFiles.<name> = { path; services; }` exports
+  an infisical folder to `/run/infisical/env/<name>.env` and wires it in as
+  those services' `EnvironmentFile`, re-exported on every service (re)start.
+  the credentials file is written by hand once per host — see
+  [secrets.md](secrets.md#infisical-homelab-servers).
+
 ## gaming
 
 - **`steam.nix`** — `programs.steam`, remote play, dedicated server, and

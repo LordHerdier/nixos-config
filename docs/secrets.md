@@ -75,6 +75,28 @@ domain=WORKGROUP   # optional
 this directory is not in the repo and not managed by nix at all — it's
 deliberately outside both.
 
+## infisical (homelab servers)
+
+servers on twm that import `modules/features/infisical-runner.nix` pull
+runtime secrets from the homelab's infisical, the same way the
+ansible-managed hosts do (see inframanagement's `docs/secrets.md`). the
+only thing on disk is the host's machine-identity credentials, written by
+hand once — the step ansible vault does for the other hosts:
+
+```sh
+install -d -m 0750 /etc/infisical
+install -m 0600 /dev/stdin /etc/infisical/service.env <<EOF
+INFISICAL_CLIENT_ID=...
+INFISICAL_CLIENT_SECRET=...
+EOF
+systemctl start infisical-token
+```
+
+services get secrets either through `infisical-run <cmd>` or, for nixos
+service modules that want an `environmentFile`, through
+`my.infisical.envFiles` (a dotenv file under `/run/infisical/env/`, never
+in the store).
+
 ## generated at first run, never checked in
 
 `modules/features/open-webui.nix`'s session-signing secret
