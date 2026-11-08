@@ -83,8 +83,6 @@
   # Unlock the login keyring at login (desktop-common only does it for sddm).
   security.pam.services.greetd.enableGnomeKeyring = true;
 
-  time.timeZone = "America/Chicago";
-
   console = {
     keyMap = "colemak";
   };

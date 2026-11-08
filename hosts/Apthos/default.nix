@@ -49,8 +49,6 @@
     "console=ttyS0,115200n8"
   ];
 
-  time.timeZone = "America/Chicago";
-
   console = {
     keyMap = "colemak";
   };

@@ -22,8 +22,6 @@
 
   system.stateVersion = "25.11";
 
-  time.timeZone = "America/Chicago";
-
   console = {
     keyMap = "colemak";
   };
