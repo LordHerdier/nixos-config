@@ -12,9 +12,11 @@
 # buildInputs / config.mk change here too.
 #
 # COLOURS ARE PARAMETERS (`colours`, attrs of #rrggbb), passed as -DCOL_* string-literal flags
-# (config.h keeps matching fallbacks so it stays valid C). Unlike dwl they are
-# fixed at build time; st-wl has no runtime palette file, so a theme change
-# means a rebuild. Defaults are the OneShot palette.
+# (config.h keeps matching fallbacks so it stays valid C), but only as the
+# fallback: patches/20-theme-colours.patch has st-wl read the active palette
+# from ~/.local/state/theme/active/st-colors at startup and on SIGUSR1, which
+# the dwl module's st-colors theme fragment writes and signals. Defaults are
+# the OneShot palette.
 #
 # FONT. st-wl's default lives in wl.c rather than config.h, so postPatch
 # rewrites it to kitty's font. Override at runtime with -f.

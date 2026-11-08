@@ -1,0 +1,76 @@
+--- a/wl.c
++++ b/wl.c
+@@ -1765,6 +1765,42 @@
+ 	return 0;
+ }
+ 
++/* Theme colours: lines of "INDEX #rrggbb" (terminal colour indices, 258/259
++ * being the default background/foreground) read from
++ * $XDG_STATE_HOME/theme/active/st-colors, at startup and again on SIGUSR1.
++ * Anything missing or malformed keeps the compiled-in colours. */
++static volatile sig_atomic_t reloadcolors;
++
++static void
++usr1handler(int sig)
++{
++	(void)sig;
++	reloadcolors = 1;
++}
++
++static void
++loadcolorsfile(void)
++{
++	char path[PATH_MAX], line[128], hex[32];
++	const char *state = getenv("XDG_STATE_HOME"), *home = getenv("HOME");
++	int idx;
++	FILE *f;
++
++	if (state && *state)
++		snprintf(path, sizeof(path), "%s/theme/active/st-colors", state);
++	else if (home && *home)
++		snprintf(path, sizeof(path), "%s/.local/state/theme/active/st-colors", home);
++	else
++		return;
++
++	if (!(f = fopen(path, "r")))
++		return;
++	while (fgets(line, sizeof(line), f))
++		if (sscanf(line, "%d %31s", &idx, hex) == 2)
++			xsetcolorname(idx, hex);
++	fclose(f);
++}
++
+ static int wlloadfont(Font *f, FcPattern *pattern, int type, int fontsize)
+ {
+ 	FcPattern *configured=NULL;
+@@ -3297,6 +3333,7 @@
+ 	wlloadfonts(usedfont, DEFAULTFONTSIZE);
+ 
+ 	xloadcols();
++	loadcolorsfile();
+ 	wlloadcursor();
+ 
+ 	/* adjust fixed window geometry */
+@@ -3384,6 +3421,14 @@
+ 	drawtimeout.tv_sec = 0;
+ 
+ 	for (drawing=0, timeout=0;;) {
++		if (reloadcolors) {
++			reloadcolors = 0;
++			loadcolorsfile();
++			wl.resized = true;
++			tfulldirt();
++			wlneeddraw();
++		}
++
+ 		FD_ZERO(&rfd);
+ 		FD_SET(ttyfd, &rfd);
+ 		FD_SET(wlfd, &rfd);
+@@ -3629,6 +3674,7 @@
+ {
+ 	// ignore broken pipe signal, happens a lot in the datasrcsend function....
+ 	sigaction(SIGPIPE, &(struct sigaction){SIG_IGN}, NULL);
++	sigaction(SIGUSR1, &(struct sigaction){.sa_handler = usr1handler}, NULL);
+ 	#if BLINKING_CURSOR_PATCH
+ 	xsetcursor(cursorstyle);
+ 	#else

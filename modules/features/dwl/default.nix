@@ -65,8 +65,9 @@ let
 
   slstatus = pkgs.slstatus;
 
-  # st-wl takes its colours at build time (pkgs/st-wl), so unlike dwl it is
-  # rebuilt for the active palette; `theme-set` does not recolour it live.
+  # st-wl's compiled-in colours (pkgs/st-wl) are the my.theme palette as
+  # built; they are only the fallback for when the st-colors fragment
+  # (below) is missing. Live windows and new ones follow `theme-set`.
   st = pkgs.st-wl.override {
     colours = {
       inherit (t.palette)
@@ -170,6 +171,49 @@ in
     file = "dwl-colors";
     render = t: colorsText t.name t;
     wal = true;
+  };
+
+  # st-wl reads this at startup and on SIGUSR1 (pkgs/st-wl/patches/
+  # 20-theme-colours.patch): "INDEX #rrggbb" per line, 0-15 the ANSI colours
+  # and 256-259 cursor, reverse cursor, default background, default foreground.
+  home-manager.users.charlotte.my.theme.fragments.st-colors = {
+    file = "st-colors";
+    wal = true;
+    render =
+      t:
+      let
+        p = t.palette;
+        ansi = [
+          p.black
+          p.red
+          p.green
+          p.yellow
+          p.blue
+          p.magenta
+          p.cyan
+          p.white
+          p.brightBlack
+          p.brightRed
+          p.brightGreen
+          p.brightYellow
+          p.brightBlue
+          p.brightMagenta
+          p.brightCyan
+          p.brightWhite
+        ];
+        line = i: c: "${toString i} ${c}\n";
+      in
+      lib.concatStrings (
+        lib.imap0 line ansi
+        ++ [
+          (line 256 t.roles.cursor)
+          (line 257 p.brightBlack)
+          (line 258 p.bg)
+          (line 259 p.fg)
+        ]
+      );
+    reload = "pkill -USR1 -x st-wl";
+    runtimeInputs = [ pkgs.procps ];
   };
 
   home-manager.users.charlotte.my.theme.fragments.mako = {
