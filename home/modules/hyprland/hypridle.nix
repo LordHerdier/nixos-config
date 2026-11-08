@@ -1,16 +1,35 @@
 # home/modules/hyprland/hypridle.nix
+#
+# Idle and lock handling for the dwl session only. Under Hyprland, Noctalia
+# owns idle (home/modules/noctalia.nix); running both double-locked at 300 s
+# and 600 s. The unit is therefore tied to dwl-session.target (defined in
+# modules/features/dwl) instead of graphical-session.target, which both
+# sessions start. A condition on XDG_CURRENT_DESKTOP wouldn't do: the user
+# manager is shared between sessions and its environment goes stale.
 
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # wlopm (wlr-output-power-management) rather than `hyprctl dispatch
-  # dpms`: hypridle also runs under dwl (both sessions start
-  # graphical-session.target), and wlopm talks to the compositor on
-  # hypridle's own WAYLAND_DISPLAY, so stale environment in the shared
-  # user manager can't point it at the wrong session.
+  # dpms`: hypridle runs under dwl, not Hyprland, and wlopm talks to the
+  # compositor on hypridle's own WAYLAND_DISPLAY, so stale environment in
+  # the shared user manager can't point it at the wrong session.
   dpms = state: "${pkgs.wlopm}/bin/wlopm --${state} '*'";
 in
 {
+  systemd.user.services.hypridle = {
+    Unit = {
+      PartOf = lib.mkForce [ "dwl-session.target" ];
+      After = lib.mkForce [ "dwl-session.target" ];
+    };
+    Install.WantedBy = lib.mkForce [ "dwl-session.target" ];
+  };
+
   services.hypridle = {
     enable = true;
     settings = {

@@ -223,9 +223,8 @@ in
 
       system.monitor.enabled = true;
 
-      # NOTE: duplicates hyprland/hypridle.nix, which already locks at
-      # 300s and owns idle; only one should. Setting both `enabled`
-      # flags below to false is the simple fix.
+      # Owns idle under Hyprland. hypridle (hyprland/hypridle.nix) is
+      # tied to the dwl session so the two never both run.
       idle = {
         pre_action_fade_seconds = 10.0;
         behavior = {

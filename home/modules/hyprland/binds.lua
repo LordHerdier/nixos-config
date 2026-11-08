@@ -29,8 +29,9 @@ local menu = ipc .. "panel-toggle launcher"
 -- Commands
 local colorpicker = "hyprpicker -qaf rgb"
 -- qylock-lock exists only on hosts that load modules/features/qylock.nix;
--- elsewhere fall back to hypridle's lock_cmd (hyprlock) via logind.
-local lock = "sh -c 'command -v qylock-lock >/dev/null && exec qylock-lock || exec loginctl lock-session'"
+-- elsewhere fall back to Noctalia's lock screen. hypridle doesn't run
+-- under Hyprland, so `loginctl lock-session` would reach nothing.
+local lock = "sh -c 'command -v qylock-lock >/dev/null && exec qylock-lock || exec noctalia msg session lock'"
 local screenshot = "hyprshot -z --mode region --output-folder ~/Pictures/Screenshots"
 local bindsMenu = "~/bin/binds-menu"
 
