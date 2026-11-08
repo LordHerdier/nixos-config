@@ -15,8 +15,8 @@ static const char unknown_str[] = "n/a";
  * @notifications@ with a bell that shows mako's Do Not Disturb, after a cup
  * while dwl-caffeine is on, @keyboard@ with the active keyboard layout, and
  * @brightness@ with the backlight level (accent while dwl-nightlight is on),
- * and @network@ with Wi-Fi and Bluetooth, each a + or - that expands to the
- * network or device name on hover.
+ * and @network@ with the network (W, E, WE or -) and Bluetooth (+ or -),
+ * each expanding to the network or device name on hover.
  * The scripts live in ./scripts. dwl's volume and brightness keys and layout
  * switch, dwl-dnd, dwl-caffeine and dwl-nightlight run dwl-bar-refresh to
  * redraw immediately, as REDRAW below does.
