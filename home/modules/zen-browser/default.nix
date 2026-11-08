@@ -4,6 +4,7 @@
 # module, built on home-manager's mkFirefoxModule (programs.firefox
 # options generally apply). Files are split by config domain:
 #
+#   05-launcher.nix   zen-beta wrapper pinning the managed profile
 #   10-policies.nix   policies.json  -- enforced, user can't change it
 #   20-settings.nix   prefs.js       -- defaults, user can change them
 #
@@ -17,6 +18,7 @@
   imports = [
     inputs.zen-browser.homeModules.beta
 
+    ./05-launcher.nix
     ./10-policies.nix
     ./20-settings.nix
     ./30-extensions.nix
