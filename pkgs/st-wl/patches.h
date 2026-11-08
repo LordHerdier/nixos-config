@@ -13,6 +13,11 @@
  * You need to uncomment the corresponding line in config.mk to use the -lXrender library
  * when including this patch.
  * https://st.suckless.org/patches/alpha/
+ *
+ * Left on, but inert: dwl sets window opacity itself (40-client-opacity), so
+ * config.h pins DEFAULT_ALPHA at 1.0 and the focus highlight below is off.
+ * It can't be 0: st-wl's wl.c calls bgalpha() unconditionally, and that is
+ * only defined with this patch.
  */
 #define ALPHA_PATCH 1
 
@@ -22,7 +27,7 @@
  * https://github.com/juliusHuelsmann/st-focus/
  * https://st.suckless.org/patches/alpha_focus_highlight/
  */
-#define ALPHA_FOCUS_HIGHLIGHT_PATCH 1
+#define ALPHA_FOCUS_HIGHLIGHT_PATCH 0
 
 /* Smooth background alpha fade when losing keyboard focus, in milliseconds.
  * Set to 0 to switch instantly. Depends on ALPHA_FOCUS_HIGHLIGHT_PATCH.

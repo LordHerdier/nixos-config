@@ -241,7 +241,7 @@ unsigned int tabspaces = 8;
 #if ALPHA_PATCH
 /* bg opacity */
 /* compositor controls alpha */
-#define DEFAULT_ALPHA 1.0;
+#define DEFAULT_ALPHA 1.0
 float alpha = DEFAULT_ALPHA;
 uint8_t term_alpha = (uint8_t)(DEFAULT_ALPHA * 255.0);
 #if ALPHA_GRADIENT_PATCH
