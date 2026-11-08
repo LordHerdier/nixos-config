@@ -77,7 +77,6 @@
           root: ~/Dotfiles
           panes:
             - clear
-            - claude
       - zsh:
           panes:
             - clear
