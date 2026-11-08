@@ -70,6 +70,19 @@ gotcha each one's header comment exists to warn about. see
   those services' `EnvironmentFile`, re-exported on every service (re)start.
   the credentials file is written by hand once per host — see
   [secrets.md](secrets.md#infisical-homelab-servers).
+- **`pelican/`** — the Pelican game server panel's node daemon, Wings
+  (`pelican/wings.nix`; the panel itself is still to come), replacing the
+  old AMP box. `pkgs/pelican-wings` builds it from source, since it isn't
+  in nixpkgs. `my.pelican.wings.settings` is the node's `config.yml`
+  (`uuid` and `remote` are required, copied from the panel's node
+  Configuration tab), written to `/etc/pelican/config.yml` on every start,
+  so changes made in the panel only last until the next restart. the node
+  token stays out of the store and comes in as `WINGS_TOKEN_ID`/`WINGS_TOKEN`
+  through `my.infisical.envFiles`. it also turns on docker, declares the
+  `pelican` user (uid 988, so wings never runs `useradd`), rotates its log
+  through `services.logrotate` and opens the API (8080) and SFTP (2022)
+  ports. game ports are published by docker and bypass the nixos
+  firewall.
 
 ## gaming
 

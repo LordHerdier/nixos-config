@@ -54,7 +54,7 @@ what it does, in order:
    `parts/overlay.nix`, which adds the custom packages to `pkgs`:
    `oneshot-cursors`, `oneshot-gtk-theme`, `oneshot-icons`,
    `oneshot-wallpaper`, `concord` (taken from its own flake), `dwl` (with
-   hyprCRT's shader path), `dwl-clangd` and `slstatus`. `gnome-console`,
+   hyprCRT's shader path), `dwl-clangd`, `slstatus` and `pelican-wings`. `gnome-console`,
    `dwl` and `slstatus` are *replacements* of nixpkgs packages (a patched
    console, a configured dwl/slstatus), which is why they read `prev`.
 2. imports the five `modules/common/*.nix` files that really are universal (`packages`, `security`, `time`, `users`, `nix`) unconditionally.

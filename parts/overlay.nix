@@ -24,6 +24,9 @@ inputs: final: prev: {
   # slstatus feeding dwl's bar -- see pkgs/slstatus.
   slstatus = final.callPackage ../pkgs/slstatus { inherit (prev) slstatus; };
 
+  # Pelican game panel's node daemon -- see pkgs/pelican-wings.
+  pelican-wings = final.callPackage ../pkgs/pelican-wings { };
+
   oneshot-cursors = final.callPackage ../pkgs/oneshot-cursors { };
   oneshot-gtk-theme = final.callPackage ../pkgs/oneshot-gtk-theme { };
   oneshot-icons = final.callPackage ../pkgs/oneshot-icons { };
