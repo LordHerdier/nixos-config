@@ -32,6 +32,12 @@
     name = lib.mkDefault hostName;
   };
 
+  # proxmox-image.nix turns cloud-init on by default, which force-blanks
+  # networking.hostName and hands the network to cloud-init. Hosts here
+  # declare their own address and name in Nix, so leave Proxmox's
+  # cloud-init drive out of it.
+  proxmox.cloudInit.enable = false;
+
   # proxmox-image.nix already puts the kernel console on ttyS0 (Proxmox's
   # serial0); mirror grub's menu there too, as on Apthos, so
   # `qm terminal <vmid>` shows the whole boot.
