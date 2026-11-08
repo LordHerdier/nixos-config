@@ -1,7 +1,7 @@
 # dwl-notifications
 #
 # Notification centre: an fzf menu over mako's open notifications (marked ●)
-# and its history, run in a centred kitty popup (Super+W in pkgs/dwl/config.h),
+# and its history, run in a centred st-wl popup (Super+W in pkgs/dwl/config.h),
 # standing in for Noctalia's control-center panel. The preview shows the full
 # text. Enter runs an open notification's default action, Ctrl+D deletes the
 # highlighted entry, Ctrl+X clears everything and Ctrl+N toggles Do Not Disturb

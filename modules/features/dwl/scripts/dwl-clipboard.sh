@@ -1,9 +1,9 @@
 # dwl-clipboard
 #
-# fzf menu over the cliphist history, run in a centred kitty popup (Super+V in
+# fzf menu over the cliphist history, run in a centred st-wl popup (Super+V in
 # pkgs/dwl/config.h), standing in for Noctalia's clipboard panel. Enter copies
 # the entry back to the clipboard; Ctrl+D deletes it from the history. Image
-# entries are previewed with kitty icat, the same way dwl-wallpaper-pick does.
+# entries are previewed with icat-mini (st-wl's), the same way dwl-wallpaper-pick does.
 #
 # The history itself is filled by the `wl-paste --watch cliphist store`
 # watchers that dwl-startup runs.
@@ -12,8 +12,10 @@
 if [ "${1:-}" = --preview ]; then
   entry=$2
   if [[ $entry == *"[[ binary data "* ]]; then
-    printf '%s\n' "$entry" | cliphist decode | kitty icat --clear --transfer-mode=memory --unicode-placeholder --stdin=yes \
-      --place="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0"
+    img=$(mktemp -t dwl-clipboard.XXXXXX)
+    printf '%s\n' "$entry" | cliphist decode >"$img"
+    icat-mini --max-cols "$FZF_PREVIEW_COLUMNS" --max-rows "$FZF_PREVIEW_LINES" "$img"
+    rm -f "$img"
   else
     printf '%s\n' "$entry" | cliphist decode
   fi
@@ -32,6 +34,6 @@ sel=$(
 
 # wl-copy stays behind to serve the clipboard. setsid keeps it clear of the
 # SIGHUP sent when this script (the popup's session leader) exits, and the
-# redirect stops it holding the pty open: kitty only closes the popup once
+# redirect stops it holding the pty open: st-wl only closes the popup once
 # nothing has the terminal open any more, not when this script exits.
 printf '%s\n' "$sel" | cliphist decode | setsid -f wl-copy >/dev/null 2>&1

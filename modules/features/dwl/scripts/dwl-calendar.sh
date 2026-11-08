@@ -1,6 +1,6 @@
 # dwl-calendar
 #
-# Three-month calendar in a centred kitty popup (Super+K, or clicking the
+# Three-month calendar in a centred st-wl popup (Super+K, or clicking the
 # bar's clock), standing in for Noctalia's calendar panel. Left/Right (or the
 # Colemak n/i) step a month, Up/Down (u/e) a year, t goes back to today, and
 # q or Escape closes it. cal highlights today whenever it is on screen.

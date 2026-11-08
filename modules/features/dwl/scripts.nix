@@ -12,6 +12,7 @@
   lib,
   pkgs,
   dwl,
+  st,
   themes,
 }:
 
@@ -69,9 +70,9 @@ let
     clipboard.deps = with pkgs; [
       cliphist
       fzf
-      kitty
       util-linux
       wl-clipboard
+      st
     ];
 
     # mako as a runtime input rather than on PATH; see startup.sh.
@@ -92,10 +93,10 @@ let
       env.DWL_EMOJI_LIST = emojiList;
     };
 
-    modal.deps = with pkgs; [
-      coreutils
-      kitty
-      procps
+    modal.deps = [
+      pkgs.coreutils
+      pkgs.procps
+      st
     ];
 
     network.deps = with pkgs; [
@@ -194,8 +195,8 @@ let
     wallpaper-pick.deps = with pkgs; [
       coreutils
       fzf
-      kitty
       scripts.wallpaper
+      st
     ];
 
     # wlrctl activates windows through dwl's 85-foreign-toplevel-management.patch.

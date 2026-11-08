@@ -1,6 +1,6 @@
 # dwl-session-menu
 #
-# Power / session menu in a centred kitty popup (Super+O in pkgs/dwl/config.h),
+# Power / session menu in a centred st-wl popup (Super+O in pkgs/dwl/config.h),
 # standing in for Noctalia's session panel. Same entries, order and 1-7
 # shortcuts as the `session.actions` list in home/modules/noctalia.nix, and the
 # same 10 s countdown before acting: Enter skips it, any other key cancels.

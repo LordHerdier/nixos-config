@@ -1,6 +1,6 @@
 # dwl-windows
 #
-# fzf window switcher, run in a centred kitty popup (Super+Alt+Tab in
+# fzf window switcher, run in a centred st-wl popup (Super+Alt+Tab in
 # pkgs/dwl/config.h), standing in for Noctalia's window switcher. Enter goes
 # to the window: dwl switches its monitor to the window's tags and focuses it
 # (85-foreign-toplevel-management.patch); Ctrl+D closes it. Super+Tab is the

@@ -1,6 +1,6 @@
 # dwl-network [--toggle-wifi | --toggle-bluetooth]
 #
-# Wi-Fi, Bluetooth and power-profile menu in a centred kitty popup
+# Wi-Fi, Bluetooth and power-profile menu in a centred st-wl popup
 # (Super+Alt+A, or left-clicking the bar's net block), standing in for the
 # network / Bluetooth / power-profile pages of Noctalia's control centre.
 # Super+A stays the audio mixer. Wi-Fi goes through nmcli, Bluetooth through

@@ -83,15 +83,15 @@ static int log_level = WLR_ERROR;
 
 /* Autostart: each command is NULL-terminated, the list ends with a bare NULL */
 static const char *const autostart[] = {
-	"kitty", "zsh", "-i", "-c", "t", NULL,
+	"st-wl", "zsh", "-i", "-c", "t", NULL,
 	NULL /* terminate */
 };
 
 static const Rule rules[] = {
 	/* app_id             title       tags mask     isfloating   iscentered   isterm   noswallow   alpha              monitor */
-	{ "kitty",            NULL,       0,            0,           0,           1,       0,          default_opacity,   -1 },
+	{ "st-wl",            NULL,       0,            0,           0,           1,       0,          default_opacity,   -1 },
 	{ "floatterm",        NULL,       0,            1,           0,           0,       1,          default_opacity,   -1 }, /* Super+T terminal */
-	{ "modal",            NULL,       0,            1,           1,           0,       1,          default_opacity,   -1 }, /* kitty control popups (MODAL below) */
+	{ "modal",            NULL,       0,            1,           1,           0,       1,          default_opacity,   -1 }, /* st-wl control popups (MODAL below) */
 	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,           0,       0,          default_opacity,   -1 }, /* Start on currently visible tags floating, not tiled */
 	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,           0,       0,          default_opacity,   -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
@@ -219,12 +219,11 @@ static const char *dmenucmd[] = { "wofi", "--dmenu", NULL };
 /* Raise/lower the default sink (capped at 100%), then redraw the bar. */
 #define VOLCMD(delta) "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ " delta "; dwl-bar-refresh"
 
-static const char *termcmd[]  = { "kitty", NULL };
-/* kitty only honours initial_window_* when remember_window_size is off. The
- * app_id is matched by a floating rule above. */
-static const char *floatterm[] = { "kitty", "--class", "floatterm", "-o", "remember_window_size=no",
-                                   "-o", "initial_window_width=80c", "-o", "initial_window_height=20c", NULL };
-/* Toggles a floating kitty centred on the focused monitor (the "modal" rule
+static const char *termcmd[]  = { "st-wl", NULL };
+/* -c sets the app_id, matched by a floating rule above; -g is columnsxrows
+ * (a flag added by pkgs/st-wl/patches/10-geometry-flag.patch). */
+static const char *floatterm[] = { "st-wl", "-c", "floatterm", "-g", "80x20", NULL };
+/* Toggles a floating st-wl centred on the focused monitor (the "modal" rule
  * above), for control popups. Each popup's size and command are set by name
  * in modules/features/dwl/scripts/dwl-modal.sh, which the bar's click
  * regions use too. Pressing the same bind again closes it. */
@@ -285,10 +284,10 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_w,           spawn,            SHCMD("moonlight stream 'nico' 'desktop'") },
 	{ MODKEY|SHIFT,              XKB_KEY_e,           spawn,            SHCMD("nautilus") },
 	{ MODKEY|SHIFT,              XKB_KEY_A,           spawn,            SHCMD("easyeffects") },
-	{ MODKEY,                    XKB_KEY_c,           spawn,            SHCMD("kitty zsh -i -c nvim") },
+	{ MODKEY,                    XKB_KEY_c,           spawn,            SHCMD("st-wl zsh -i -c nvim") },
 	{ MODKEY,                    XKB_KEY_b,           spawn,            SHCMD("zen-beta") },
-	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("kitty zsh -i -c spotify_player") },
-	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD("kitty zsh -i -c concord") },
+	{ MODKEY,                    XKB_KEY_m,           spawn,            SHCMD("st-wl zsh -i -c spotify_player") },
+	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD("st-wl zsh -i -c concord") },
 
 	/* Noctalia launchers */
 	{ MODKEY,                    XKB_KEY_v,           spawn,            MODAL("clipboard") },

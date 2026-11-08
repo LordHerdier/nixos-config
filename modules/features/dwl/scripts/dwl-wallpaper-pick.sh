@@ -1,7 +1,7 @@
 # dwl-wallpaper-pick
 #
-# fzf menu over the dwl-wallpaper images, run in a centred kitty popup (Super+Alt+4
-# in pkgs/dwl/config.h) so the preview pane can show thumbnails with kitty icat.
+# fzf menu over the dwl-wallpaper images, run in a centred st-wl popup (Super+Alt+4
+# in pkgs/dwl/config.h) so the preview pane can show thumbnails with icat-mini.
 # Each entry is applied as the cursor lands on it, but only once the cursor has
 # rested there for a moment: dwl-wallpaper starts a fresh swaybg per change, so
 # holding an arrow key would otherwise pile them up. Enter keeps the highlighted
@@ -44,7 +44,7 @@ done
 
 pending=$(mktemp -t dwl-wallpaper-pick.XXXXXX)
 trap 'rm -f "$pending"' EXIT
-# Pressing Super+Alt+4 again closes the kitty (dwl-modal), which hangs up
+# Pressing Super+Alt+4 again closes the popup (dwl-modal), which hangs up
 # fzf. Outlive that hangup so the code below still puts back the original
 # wallpaper, the same as Esc.
 trap : HUP TERM
@@ -55,7 +55,7 @@ sel=$(
     --delimiter / --with-nth -1 \
     --layout reverse --prompt 'wallpaper> ' \
     --preview-window right,65%,border-left \
-    --preview 'kitty icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0" {}' \
+    --preview 'icat-mini --max-cols "$FZF_PREVIEW_COLUMNS" --max-rows "$FZF_PREVIEW_LINES" {}' \
     --bind "load:pos($pos)" \
     --bind "focus:execute-silent($0 --apply-later $pending {})"
 ) || true

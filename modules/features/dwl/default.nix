@@ -6,7 +6,7 @@
 #
 # Shows up as "dwl" in tuigreet's session list (F3), next to Hyprland and
 # the gamescope Steam session. Needs the desktop-hyprland profile for the
-# kitty / wofi that config.h launches.
+# wofi that config.h launches; its terminal, st-wl, is built here.
 #
 # Colours (bar, borders, mako, slstatus) follow charlotte's
 # `my.theme.default`, the same palette her kitty/wofi/nvim get on this
@@ -65,11 +65,41 @@ let
 
   slstatus = pkgs.slstatus;
 
+  # st-wl takes its colours at build time (pkgs/st-wl), so unlike dwl it is
+  # rebuilt for the active palette; `theme-set` does not recolour it live.
+  st = pkgs.st-wl.override {
+    colours = {
+      inherit (t.palette)
+        bg
+        fg
+        black
+        red
+        green
+        yellow
+        blue
+        magenta
+        cyan
+        white
+        brightBlack
+        brightRed
+        brightGreen
+        brightYellow
+        brightBlue
+        brightMagenta
+        brightCyan
+        brightWhite
+        ;
+      cursor = t.roles.cursor;
+      cursorRev = t.palette.brightBlack;
+    };
+  };
+
   scripts = import ./scripts.nix {
     inherit
       lib
       pkgs
       dwl
+      st
       themes
       ;
   };
@@ -177,8 +207,8 @@ in
   environment.systemPackages = lib.attrValues scripts ++ [
     dwl
     session
-    # Wayland-native st (pkgs/st-wl), an alternative to the kitty config.h launches.
-    pkgs.st-wl
+    # The terminal config.h launches (pkgs/st-wl), coloured from `my.theme`.
+    st
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.
