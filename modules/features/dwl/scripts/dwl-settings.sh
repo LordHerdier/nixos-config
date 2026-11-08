@@ -7,10 +7,11 @@
 # scripts.nix, so a page only has to define its functions and be added to
 # the list below; common.sh holds what they share (pick, pause).
 #
-# Pages so far: network (Wi-Fi, Bluetooth, power profile), sound, appearance,
-# notifications (with power). Planned: display, input, system info.
+# Pages so far: network (Wi-Fi, Bluetooth, power profile, airplane mode,
+# Ethernet, VPN), sound, display, appearance, notifications (with power).
+# Planned: input, system info.
 #
-# A page name (network, sound, appearance, notifications) opens that page
+# A page name (network, sound, display, appearance, notifications) opens that page
 # directly: Super+Alt+A and the bar's net block use `network`, through
 # dwl-modal's "network" entry. --toggle-wifi and --toggle-bluetooth are for the
 # bar block: right clicking the Wi-Fi name or the Bluetooth entry toggles that
@@ -22,6 +23,7 @@ case ${1:-} in
   --swatch) swatch "${2:-default}"; exit 0 ;;
   network) network_menu; exit 0 ;;
   sound) sound_menu; exit 0 ;;
+  display) display_menu; exit 0 ;;
   appearance) appearance_menu; exit 0 ;;
   notifications) notifications_menu; exit 0 ;;
   "") ;;
@@ -36,6 +38,7 @@ while :; do
     {
       printf 'Network                %s\tnetwork\n' "$(network_summary)"
       printf 'Sound                  %s\tsound\n' "$(sound_summary)"
+      printf 'Display                %s\tdisplay\n' "$(display_summary)"
       printf 'Appearance             %s\tappearance\n' "$(appearance_summary)"
       printf 'Notifications & power  %s\tnotifications\n' "$(notifications_summary)"
     } | pick settings
@@ -43,6 +46,7 @@ while :; do
   case ${sel#*$'\t'} in
     network) network_menu ;;
     sound) sound_menu ;;
+    display) display_menu ;;
     appearance) appearance_menu ;;
     notifications) notifications_menu ;;
     *) ;;

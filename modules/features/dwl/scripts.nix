@@ -110,27 +110,33 @@ let
         "common"
         "network"
         "sound"
+        "display"
         "appearance"
         "notifications"
       ];
       deps = with pkgs; [
         bluez
+        brightnessctl
         coreutils
         fzf
         gawk
         gnugrep
         gnused
+        jq
         mako
         networkmanager
         power-profiles-daemon
         procps
         util-linux
         wireplumber
+        wlr-randr
         scripts.airpods
         scripts.bar-refresh
         scripts.caffeine
         scripts.dnd
         scripts.modal
+        scripts.nightlight
+        scripts.powersave
       ];
       env.DWL_THEMES = themes;
     };

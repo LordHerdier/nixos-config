@@ -24,3 +24,10 @@ notice() {
 onoff() {
   if "$1"; then echo on; else echo off; fi
 }
+
+# Asks "title?" with Yes/No; succeeds only on Yes.
+confirm() {
+  local sel
+  sel=$(printf 'Yes\tyes\nNo\tno\n' | pick "$1") || return 1
+  [ "${sel#*$'\t'}" = yes ]
+}
