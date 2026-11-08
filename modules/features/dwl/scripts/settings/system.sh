@@ -26,8 +26,21 @@ system_generation() {
   echo "${link%-link}"
 }
 
+# "2d 3h 14m", from /proc/uptime: the uptime on PATH is coreutils' (no -p),
+# and procps' comes later in the runtime inputs.
+uptime_pretty() {
+  local s d h m out=''
+  read -r s _ </proc/uptime
+  s=${s%.*}
+  d=$((s / 86400))
+  h=$((s % 86400 / 3600))
+  m=$((s % 3600 / 60))
+  if [ "$d" -gt 0 ]; then out="${d}d "; fi
+  echo "${out}${h}h ${m}m"
+}
+
 system_summary() {
-  echo "gen $(system_generation) · $(uptime -p | sed 's/^up //')"
+  echo "gen $(system_generation) · $(uptime_pretty)"
 }
 
 system_menu() {
@@ -39,7 +52,7 @@ system_menu() {
     printf 'os          %s\n' "${os:-unknown}"
     printf 'kernel      %s\n' "$(uname -r)"
     printf 'generation  %s\n' "$(system_generation)"
-    printf 'uptime      %s\n' "$(uptime -p | sed 's/^up //')"
+    printf 'uptime      %s\n' "$(uptime_pretty)"
     printf 'memory      %s\n' "$(free -h | awk '/^Mem:/ { print $3 " of " $2 " used" }')"
     printf 'disk (/)    %s\n' "$(df -h --output=used,size,pcent / | awk 'NR == 2 { print $1 " of " $2 " (" $3 ")" }')"
     if [ -n "$temp" ]; then
