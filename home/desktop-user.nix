@@ -19,6 +19,7 @@
     ./modules/tmux
     ./modules/spotify-player.nix
     ./modules/wiremix.nix
+    ./modules/youtube-tui
     ./modules/case-insensitive-dirs.nix
     ./modules/zen-browser
   ];
