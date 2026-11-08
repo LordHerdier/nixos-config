@@ -20,7 +20,7 @@
 
     theme() {
       if [[ -z "$1" ]]; then
-        echo "Usage: omp-theme <theme>"
+        echo "Usage: theme <theme>"
         return 1
       fi
 
