@@ -9,5 +9,12 @@
     enable = true;
     enableZshIntegration = true;
     nix-direnv.enable = true;
+
+    # Written to ~/.config/direnv/direnv.toml.
+    config.global = {
+      hide_env_diff = true;
+      load_dotenv = true;
+      strict_env = true;
+    };
   };
 }
