@@ -3,13 +3,53 @@
 # LibrePods: AirPods features (ANC/transparency control, ear detection,
 # battery) outside Apple's ecosystem. The nixpkgs module installs a
 # cap_net_admin wrapper that only members of the librepods group can run.
+#
+# It isn't started with the session: librepods-watch starts librepods.service
+# when an Apple Bluetooth device connects and stops it three minutes after the
+# last one disconnects. Start it by hand with `systemctl --user start librepods`.
 
-{ ... }:
+{ pkgs, ... }:
 
+let
+  watcher = pkgs.writers.writePython3Bin "librepods-watch" {
+    libraries = [ pkgs.python3Packages.pygobject3 ];
+    flakeIgnore = [
+      "E501" # long lines are fine
+      "E402" # gi.require_version() must run before the gi.repository import
+    ];
+  } (builtins.readFile ./librepods-watch.py);
+in
 {
   programs.librepods.enable = true;
 
   users.users.charlotte.extraGroups = [ "librepods" ];
+
+  systemd.user.services = {
+    librepods = {
+      description = "LibrePods (AirPods control)";
+      after = [ "graphical-session.target" ];
+      partOf = [ "graphical-session.target" ];
+      serviceConfig = {
+        # The setcap wrapper, not the store binary: it needs cap_net_admin.
+        # --hide starts it tray-only.
+        ExecStart = "/run/wrappers/bin/librepods --hide";
+        Restart = "no";
+      };
+    };
+
+    librepods-watch = {
+      description = "Start LibrePods while an Apple Bluetooth device is connected";
+      wantedBy = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      partOf = [ "graphical-session.target" ];
+      path = [ pkgs.systemd ];
+      serviceConfig = {
+        ExecStart = "${watcher}/bin/librepods-watch";
+        Restart = "on-failure";
+        RestartSec = 5;
+      };
+    };
+  };
 
   # font-rendering.nix exports QT_STYLE_OVERRIDE=adwaita-dark for widget apps,
   # but Qt Quick Controls reads the same variable as a QML style module name.

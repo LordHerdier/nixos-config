@@ -65,10 +65,6 @@ mako --config "$mako_config" &
 # Both exit with the compositor when the Wayland connection drops.
 wl-paste --type text --watch cliphist store &
 wl-paste --type image --watch cliphist store &
-# The setcap wrapper (modules/features/librepods.nix), not the store
-# binary: it needs cap_net_admin. --hide starts it tray-only, which
-# shows up in the bar's systray.
-/run/wrappers/bin/librepods --hide &
 
 # Not exec: the shell has to outlive sleep for the trap to run.
 sleep infinity &

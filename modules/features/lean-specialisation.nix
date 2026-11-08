@@ -38,8 +38,8 @@
 # in any session, lean or not.
 #
 # tailscaled is deliberately kept: it reaches the remote builder / cache.
-# Not covered: librepods, which dwl-startup launches directly rather than via
-# a unit.
+# librepods is a user service that only runs while an Apple device is
+# connected (modules/features/librepods.nix), so it needs no handling here.
 
 { lib, ... }:
 

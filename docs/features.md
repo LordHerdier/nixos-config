@@ -189,8 +189,10 @@ per host, not part of a "what kind of desktop is this" bundle:
   detection, battery) outside Apple's ecosystem. uses the harveywuk fork
   (the airpods noctalia plugin needs its status file and verbs), adds
   charlotte to the `librepods` group, and overrides `QT_STYLE_OVERRIDE`
-  for the app because font-rendering.nix's value breaks its QML.
-  index only.
+  for the app because font-rendering.nix's value breaks its QML. a user
+  service (`librepods-watch`, following BlueZ over D-Bus) starts it when a
+  device with Apple's vendor ID connects and stops it 3 minutes after the
+  last one disconnects. index only.
 - **`framework-kmod-fix.nix`** — rebuilds `framework-laptop-kmod` with an
   install phase that runs `modules_install`, since current nixpkgs
   requires a `.ko.cer` digest the upstream package doesn't ship. drop it
