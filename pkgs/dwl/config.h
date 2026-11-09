@@ -6,7 +6,16 @@
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
+static const int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
+static const int monoclegaps               = 0;  /* 1 means outer gaps in monocle layout */
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
+/* Gaps (84-vanitygaps.patch), 16px everywhere. Despite the names, in tile()
+ * ih is the gap between stacked windows, iv between the master and stack
+ * columns, oh the top/bottom screen edge and ov the left/right one. */
+static const unsigned int gappih           = 16; /* gap between stacked windows */
+static const unsigned int gappiv           = 16; /* gap between master and stack columns */
+static const unsigned int gappoh           = 16; /* gap at the top/bottom screen edge */
+static const unsigned int gappov           = 16; /* gap at the left/right screen edge */
 static const unsigned int snap             = 32; /* snap pixel */
 static const unsigned int systrayspacing   = 2; /* systray spacing */
 static const int showsystray               = 1; /* 0 means no systray */
@@ -340,6 +349,28 @@ static const Key keys[] = {
 	{ MODKEY|CTRL|SHIFT,         XKB_KEY_O,           setopacity,       {.f = -0.05f} },
 	{ MODKEY|CTRL,               XKB_KEY_u,           incnmaster,       {.i = +1} },
 	{ MODKEY|CTRL,               XKB_KEY_e,           incnmaster,       {.i = -1} },
+	/* Gaps, 2px a step on this monitor: ] grows, [ shrinks. Super+Ctrl for
+	 * all of them / outer (Shift) / inner (Alt), Super+Alt for the inner gaps
+	 * alone, Super for the screen edges alone; there Shift picks the other
+	 * axis. Super+Ctrl+\ turns gaps off and on, Super+Ctrl+Shift+\ resets
+	 * them to the sizes above. Brackets rather than = / -, which are in
+	 * lockedkeys and would fire under the locker */
+	{ MODKEY|CTRL,               XKB_KEY_bracketright, incgaps,         {.i = +2} },
+	{ MODKEY|CTRL,               XKB_KEY_bracketleft, incgaps,          {.i = -2} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_braceright,  incogaps,         {.i = +2} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_braceleft,   incogaps,         {.i = -2} },
+	{ MODKEY|CTRL|ALT,           XKB_KEY_bracketright, incigaps,        {.i = +2} },
+	{ MODKEY|CTRL|ALT,           XKB_KEY_bracketleft, incigaps,         {.i = -2} },
+	{ MODKEY|ALT,                XKB_KEY_bracketright, incihgaps,       {.i = +2} },
+	{ MODKEY|ALT,                XKB_KEY_bracketleft, incihgaps,        {.i = -2} },
+	{ MODKEY|ALT|SHIFT,          XKB_KEY_braceright,  incivgaps,        {.i = +2} },
+	{ MODKEY|ALT|SHIFT,          XKB_KEY_braceleft,   incivgaps,        {.i = -2} },
+	{ MODKEY,                    XKB_KEY_bracketright, incohgaps,       {.i = +2} },
+	{ MODKEY,                    XKB_KEY_bracketleft, incohgaps,        {.i = -2} },
+	{ MODKEY|SHIFT,              XKB_KEY_braceright,  incovgaps,        {.i = +2} },
+	{ MODKEY|SHIFT,              XKB_KEY_braceleft,   incovgaps,        {.i = -2} },
+	{ MODKEY|CTRL,               XKB_KEY_backslash,   togglegaps,       {0} },
+	{ MODKEY|CTRL|SHIFT,         XKB_KEY_bar,         defaultgaps,      {0} },
 	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },
 	/* Alt+Tab-style: hold Super, Tab steps through windows in recently used
 	 * order, releasing Super keeps the one shown, Escape goes back */

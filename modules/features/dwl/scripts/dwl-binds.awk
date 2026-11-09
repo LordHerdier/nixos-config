@@ -34,6 +34,9 @@ function describe(fn, arg,    c) {
 	if (fn == "focusdir" || fn == "focusmon" || fn == "tagmon") {
 		if (match(arg, /WLR_DIRECTION_([A-Z]+)/, c)) return fn " " tolower(c[1])
 	}
+	if (fn in gapfns && match(arg, /\.i *= *([-+]?[0-9]+)/, c)) return gapfns[fn] " " c[1] "px"
+	if (fn == "togglegaps") return "gaps on/off"
+	if (fn == "defaultgaps") return "reset gaps"
 	sub(/^\{ */, "", arg); sub(/\}? *$/, "", arg)
 	sub(/^\.[a-z]+ *= */, "", arg)
 	return (arg == "0" || arg == "") ? fn : fn " " arg
@@ -44,6 +47,15 @@ BEGIN {
 	names["space"] = "Space"; names["Return"] = "Enter"; names["grave"] = "`"
 	names["equal"] = "="; names["minus"] = "-"; names["plus"] = "+"
 	names["underscore"] = "_"; names["BackSpace"] = "Backspace"
+	names["bracketleft"] = "["; names["bracketright"] = "]"
+	names["braceleft"] = "{"; names["braceright"] = "}"
+	names["backslash"] = "\\"; names["bar"] = "|"
+	gapfns["incgaps"] = "all gaps"; gapfns["incogaps"] = "outer gaps"
+	gapfns["incigaps"] = "inner gaps"
+	gapfns["incihgaps"] = "gap between stacked windows"
+	gapfns["incivgaps"] = "gap between columns"
+	gapfns["incohgaps"] = "top/bottom edge gap"
+	gapfns["incovgaps"] = "left/right edge gap"
 	print "Super+1 … 0\tview workspace"
 	print "Super+Shift+1 … 0\tmove window to workspace"
 	print "Super+Ctrl+1 … 0\ttoggle workspace in view"
