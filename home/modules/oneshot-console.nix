@@ -18,8 +18,8 @@
 # { foreground: (ddd), background: (ddd), colours: a(ddd), transparency: d }
 # with 0.0-1.0 components; transparency is left at its 0.0 default.
 #
-# NEEDS THE PATCHED kgx in pkgs/gnome-console: stock Console 50.0 drops
-# every custom livery (wrong format string), silently.
+# Needs Console >= 51.0: 50.0 dropped every custom livery (wrong format
+# string), silently. Fixed upstream.
 #
 # The GVariant type annotations matter: `dconf load` parses untyped, and
 # an unannotated tuple comes back as the wrong type, which kgx silently

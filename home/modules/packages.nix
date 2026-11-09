@@ -31,7 +31,11 @@
       gron
       gum
       inetutils
-      inputs.forgejo-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      # Upstream flake lacks libgit2 now that nixpkgs sets LIBGIT2_NO_VENDOR.
+      (inputs.forgejo-cli.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkg-config ];
+        buildInputs = (old.buildInputs or [ ]) ++ [ libgit2 ];
+      }))
       inputs.pluralspace-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       jq
       lazydocker
