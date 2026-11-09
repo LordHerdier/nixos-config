@@ -5,7 +5,7 @@
 # script (uses `print -P`), so edit freely; changes apply after a rebuild.
 
 print -P "%F{cyan}%B$(date '+%A, %d %B %Y')%b%f"
-curl -s --max-time 3 "wttr.is/?0pq" || true
+curl -s --max-time 3 "wttr.is/?1pq" || true
 print ""
 
 source "${MOTD_UPTIME:?}"  # uptime -p, which coreutils' uptime lacks
