@@ -1,6 +1,6 @@
 # home/modules/nvf/20-lsp.nix
 
-{ ... }:
+{ lib, pkgs, ... }:
 
 {
   config.vim = {
@@ -9,6 +9,37 @@
     # Without it nvf registers no luasnip cmp source, and LSP snippet
     # completions insert literal $1/$0 placeholders.
     snippets.luasnip.enable = true;
+
+    # nixpkgs asm-lsp 0.10.1 and neocmakelsp 0.11.2 fail to build (missing
+    # zstd / pkg-config+oniguruma for their -sys crates), as does gersemi (sqlite). The nvf presets
+    # hardcode pkgs.<name>, so override each server's cmd. Drop once fixed
+    # upstream.
+    lsp.servers = {
+      asm-lsp.cmd = lib.mkForce [
+        (lib.getExe (
+          pkgs.asm-lsp.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.zstd ];
+          })
+        ))
+      ];
+      neocmakelsp.cmd = lib.mkForce [
+        (lib.getExe (
+          pkgs.neocmakelsp.overrideAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.pkg-config ];
+            buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.oniguruma ];
+          })
+        ))
+        "stdio"
+      ];
+    };
+
+    formatter.conform-nvim.setupOpts.formatters.gersemi.command = lib.mkForce (
+      lib.getExe (
+        pkgs.gersemi.overrideAttrs (old: {
+          buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.sqlite ];
+        })
+      )
+    );
 
     lsp = {
       enable = true;
