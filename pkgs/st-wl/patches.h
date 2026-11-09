@@ -14,7 +14,7 @@
  * when including this patch.
  * https://st.suckless.org/patches/alpha/
  *
- * Left on, but inert: dwl sets window opacity itself (40-client-opacity), so
+ * Left on, but inert: dwl sets window opacity itself (21-client-opacity), so
  * config.h pins DEFAULT_ALPHA at 1.0 and the focus highlight below is off.
  * It can't be 0: st-wl's wl.c calls bgalpha() unconditionally, and that is
  * only defined with this patch.

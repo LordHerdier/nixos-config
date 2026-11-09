@@ -2,7 +2,7 @@
 #
 # fzf window switcher in a centred st-wl popup (Super+Alt+Tab), standing in
 # for Noctalia's. Enter goes to the window (dwl views its tags and focuses
-# it, 85-foreign-toplevel-management.patch); Ctrl+D closes it.
+# it, 42-foreign-toplevel-management.patch); Ctrl+D closes it.
 #
 # wlrctl matches by exact app_id and title (the protocol has no stable IDs),
 # so of two windows with the same pair, the first one wins.

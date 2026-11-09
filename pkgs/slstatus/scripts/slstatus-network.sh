@@ -4,7 +4,7 @@
 # (Ethernet), "WE" (both) or "-" (nothing; alert colour when the Wi-Fi radio
 # is off); Bluetooth "+" or "-". Hovering shows the network or device name
 # (first connected device, +N for more), or "off" / "none", through dwl's
-# ^hv() (99-z-bar-status-hover.patch). Right-clicking either half toggles
+# ^hv() (81-bar-status-hover.patch). Right-clicking either half toggles
 # Wi-Fi or Bluetooth. config.h prints the "net" label, this the "bt" one.
 
 name=

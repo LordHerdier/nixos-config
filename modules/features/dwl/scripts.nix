@@ -229,7 +229,7 @@ let
       st
     ];
 
-    # wlrctl activates windows through dwl's 85-foreign-toplevel-management.patch.
+    # wlrctl activates windows through dwl's 42-foreign-toplevel-management.patch.
     windows.deps = with pkgs; [
       fzf
       gnugrep

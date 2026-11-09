@@ -9,17 +9,17 @@ static const char unknown_str[] = "n/a";
 /* maximum output string length */
 #define MAXLEN 4096
 
-/* dwl's bar (05-bar.patch) reads one line of this from its stdin. default.nix
+/* dwl's bar (06-bar.patch) reads one line of this from its stdin. default.nix
  * replaces @volume@ and the like with the ./scripts that print those blocks.
  * Whatever changes a block (dwl's volume, brightness and layout keys,
  * dwl-dnd, dwl-caffeine, dwl-nightlight...) runs dwl-bar-refresh to redraw
  * at once, as REDRAW below does.
  *
  * The inline commands are dwl's: ^fg(...) colours, where accent/muted/alert/
- * good are theme names that follow dwl-theme (99-theme-colours.patch);
+ * good are theme names that follow dwl-theme (75-theme-colours.patch);
  * ^lm/^mm/^rm/^us/^ds(cmd) click and scroll regions
- * (95-bar-status-commands.patch); ^ct() centring (96-bar-status-centre.patch);
- * ^hv(text) hover text (99-z-bar-status-hover.patch). An argument ends at the
+ * (57-bar-status-commands.patch); ^ct() centring (60-bar-status-centre.patch);
+ * ^hv(text) hover text (81-bar-status-hover.patch). An argument ends at the
  * first ')', so none may contain one. */
 #define LABEL(text) "^fg(accent)" text "^fg()"
 #define SEP         "^fg(muted) | ^fg()"

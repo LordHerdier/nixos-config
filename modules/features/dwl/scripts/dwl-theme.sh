@@ -30,7 +30,7 @@ current() {
 }
 
 # Signal only the dwl this script was built with: one from before
-# 99-theme-colours.patch has no SIGUSR2 handler and would die of it.
+# 75-theme-colours.patch has no SIGUSR2 handler and would die of it.
 reload() {
   local pid
   for pid in $(pgrep -x dwl); do

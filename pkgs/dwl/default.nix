@@ -12,12 +12,12 @@
 # config.def.h (`nix build nixpkgs#dwl.src`) and refresh the patch.
 #
 # COLOURS. The parameters are only the fallback: dwl reads its real colours
-# at runtime (99-theme-colours.patch) from a file modules/features/dwl
+# at runtime (75-theme-colours.patch) from a file modules/features/dwl
 # writes. They default to the OneShot palette and reach config.h as -D flags
 # rather than substituted placeholders, so config.h stays valid C for
 # clangd.nix.
 #
-# SCREEN SHADER. `screenShader` is the fragment shader 99-screen-shader.patch
+# SCREEN SHADER. `screenShader` is the fragment shader 72-screen-shader.patch
 # runs over each output (Super+Shift+G), passed the same way; null keeps
 # config.h's fallback. The overlay points it at hyprCRT's crt.frag. dwl
 # rereads the file each time the shader is turned on.
@@ -65,9 +65,9 @@ in
       + lib.optionalString (screenShader != null) " -DSCREEN_SHADER=\"${screenShader}\"";
   };
 
-  # drwl.h (05-bar.patch) draws the bar with fcft and DRM fourcc formats;
-  # 90-bar-systray.patch talks StatusNotifierItem over libdbus;
-  # 99-screen-shader.patch draws with GLES2 (libglvnd's glesv2).
+  # drwl.h (06-bar.patch) draws the bar with fcft and DRM fourcc formats;
+  # 54-bar-systray.patch talks StatusNotifierItem over libdbus;
+  # 72-screen-shader.patch draws with GLES2 (libglvnd's glesv2).
   buildInputs = (old.buildInputs or [ ]) ++ [
     dbus
     fcft

@@ -13,7 +13,7 @@ static const int showsystray               = 1; /* 0 means no systray */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=12"};
-/* Fallback colours (OneShot), used until loadcolors (99-theme-colours.patch)
+/* Fallback colours (OneShot), used until loadcolors (75-theme-colours.patch)
  * reads the colours file at startup / on SIGUSR2, or when there is none.
  * pkgs/dwl/default.nix overrides them with -D flags. */
 #ifndef COLORS_SYSTEM
@@ -68,7 +68,7 @@ static uint32_t successcolor               = COL_SUCCESS;
 static const float default_opacity = 0.9f;
 
 /* Fragment shader run over each output while togglescreenshader is on
- * (99-screen-shader). SCREEN_SHADER comes from pkgs/dwl/default.nix; the
+ * (72-screen-shader). SCREEN_SHADER comes from pkgs/dwl/default.nix; the
  * fallback is where Home Manager installs hyprCRT. */
 #ifndef SCREEN_SHADER
 #define SCREEN_SHADER "/etc/profiles/per-user/charlotte/share/hyprCRT/crt.frag"
@@ -122,7 +122,7 @@ static const MonitorRule monrules[] = {
 	/* default monitor rule: can be changed but cannot be eliminated; at least one monitor rule must exist */
 };
 
-/* Output each tag lives on (50-tagmon), as Hyprland's workspace rules: DP-4
+/* Output each tag lives on (30-tagmon), as Hyprland's workspace rules: DP-4
  * the odd tags, eDP-1 the even. Plugging DP-4 in pulls its tags' windows
  * over; without it every tag uses the focused monitor. */
 static const char *tagmons[] = {
@@ -144,7 +144,7 @@ static const struct xkb_rule_names xkb_rules = {
 };
 
 /* Run after the layout changes and dwl has written its name to
- * $XDG_RUNTIME_DIR/dwl-xkb-layout (89-xkb-layout), so the bar redraws */
+ * $XDG_RUNTIME_DIR/dwl-xkb-layout (51-xkb-layout), so the bar redraws */
 static const char *const xkblayoutcmd[] = { "dwl-bar-refresh", NULL };
 
 static const int repeat_rate = 25;
@@ -230,7 +230,7 @@ static const char *floatterm[] = { "st-wl", "-c", "floatterm", "-g", "80x20", NU
 #define ALT   WLR_MODIFIER_ALT
 
 /* The only binds that still fire while the session is locked
- * (80-locked-keys.patch). */
+ * (39-locked-keys.patch). */
 static const xkb_keysym_t lockedkeys[] = {
 	XKB_KEY_XF86AudioRaiseVolume,
 	XKB_KEY_XF86AudioLowerVolume,
@@ -305,7 +305,7 @@ static const Key keys[] = {
 	{ MODKEY|SHIFT,              XKB_KEY_n,           spawn,            SHCMD("dwl-nightlight") },
 	{ MODKEY|SHIFT,              XKB_KEY_i,           spawn,            SHCMD("dwl-caffeine") },
 	{ MODKEY|SHIFT,              XKB_KEY_p,           spawn,            SHCMD("dwl-powersave") },
-	/* Colemak <-> QWERTY (89-xkb-layout) */
+	/* Colemak <-> QWERTY (51-xkb-layout) */
 	{ MODKEY|ALT,                XKB_KEY_k,           switchxkblayout,  {.i = +1} },
 
 	/* Noctalia plugins */
@@ -322,7 +322,7 @@ static const Key keys[] = {
 	{ MODKEY|CTRL,               XKB_KEY_a,           toggleautoswallow,{0} },
 
 	/* Focus: Colemak n/i/u/e and the arrows, as in Hyprland. Directional
-	 * (88-focusdir), crossing outputs at the edge and wrapping; monocle
+	 * (48-focusdir), crossing outputs at the edge and wrapping; monocle
 	 * steps the stack instead */
 	{ MODKEY,                    XKB_KEY_n,           focusdir,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY,                    XKB_KEY_i,           focusdir,         {.i = WLR_DIRECTION_RIGHT} },
@@ -419,7 +419,7 @@ static const Axis axes[] = {
 };
 
 /* Scrolling over the status text outside a ^us()/^ds() region
- * (35-bar-status-volume.patch). Nothing bound: slstatus's own regions handle
+ * (18-bar-status-volume.patch). Nothing bound: slstatus's own regions handle
  * volume. C forbids an empty array, so one NULL-func entry, which the lookup
  * skips. */
 static const Axis statusaxes[] = {

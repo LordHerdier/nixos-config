@@ -34,7 +34,7 @@ let
   # below), so a palette change does not rebuild or restart it.
   dwl = pkgs.dwl;
 
-  # What dwl's loadcolors (pkgs/dwl/patches/99-theme-colours.patch) reads,
+  # What dwl's loadcolors (pkgs/dwl/patches/75-theme-colours.patch) reads,
   # one file per palette. The "# NAME" line is for dwl-theme.
   colorsText = name: theme: ''
     # ${name}

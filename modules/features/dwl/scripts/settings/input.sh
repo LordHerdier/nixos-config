@@ -1,10 +1,10 @@
 # Input page: the keyboard layout, and a shortcut to the keybind cheat sheet.
 # Concatenated into dwl-settings by scripts.nix; relies on common.sh.
 #
-# dwl (89-xkb-layout) writes the active layout's name to dwl-xkb-layout and
+# dwl (51-xkb-layout) writes the active layout's name to dwl-xkb-layout and
 # every layout's name, one per line in index order, to dwl-xkb-layouts. A
 # choice is made by writing its index to dwl-xkb-set and signalling dwl
-# (dwl-xkb-switch), which 99-xkb-layout-signal reads. Natural scroll and key
+# (dwl-xkb-switch), which 78-xkb-layout-signal reads. Natural scroll and key
 # repeat are compile-time in pkgs/dwl/config.h, so they are not here.
 
 xkb_dir=${XDG_RUNTIME_DIR:?}

@@ -7,7 +7,7 @@
 #
 # No colours are baked in: the scripts and config.h print dwl's theme colour
 # names (^fg(accent), ^fg(alert), ...), which dwl resolves when it draws, so
-# a dwl-theme switch recolours the blocks (99-theme-colours.patch).
+# a dwl-theme switch recolours the blocks (75-theme-colours.patch).
 
 {
   lib,

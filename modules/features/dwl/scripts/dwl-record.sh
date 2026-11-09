@@ -8,7 +8,7 @@
 # default mic; the choice is remembered. wf-recorder takes one audio device,
 # so both are mixed through a temporary null sink, unloaded on stop.
 #
-# The bind uses `spawnfocused` (97-spawn-focused.patch), so DWL_FOCUS_GEOM
+# The bind uses `spawnfocused` (63-spawn-focused.patch), so DWL_FOCUS_GEOM
 # (the focused window's box) is set before the popup steals focus.
 
 dir="$HOME/Videos/Recordings"
