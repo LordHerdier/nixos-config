@@ -70,7 +70,7 @@
 #define COL_FG "#cbb8ff"
 #endif
 
-#define DEFAULTFONTSIZE 15
+#define DEFAULTFONTSIZE 20
 
 #if FONT2_PATCH
 /* Spare fonts */
