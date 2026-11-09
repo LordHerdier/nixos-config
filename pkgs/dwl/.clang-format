@@ -1,0 +1,4 @@
+# config.h is hand-aligned (keybind and rule tables, columns that line up with
+# the headers), and dwl patches are written against that layout. Without this,
+# nvf's format-on-save runs clang-format over it and collapses the tables.
+DisableFormat: true

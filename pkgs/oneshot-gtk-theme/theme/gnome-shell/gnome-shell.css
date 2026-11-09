@@ -1,0 +1,615 @@
+/* Oneshot GNOME Shell theme.
+ *
+ * Same look as the GTK stylesheets next door -- pure black surfaces, a
+ * single saturated purple accent for borders and text, hard square
+ * corners, no gradients or shadows, and an "inverted" selection (solid
+ * accent fill + black text) for anything hovered or picked.
+ *
+ * OVERRIDES ONLY. Unlike a GTK theme, a GNOME Shell theme does not
+ * replace the stock stylesheet: Main.loadTheme() passes the user theme
+ * as St.Theme's `application_stylesheet` and keeps GNOME's own sheet as
+ * `default_stylesheet`, and St's cascade (src/st/st-theme.c,
+ * compare_declarations) ranks by *origin* before specificity. So every
+ * rule here outranks the stock rule it collides with no matter how
+ * specific that one is, and everything not mentioned -- all the sizing,
+ * spacing, fonts and animation -- keeps coming from GNOME. That is why
+ * this file is ~200 lines instead of ~3000, and why a GNOME upgrade
+ * that renames a widget degrades to "that widget looks stock" rather
+ * than to a broken shell.
+ *
+ * The one wrinkle in that ordering: St adds a fixed offset for
+ * `!important` *on top of* the origin, so a stock `!important` (origin
+ * UA + important) still beats a plain rule here (origin author). Real
+ * CSS inverts importance for the UA origin; libcroco does not. Where a
+ * rule below carries `!important` it is because the stock declaration
+ * it replaces carries one too -- not decoration.
+ *
+ * As in the GTK sheets the colors are literals, and ../default.nix
+ * remaps them by value when the Nix side passes a palette, so don't
+ * quote a specific hex in a comment -- it would be rewritten along with
+ * the real declarations and then lie. Colors written with rgba() are
+ * *not* remapped, which is why the translucent accents below go through
+ * st-transparentize() on a literal instead.
+ */
+
+/* ===== Top bar ===================================================== */
+
+#panel {
+  background-color: #000000;
+  border-bottom: 1px solid #4a3d66;
+}
+
+#panel .panel-button {
+  color: #cbb8ff;
+  border-radius: 0;
+}
+
+#panel .panel-button:focus,
+#panel .panel-button:hover,
+#panel .panel-button.clock-display:focus .clock,
+#panel .panel-button.clock-display:hover .clock {
+  color: #000000;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 100px #9664ff;
+}
+
+#panel .panel-button:active,
+#panel .panel-button:checked,
+#panel .panel-button:active:hover,
+#panel .panel-button:checked:hover,
+#panel .panel-button.clock-display:active .clock,
+#panel .panel-button.clock-display:checked .clock {
+  color: #000000;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 100px #6442a5;
+}
+
+/* The workspace pips in the Activities button ride on top of the fill,
+ * so they have to invert with it. */
+#panel .panel-button#panelActivities .workspace-dot {
+  border-radius: 0;
+  background-color: #9664ff;
+}
+
+#panel .panel-button#panelActivities:hover .workspace-dot,
+#panel .panel-button#panelActivities:focus .workspace-dot,
+#panel .panel-button#panelActivities:active .workspace-dot,
+#panel .panel-button#panelActivities:checked .workspace-dot {
+  background-color: #000000;
+}
+
+/* The screen recording/sharing indicators are deliberately alarming and
+ * the .panel-button rules above are specific enough to repaint them
+ * purple, which would throw away the only signal they carry. Restate
+ * GNOME's own red and orange -- these hexes are not in the palette
+ * remap, so they stay put when the theme is rebuilt on another palette. */
+#panel .panel-button.screen-recording-indicator {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #c01c28;
+}
+
+#panel .panel-button.screen-recording-indicator:focus,
+#panel .panel-button.screen-recording-indicator:hover {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #d61f2d;
+}
+
+#panel .panel-button.screen-recording-indicator:active,
+#panel .panel-button.screen-recording-indicator:checked {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #e02a37;
+}
+
+#panel .panel-button.screen-sharing-indicator {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #ff7800;
+}
+
+#panel .panel-button.screen-sharing-indicator:focus,
+#panel .panel-button.screen-sharing-indicator:hover {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #ff861a;
+}
+
+#panel .panel-button.screen-sharing-indicator:active,
+#panel .panel-button.screen-sharing-indicator:checked {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px #ff902e;
+}
+
+/* Hot-corner ripple. */
+.ripple-box {
+  border-radius: 0;
+  background-color: st-transparentize(#9664ff, 0.7);
+  box-shadow: none;
+}
+
+/* ===== Panel menus, popovers and dialogs =========================== */
+
+.popup-menu {
+  color: #cbb8ff;
+}
+
+.popup-menu-content,
+.candidate-popup-content,
+.popup-sub-menu,
+.modal-dialog,
+.app-folder-dialog,
+#LookingGlassDialog,
+.screenshot-ui-panel,
+.workspace-switcher,
+.switcher-list,
+.resize-popup,
+.osd-window {
+  color: #cbb8ff;
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.quick-settings,
+.quick-settings-grid,
+.quick-toggle,
+.quick-toggle-has-menu,
+.quick-toggle-menu,
+.popup-menu-item,
+.switcher-list .item-box,
+.switcher-list .thumbnail,
+.message,
+.message-notification-group,
+.events-button,
+.world-clocks-button,
+.weather-button,
+.calendar,
+.datemenu-today-button,
+.system-action-icon,
+.user-icon {
+  border-radius: 0;
+}
+
+/* Cards inside a menu (quick toggles, notifications, the calendar's
+ * world clock/weather tiles): one step off black, purple hairline. */
+.quick-toggle-menu,
+.message,
+.events-button,
+.world-clocks-button,
+.weather-button,
+.calendar,
+.datemenu-today-button {
+  color: #cbb8ff;
+  background-color: #1a1a1a;
+  border: 1px solid #4a3d66;
+  box-shadow: none;
+}
+
+.quick-toggle-menu:hover,
+.message:hover,
+.events-button:hover,
+.world-clocks-button:hover,
+.weather-button:hover,
+.datemenu-today-button:hover {
+  color: #cbb8ff;
+  background-color: st-transparentize(#9664ff, 0.82);
+}
+
+.quick-toggle-menu:active,
+.message:active,
+.events-button:active,
+.world-clocks-button:active,
+.weather-button:active,
+.datemenu-today-button:active {
+  color: #000000;
+  background-color: #6442a5;
+}
+
+.popup-menu-item:hover,
+.popup-menu-item:selected,
+.popup-menu-item:checked,
+.popup-sub-menu .popup-menu-item:hover,
+.popup-sub-menu .popup-menu-item:selected,
+.popup-sub-menu .popup-menu-item:checked {
+  color: #000000;
+  background-color: #9664ff;
+}
+
+.popup-menu-item:active,
+.popup-menu-item:active:hover,
+.popup-menu-item:active:focus,
+.popup-sub-menu .popup-menu-item:active {
+  color: #000000;
+  background-color: #6442a5;
+}
+
+.popup-menu-item:insensitive,
+.popup-sub-menu .popup-menu-item:insensitive {
+  color: #4a3d66;
+}
+
+/* Stock gives the expanded row a rounded top; we have no round. */
+.popup-menu-item:checked {
+  border-radius: 0 !important;
+}
+
+.popup-separator-menu-item .popup-separator-menu-item-separator,
+.popup-menu-section .popup-separator-menu-item-separator,
+.switcher-list .separator,
+#dash .dash-separator {
+  background-color: #4a3d66;
+}
+
+/* ===== Buttons and entries ========================================= */
+
+.button,
+.icon-button,
+.notification-button,
+.modal-dialog .modal-dialog-button-box .modal-dialog-button,
+.message .message-header .message-expand-button,
+.message .message-header .message-close-button,
+.message-notification-group .message-collapse-button,
+.calendar .calendar-month-header .pager-button,
+.screenshot-ui-show-pointer-button {
+  color: #cbb8ff;
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  border-radius: 0;
+}
+
+.button:hover,
+.icon-button:hover,
+.notification-button:hover,
+.message .message-header .message-expand-button:hover,
+.message .message-header .message-close-button:hover,
+.message-notification-group .message-collapse-button:hover,
+.calendar .calendar-month-header .pager-button:hover {
+  color: #cbb8ff;
+  background-color: st-transparentize(#9664ff, 0.82);
+}
+
+.button:active,
+.button:selected,
+.button:checked,
+.icon-button:active,
+.icon-button:checked,
+.notification-button:active,
+.message .message-header .message-expand-button:active,
+.message .message-header .message-close-button:active,
+.message-notification-group .message-collapse-button:active,
+.calendar .calendar-month-header .pager-button:active {
+  color: #000000;
+  background-color: #9664ff;
+}
+
+.button:insensitive,
+.icon-button:insensitive {
+  color: #4a3d66;
+  background-color: #000000;
+}
+
+/* Stock marks keyboard focus with an !important inset box-shadow, so
+ * replacing it needs one too. */
+.button:focus,
+.icon-button:focus,
+.notification-button:focus,
+StEntry:focus,
+.search-entry:focus,
+.popup-menu-item:focus,
+.switcher-list .item-box:focus,
+.list-search-result:focus,
+.search-provider-icon:focus,
+.app-folder:focus {
+  box-shadow: inset 0 0 0 1px #cbb8ff !important;
+}
+
+StEntry,
+.search-entry,
+.app-folder-dialog .folder-name-container .folder-name-entry {
+  color: #cbb8ff;
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  border-radius: 0;
+  selection-background-color: #9664ff;
+  selected-color: #000000;
+}
+
+StEntry:hover,
+.search-entry:hover {
+  color: #cbb8ff;
+  background-color: #1a1a1a;
+}
+
+StEntry:focus,
+.search-entry:focus {
+  color: #cbb8ff;
+  background-color: #000000;
+}
+
+StEntry:insensitive,
+.search-entry:insensitive {
+  color: #4a3d66;
+  background-color: #000000;
+}
+
+StEntry StLabel.hint-text,
+.search-entry StLabel.hint-text {
+  color: #4a3d66;
+}
+
+/* ===== Check boxes, switches, sliders ============================== */
+
+.check-box StBin,
+.check-box StIcon {
+  border-radius: 0;
+}
+
+.check-box StIcon {
+  border: 1px solid #9664ff;
+}
+
+.check-box:checked StIcon {
+  background-color: #9664ff;
+  color: #000000;
+  border-color: #9664ff;
+}
+
+.check-box:focus StBin {
+  box-shadow: inset 0 0 0 1px #cbb8ff;
+}
+
+.toggle-switch {
+  border-radius: 0;
+  color: #cbb8ff;
+  background: #000000;
+  box-shadow: inset 0 0 0 1px #9664ff;
+}
+
+.toggle-switch .handle {
+  border-radius: 0;
+  background: #4a3d66;
+  box-shadow: none;
+}
+
+.toggle-switch:checked {
+  background: #9664ff;
+  color: #000000;
+}
+
+.toggle-switch:checked .handle {
+  background: #000000;
+}
+
+.slider {
+  color: #9664ff;
+  -barlevel-background-color: #4a3d66;
+  -barlevel-active-background-color: #9664ff;
+  -slider-handle-radius: 0.3em;
+}
+
+.slider:hover {
+  color: #cbb8ff;
+}
+
+/* ===== Overview ==================================================== */
+
+/* The backdrop the app grid and window picker sit on. Stock is a mid
+ * grey, which is the reason the purple below never reads as purple. */
+#overviewGroup {
+  background-color: #000000;
+}
+
+.workspace-background {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.search-entry {
+  border-radius: 0;
+}
+
+.window-close,
+.screenshot-ui-close-button {
+  color: #000000;
+  background-color: #9664ff;
+  border-radius: 0;
+  border: 1px solid #9664ff;
+  box-shadow: none;
+}
+
+.window-close:hover,
+.screenshot-ui-close-button:hover {
+  background-color: #cbb8ff;
+}
+
+.window-close:active,
+.screenshot-ui-close-button:active {
+  background-color: #6442a5;
+}
+
+/* --- Dash / dock --- */
+
+#dash .dash-background {
+  background-color: #000000;
+  border: 1px solid #4a3d66;
+  border-radius: 0;
+}
+
+#dash .dash-item-container .show-apps .overview-icon,
+#dash .dash-item-container .overview-tile .overview-icon,
+#dash .dash-item-container .grid-search-result .overview-icon {
+  color: #cbb8ff;
+  background-color: #000000;
+  border-radius: 0;
+}
+
+#dash .dash-item-container .show-apps:hover .overview-icon,
+#dash .dash-item-container .overview-tile:hover .overview-icon,
+#dash .dash-item-container .grid-search-result:hover .overview-icon,
+#dash .dash-item-container .show-apps:focus .overview-icon,
+#dash .dash-item-container .overview-tile:focus .overview-icon,
+#dash .dash-item-container .grid-search-result:focus .overview-icon {
+  color: #000000;
+  background-color: #9664ff;
+}
+
+#dash .dash-item-container .show-apps:active .overview-icon,
+#dash .dash-item-container .overview-tile:active .overview-icon,
+#dash .dash-item-container .grid-search-result:active .overview-icon,
+#dash .dash-item-container .show-apps:checked .overview-icon,
+#dash .dash-item-container .overview-tile:checked .overview-icon,
+#dash .dash-item-container .grid-search-result:checked .overview-icon {
+  color: #000000;
+  background-color: #6442a5;
+}
+
+/* --- App grid and search results --- */
+
+.overview-tile,
+.grid-search-result,
+.app-folder,
+.list-search-result,
+.search-provider-icon,
+.app-folder-dialog .overview-tile,
+.app-folder-dialog .grid-search-result {
+  color: #cbb8ff;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.app-folder {
+  background-color: #1a1a1a;
+}
+
+.overview-tile:hover,
+.grid-search-result:hover,
+.app-folder:hover,
+.list-search-result:hover,
+.search-provider-icon:hover,
+.overview-tile:focus,
+.grid-search-result:focus,
+.app-folder:focus,
+.list-search-result:focus,
+.search-provider-icon:focus,
+.switcher-list .item-box:hover,
+.switcher-list .item-box:focus {
+  color: #000000;
+  background-color: #9664ff;
+}
+
+.overview-tile:active,
+.grid-search-result:active,
+.overview-tile:selected,
+.grid-search-result:selected,
+.overview-tile:checked,
+.grid-search-result:checked,
+.overview-tile:highlighted,
+.grid-search-result:highlighted,
+.app-folder:active,
+.app-folder:selected,
+.app-folder:checked,
+.list-search-result:active,
+.search-provider-icon:active,
+.switcher-list .item-box:selected,
+.switcher-list .item-box:highlighted,
+.switcher-list .item-box:checked,
+.switcher-list .item-box:active {
+  color: #000000;
+  background-color: #6442a5;
+}
+
+.overview-tile:insensitive,
+.grid-search-result:insensitive,
+.app-folder:insensitive {
+  color: #4a3d66;
+  background-color: #000000;
+}
+
+.overview-tile:drop,
+.grid-search-result:drop,
+.app-folder:drop,
+.switcher-list .item-box:drop {
+  background-color: st-transparentize(#9664ff, 0.7);
+  box-shadow: inset 0 0 0 1px #9664ff;
+}
+
+.app-grid-running-dot {
+  border-radius: 0;
+  background-color: #9664ff;
+}
+
+.search-section-content {
+  background-color: #000000;
+  border: 1px solid #4a3d66;
+  border-radius: 0;
+}
+
+.app-folder-dialog .page-indicators .page-indicator .page-indicator-icon,
+.page-indicator .page-indicator-icon {
+  border-radius: 0;
+  background-color: #9664ff;
+}
+
+/* --- Workspace pager --- */
+
+.workspace-thumbnails .workspace-thumbnail {
+  color: #cbb8ff;
+  background-color: #1a1a1a;
+  border-radius: 0;
+  border: 1px solid #4a3d66;
+}
+
+.workspace-thumbnail-indicator {
+  border: 2px solid #9664ff;
+  border-radius: 0;
+}
+
+.ws-switcher-indicator:active {
+  background-color: #9664ff;
+}
+
+.workspace-animation {
+  background-color: #000000;
+}
+
+/* ===== Window management feedback ================================== */
+
+.tile-preview {
+  background-color: st-transparentize(#9664ff, 0.7);
+  border: 1px solid #9664ff;
+}
+
+.cycler-highlight {
+  border: 3px solid #9664ff;
+}
+
+.select-area-rubberband {
+  background-color: st-transparentize(#9664ff, 0.7);
+  border: 1px solid #9664ff;
+}
+
+.magnifier-zoom-region {
+  border: 2px solid #9664ff;
+}
+
+.pie-timer {
+  -pie-border-color: #9664ff;
+  -pie-background-color: st-transparentize(#9664ff, 0.7);
+}
+
+.ripple-pointer-location {
+  border-radius: 0;
+  background-color: st-transparentize(#9664ff, 0.7);
+  box-shadow: none;
+}
+
+.window-caption,
+.dash-label,
+.screenshot-ui-tooltip {
+  color: #cbb8ff;
+  background-color: #000000;
+  border: 1px solid #9664ff;
+  border-radius: 0;
+}
+
+.caps-lock-warning-label {
+  color: #9664ff;
+}

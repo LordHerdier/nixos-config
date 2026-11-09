@@ -1,6 +1,6 @@
 # home/modules/zsh/default.nix
 
-{ lib, ... }:
+{ ... }:
 
 {
   imports = [
@@ -8,12 +8,15 @@
     ./profile.nix
 
     ./init/00-guard.nix
+    ./init/05-keybinds.nix
     ./init/10-paths-xdg-editor.nix
     ./init/20-zoxide.nix
     ./init/30-oh-my-posh.nix
     ./init/40-ssh-agent.nix
     ./init/50-history-completion.nix
     ./init/60-functions.nix
+    ./init/61-manpager.nix
+    ./init/62-motd.nix
     ./init/99-private-extras.nix
   ];
 
@@ -29,4 +32,3 @@
     syntaxHighlighting.enable = true;
   };
 }
-

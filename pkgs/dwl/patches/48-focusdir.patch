@@ -1,0 +1,123 @@
+diff --git a/dwl.c b/dwl.c
+index 78609b8..aad735c 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -379,6 +379,7 @@ static Monitor *dirtomon(enum wlr_direction dir);
+ static void drawbar(Monitor *m);
+ static void drawbars(void);
+ static void focusclient(Client *c, int lift);
++static void focusdir(const Arg *arg);
+ static void focusmon(const Arg *arg);
+ static void focusstack(const Arg *arg);
+ static Client *focustop(Monitor *m);
+@@ -2174,6 +2175,110 @@ focusclient(Client *c, int lift)
+ 	}
+ }
+ 
++void
++focusdir(const Arg *arg)
++{
++	/* Focus the nearest client in a direction (arg->i, a wlr_direction),
++	 * moving to the adjacent output when there is none on selmon and
++	 * wrapping around at the edge of the layout */
++	Client *c, *sel = focustop(selmon), *best = NULL;
++	Monitor *m;
++	struct wlr_output *next;
++	struct wlr_box a, b;
++	int horiz = arg->i & (WLR_DIRECTION_LEFT | WLR_DIRECTION_RIGHT);
++	int fwd = arg->i & (WLR_DIRECTION_RIGHT | WLR_DIRECTION_DOWN);
++	long dist, off, bestdist = LONG_MAX, bestoff = LONG_MAX;
++	double cx, cy;
++
++	if (!selmon)
++		return;
++	/* Monocle stacks every window on the same box: step the stack instead */
++	if (sel && !sel->isfloating && !sel->isfullscreen
++			&& selmon->lt[selmon->sellt]->arrange == monocle) {
++		focusstack(&(Arg){.i = fwd ? +1 : -1});
++		return;
++	}
++
++	a = sel ? sel->geom : selmon->w;
++	cx = a.x + a.width / 2.0;
++	cy = a.y + a.height / 2.0;
++
++	/* A fullscreen window covers the output, so only look past it */
++	if (sel && !(sel->isfullscreen && !client_has_children(sel))) {
++		/* In focus order, so ties go to the most recently focused */
++		wl_list_for_each(c, &fstack, flink) {
++			if (c == sel || !VISIBLEON(c, selmon))
++				continue;
++			b = c->geom;
++			/* Gap along the direction (negative: the boxes overlap) and
++			 * whether they overlap across it */
++			if (horiz) {
++				dist = fwd ? b.x - (a.x + a.width) : a.x - (b.x + b.width);
++				off = MIN(a.y + a.height, b.y + b.height) > MAX(a.y, b.y)
++					? 0 : (long)fabs(b.y + b.height / 2.0 - cy);
++				if (fwd ? b.x + b.width / 2.0 <= cx : b.x + b.width / 2.0 >= cx)
++					continue;
++			} else {
++				dist = fwd ? b.y - (a.y + a.height) : a.y - (b.y + b.height);
++				off = MIN(a.x + a.width, b.x + b.width) > MAX(a.x, b.x)
++					? 0 : (long)fabs(b.x + b.width / 2.0 - cx);
++				if (fwd ? b.y + b.height / 2.0 <= cy : b.y + b.height / 2.0 >= cy)
++					continue;
++			}
++			dist = MAX(dist, 0);
++			/* Overlapping across the direction wins, then the closest */
++			if (off < bestoff || (off == bestoff && dist < bestdist)) {
++				best = c;
++				bestoff = off;
++				bestdist = dist;
++			}
++		}
++		if (best) {
++			focusclient(best, 1);
++			return;
++		}
++	}
++
++	/* Nothing that way on this output: try the next one over, wrapping to
++	 * the far side of the layout (this output, if it is the only one) */
++	if (!wlr_output_layout_get(output_layout, selmon->wlr_output))
++		return;
++	if (!(next = wlr_output_layout_adjacent_output(output_layout,
++			arg->i, selmon->wlr_output, cx, cy)))
++		next = wlr_output_layout_farthest_output(output_layout,
++				horiz ? arg->i ^ (WLR_DIRECTION_LEFT | WLR_DIRECTION_RIGHT)
++				      : arg->i ^ (WLR_DIRECTION_UP | WLR_DIRECTION_DOWN),
++				selmon->wlr_output, cx, cy);
++	if (!next || !(m = next->data) || !m->wlr_output->enabled)
++		m = selmon;
++	selmon = m;
++
++	/* Enter at the client nearest the edge we came in from, and closest to
++	 * where we left across it */
++	best = NULL;
++	bestdist = bestoff = LONG_MAX;
++	if (!(sel = focustop(m)) || !sel->isfullscreen) {
++		wl_list_for_each(c, &clients, link) {
++			if (!VISIBLEON(c, m))
++				continue;
++			b = c->geom;
++			if (horiz) {
++				dist = fwd ? b.x : -(b.x + b.width);
++				off = (long)fabs(b.y + b.height / 2.0 - cy);
++			} else {
++				dist = fwd ? b.y : -(b.y + b.height);
++				off = (long)fabs(b.x + b.width / 2.0 - cx);
++			}
++			if (dist < bestdist || (dist == bestdist && off < bestoff)) {
++				best = c;
++				bestdist = dist;
++				bestoff = off;
++			}
++		}
++	}
++	focusclient(best ? best : sel, 1);
++}
++
+ void
+ focusmon(const Arg *arg)
+ {

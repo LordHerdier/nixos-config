@@ -1,0 +1,62 @@
+# home/modules/youtube-tui/keybindings.yml
+#
+# youtube-tui's defaults with h/j/k/l swapped for Colemak n/e/u/i,
+# matching home/modules/nvf/90-keymaps.nix. This file replaces the
+# built-in table wholesale, so every binding has to be listed.
+#
+# Modifier keys are crossterm bits: 0 none, 1 Shift, 2 Ctrl, 4 Alt.
+
+# ── Colemak movement ───────────────────────────────────────────────
+# Ctrl+u / Ctrl+e keep their text-field meanings (clear line, end).
+'n':
+  0: MoveLeft
+'e':
+  0: MoveDown
+  2: End
+'u':
+  0: MoveUp
+  2: ClearLine
+'i':
+  0: MoveRight
+
+# ── Everything else, unchanged from upstream ──────────────────────
+Up:
+  0: MoveUp
+  2: PreviousEntry
+Down:
+  0: MoveDown
+  2: NextEntry
+Left:
+  0: MoveLeft
+  2: PreviousWord
+  4: Back
+Right:
+  0: MoveRight
+  2: NextWord
+Esc:
+  0: Deselect
+Enter:
+  0: Select
+Backspace:
+  0: Back
+Home:
+  0: FirstHistory
+End:
+  0: ClearHistory
+F5:
+  0: Reload
+'r':
+  2: Reload
+'q':
+  0: Exit
+'a':
+  2: First
+'w':
+  2: RemoveWord
+'d':
+  0: ClearHistory
+  4: RemoveWord
+'v':
+  2: Paste
+':':
+  0: StartCommandCapture

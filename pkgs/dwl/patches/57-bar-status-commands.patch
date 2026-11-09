@@ -1,0 +1,309 @@
+diff --git a/dwl.c b/dwl.c
+index 37574e3..647cd47 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -126,6 +126,16 @@ typedef struct {
+ 	const Arg arg;
+ } Button;
+ 
++enum { StBtnLeft, StBtnMiddle, StBtnRight, StScrollUp, StScrollDown, StCmdLast }; /* status region commands */
++
++/* A run of status text drawn in one colour, optionally inside click regions.
++ * fg/bg of 0 mean the SchemeNorm colour. */
++typedef struct {
++	const char *text;
++	uint32_t fg, bg;
++	const char *cmd[StCmdLast];
++} StatusBlock;
++
+ typedef struct Monitor Monitor;
+ typedef struct Client Client;
+ struct Client {
+@@ -412,7 +422,9 @@ static void setopacity(const Arg *arg);
+ static void setpsel(struct wl_listener *listener, void *data);
+ static void setsel(struct wl_listener *listener, void *data);
+ static void setup(void);
++static void setstatus(const char *s);
+ static void spawn(const Arg *arg);
++static void spawnstatuscmd(const StatusBlock *b, int cmd);
+ static void startdrag(struct wl_listener *listener, void *data);
+ static void swallow(Client *c, Client *toswallow);
+ static int statusin(int fd, unsigned int mask, void *data);
+@@ -431,6 +443,8 @@ static void toggleview(const Arg *arg);
+ static void trayactivate(const Arg *arg);
+ static void traymenu(const Arg *arg);
+ static void traynotify(void *data);
++static StatusBlock *statusblockat(Monitor *m, double cx);
++static int statusw(Monitor *m);
+ static int traysepw(Monitor *m);
+ static void unlocksession(struct wl_listener *listener, void *data);
+ static void unmaplayersurfacenotify(struct wl_listener *listener, void *data);
+@@ -506,7 +520,9 @@ static struct wl_list mons;
+ static Monitor *selmon;
+ static int consumed[KEY_MAX + 1];
+ 
+-static char stext[256];
++static char stextbuf[4096]; /* block texts and region commands, NUL-separated */
++static StatusBlock sblocks[64];
++static int nsblocks;
+ static struct wl_event_source *status_event_source;
+ 
+ static DBusConnection *bus_conn;
+@@ -800,6 +816,7 @@ axisnotify(struct wl_listener *listener, void *data)
+ 	uint32_t mods;
+ 	double cx;
+ 	int tw;
++	StatusBlock *sb;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+@@ -807,7 +824,8 @@ axisnotify(struct wl_listener *listener, void *data)
+ 	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
+ 
+ 	/* Scrolling over the bar cycles through tags (wrapping); over the
+-	 * status text it runs the matching statusaxes[] binding instead. */
++	 * status text it runs the region's ^us()/^ds() command, or failing that
++	 * the matching statusaxes[] binding. */
+ 	if (!locked && !exclusive_focus && selmon &&
+ 		(node = wlr_scene_node_at(&layers[LyrBottom]->node, cursor->x, cursor->y, NULL, NULL)) &&
+ 		(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer) {
+@@ -818,8 +836,13 @@ axisnotify(struct wl_listener *listener, void *data)
+ 				adir = barscroll > 0 ? AxisDown : AxisUp;
+ 				barscroll = 0;
+ 				cx = (cursor->x - selmon->m.x) * selmon->wlr_output->scale;
+-				tw = TEXTW(selmon, stext) - selmon->lrpad + 2;
++				tw = statusw(selmon);
+ 				if (cx > selmon->b.width - tw - traysepw(selmon)) {
++					sb = statusblockat(selmon, cx);
++					if (!CLEANMASK(mods) && sb && sb->cmd[adir == AxisUp ? StScrollUp : StScrollDown]) {
++						spawnstatuscmd(sb, adir == AxisUp ? StScrollUp : StScrollDown);
++						return;
++					}
+ 					for (a = statusaxes; a < END(statusaxes); a++)
+ 						if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func)
+ 							a->func(&a->arg);
+@@ -937,6 +960,8 @@ buttonpress(struct wl_listener *listener, void *data)
+ 	Client *c = NULL;
+ 	LayerSurface *l = NULL;
+ 	const Button *b;
++	StatusBlock *sb = NULL;
++	int sbcmd;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+@@ -957,7 +982,7 @@ buttonpress(struct wl_listener *listener, void *data)
+ 			(buffer = wlr_scene_buffer_from_node(node)) && buffer == selmon->scene_buffer) {
+ 			cx = (cursor->x - selmon->m.x) * selmon->wlr_output->scale;
+ 			traywidth = tray_get_width(selmon->tray);
+-			tw = TEXTW(selmon, stext) - selmon->lrpad + 2;
++			tw = statusw(selmon);
+ 			wl_list_for_each(c, &clients, link) {
+ 				if (c->mon != selmon)
+ 					continue;
+@@ -985,6 +1010,7 @@ buttonpress(struct wl_listener *listener, void *data)
+ 				arg.ui = ti;
+ 			} else if (cx > selmon->b.width - tw - traysepw(selmon)) {
+ 				click = ClkStatus;
++				sb = statusblockat(selmon, cx);
+ 			} else
+ 				click = ClkTitle;
+ 		}
+@@ -1001,6 +1027,15 @@ buttonpress(struct wl_listener *listener, void *data)
+ 
+ 		keyboard = wlr_seat_get_keyboard(seat);
+ 		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
++		/* An unmodified click inside a ^lm()/^mm()/^rm() region runs its
++		 * command instead of the ClkStatus bindings */
++		sbcmd = event->button == BTN_LEFT ? StBtnLeft
++			: event->button == BTN_MIDDLE ? StBtnMiddle
++			: event->button == BTN_RIGHT ? StBtnRight : -1;
++		if (sb && !CLEANMASK(mods) && sbcmd >= 0 && sb->cmd[sbcmd]) {
++			spawnstatuscmd(sb, sbcmd);
++			return;
++		}
+ 		for (b = buttons; b < END(buttons); b++) {
+ 			if (CLEANMASK(mods) == CLEANMASK(b->mod) && event->button == b->button && click == b->click && b->func) {
+ 				if (click == ClkTagBar && b->arg.i == 0)
+@@ -1882,6 +1917,7 @@ drawbar(Monitor *m)
+ 	int boxs = m->drw->font->height / 9;
+ 	int boxw = m->drw->font->height / 6 + 2;
+ 	uint32_t i, occ = 0, urg = 0;
++	uint32_t scm[3];
+ 	Client *c;
+ 	Buffer *buf;
+ 
+@@ -1896,8 +1932,19 @@ drawbar(Monitor *m)
+ 	/* draw status first so it can be overdrawn by tags later */
+ 	if (m == selmon) { /* status is only drawn on selected monitor */
+ 		drwl_setscheme(m->drw, colors[SchemeNorm]);
+-		tw = TEXTW(m, stext) - m->lrpad + 2; /* 2px right padding */
+-		drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0);
++		tw = statusw(m);
++		x = m->b.width - tw;
++		drwl_rect(m->drw, x, 0, tw, m->b.height, 1, 1);
++		for (i = 0; i < (uint32_t)nsblocks; i++) {
++			if (!(w = drwl_font_getwidth(m->drw, sblocks[i].text)))
++				continue;
++			scm[ColFg] = sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
++			scm[ColBg] = sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
++			scm[ColBorder] = colors[SchemeNorm][ColBorder];
++			drwl_setscheme(m->drw, scm);
++			drwl_text(m->drw, x, 0, w, m->b.height, 0, sblocks[i].text, 0);
++			x += w;
++		}
+ 	}
+ 
+ 	wl_list_for_each(c, &clients, link) {
+@@ -1955,6 +2002,32 @@ drawbar(Monitor *m)
+ 	wlr_buffer_unlock(&buf->base);
+ }
+ 
++/* the status block under bar x-coordinate cx, which must be inside the
++ * status text */
++StatusBlock *
++statusblockat(Monitor *m, double cx)
++{
++	int i, x = m->b.width - statusw(m);
++
++	for (i = 0; i < nsblocks; i++) {
++		x += drwl_font_getwidth(m->drw, sblocks[i].text);
++		if (cx < x)
++			return &sblocks[i];
++	}
++	return NULL;
++}
++
++/* width of the status text, including 2px of right padding */
++int
++statusw(Monitor *m)
++{
++	int i, w = 2;
++
++	for (i = 0; i < nsblocks; i++)
++		w += drwl_font_getwidth(m->drw, sblocks[i].text);
++	return w;
++}
++
+ /* width of the " | " between the tray and the status text; only the selected
+  * monitor draws status text, so only it has a separator */
+ int
+@@ -3379,6 +3452,90 @@ setup(void)
+ #endif
+ }
+ 
++/* Parse a status line into sblocks. Inline commands, as in dwlb:
++ *   ^fg(rrggbb[aa]) ^bg(rrggbb[aa])     colour the following text; empty
++ *                                       argument reverts to SchemeNorm
++ *   ^lm(cmd) ^mm(cmd) ^rm(cmd)          left/middle/right click region
++ *   ^us(cmd) ^ds(cmd)                   scroll up/down region
++ * A region runs until the same command with an empty argument, e.g.
++ * "^lm(foot)click me^lm()". cmd runs through /bin/sh -c and ends at the
++ * first ')'. "^^" is a literal '^'; anything else starting with '^' is
++ * drawn as is. */
++void
++setstatus(const char *s)
++{
++	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds" };
++	char *p = stextbuf, *end = stextbuf + sizeof(stextbuf) - 1, hex[9], *e;
++	const char *arg, *close;
++	StatusBlock *b = sblocks;
++	unsigned long v;
++	size_t i, n;
++
++	memset(b, 0, sizeof(*b));
++	b->text = p;
++	while (*s && p < end) {
++		if (s[0] == '^' && s[1] == '^') {
++			*p++ = '^';
++			s += 2;
++			continue;
++		}
++		for (i = 0; s[0] == '^' && i < LENGTH(names); i++)
++			if (!strncmp(s + 1, names[i], 2) && s[3] == '(')
++				break;
++		if (s[0] != '^' || i == LENGTH(names) || !(close = strchr(s + 4, ')'))) {
++			*p++ = *s++;
++			continue;
++		}
++		arg = s + 4;
++		n = close - arg;
++		s = close + 1;
++
++		/* end the current block's text; out of blocks, drop the command */
++		if (p > b->text) {
++			if (b + 1 == END(sblocks))
++				continue;
++			*p++ = '\0';
++			b[1] = b[0];
++			b++;
++		}
++		if (i < 2) {
++			v = 0;
++			if (n && *arg == '#')
++				arg++, n--;
++			if (n == 6 || n == 8) {
++				memcpy(hex, arg, n);
++				hex[n] = '\0';
++				v = strtoul(hex, &e, 16);
++				if (*e)
++					v = 0;
++				else if (n == 6)
++					v = v << 8 | 0xff;
++			}
++			if (i == 0)
++				b->fg = v;
++			else
++				b->bg = v;
++		} else if (n && p + n < end) {
++			memcpy(p, arg, n);
++			p[n] = '\0';
++			b->cmd[i - 2] = p;
++			p += n + 1;
++		} else {
++			b->cmd[i - 2] = NULL;
++		}
++		b->text = p;
++	}
++	*p = '\0';
++	nsblocks = b - sblocks + 1;
++}
++
++void
++spawnstatuscmd(const StatusBlock *b, int cmd)
++{
++	Arg arg = {.v = (const char *[]){ "/bin/sh", "-c", b->cmd[cmd], NULL }};
++	spawn(&arg);
++}
++
+ void
+ spawn(const Arg *arg)
+ {
+@@ -3406,7 +3563,7 @@ startdrag(struct wl_listener *listener, void *data)
+ int
+ statusin(int fd, unsigned int mask, void *data)
+ {
+-	char status[256];
++	char status[4096];
+ 	ssize_t n;
+ 
+ 	if (mask & WL_EVENT_ERROR)
+@@ -3421,7 +3578,7 @@ statusin(int fd, unsigned int mask, void *data)
+ 	status[n] = '\0';
+ 	status[strcspn(status, "\n")] = '\0';
+ 
+-	strncpy(stext, status, sizeof(stext));
++	setstatus(status);
+ 	drawbars();
+ 
+ 	return 0;
+@@ -3833,8 +3990,8 @@ updatemons(struct wl_listener *listener, void *data)
+ 		}
+ 	}
+ 
+-	if (stext[0] == '\0')
+-		strncpy(stext, "dwl-"VERSION, sizeof(stext));
++	if (!sblocks[0].text)
++		setstatus("dwl-"VERSION);
+ 	wl_list_for_each(m, &mons, link) {
+ 		updatebar(m);
+ 		drawbar(m);

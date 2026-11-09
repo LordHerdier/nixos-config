@@ -1,0 +1,52 @@
+# home/modules/youtube-tui/commandbindings.yml
+#
+# youtube-tui's defaults, except every external player is launched through
+# ${video-player} (set in main.yml) instead of a bare `mpv`, so the yt-dlp
+# cookie option reaches the hover-to-play bindings too.
+#
+# Modifier keys are crossterm bits: 0 none, 1 Shift, 2 Ctrl, 4 Alt.
+# Per page: Ctrl+p plays, Ctrl+a plays audio-only, Shift+A shuffles on loop.
+
+global:
+  'y':
+    0: cp ${url}
+  'c':
+    2: cp ${url}
+  'f':
+    2: run ${browser} '${url}'
+  ' ':
+    0: tpause ;; echo mpv Player pause toggled
+  Right:
+    2: mpv seek 5 ;; echo mpv Fast forwarded 5 seconds
+    3: next ;; echo mpv Skipped
+  Left:
+    2: mpv seek -5 ;; echo mpv Rewinded 5 seconds
+    3: back ;; echo mpv Unskipped
+
+search: &hover
+  'p':
+    2: parrun ${video-player} '${hover-url}'
+  'a':
+    2: parrun ${terminal-emulator} ${video-player} '${hover-url}' --no-video
+  'A':
+    1: parrun ${terminal-emulator} ${video-player} '${hover-url}' --no-video --loop-playlist=inf --shuffle
+popular: *hover
+trending: *hover
+playlist: *hover
+channel_videos: *hover
+channel_playlists: *hover
+watchhistory: *hover
+library: *hover
+
+feed:
+  'p':
+    2: parrun ${video-player} '${hover-video-url}'
+  'a':
+    2: parrun ${terminal-emulator} ${video-player} '${hover-video-url}' --no-video
+  'A':
+    1: parrun ${terminal-emulator} ${video-player} '${hover-channel-url}/videos' --no-video --loop-playlist=inf --shuffle
+  'P':
+    1: parrun ${terminal-emulator} ${video-player} '${hover-channel-url}/videos' --no-video --loop-playlist=inf --shuffle
+
+video: {}
+channel_main: {}

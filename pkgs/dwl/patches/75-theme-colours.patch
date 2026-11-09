@@ -1,0 +1,214 @@
+diff --git a/dwl.c b/dwl.c
+index 42635ef..ea7d1ea 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -139,6 +139,7 @@ enum { StBtnLeft, StBtnMiddle, StBtnRight, StScrollUp, StScrollDown, StCmdLast }
+ typedef struct {
+ 	const char *text;
+ 	uint32_t fg, bg;
++	unsigned char fgrole, bgrole; /* 1 + a statuscolor() role; 0 uses fg/bg */
+ 	const char *cmd[StCmdLast];
+ 	int centre; /* drawn in the middle of the bar, not at the right */
+ } StatusBlock;
+@@ -411,6 +412,9 @@ static void ftlfullscreennotify(struct wl_listener *listener, void *data);
+ static void fullscreennotify(struct wl_listener *listener, void *data);
+ static void gpureset(struct wl_listener *listener, void *data);
+ static void handlesig(int signo);
++static int loadcolors(void);
++static uint32_t statuscolor(int role);
++static int sigcolors(int signo, void *data);
+ static void incnmaster(const Arg *arg);
+ static void inputdevice(struct wl_listener *listener, void *data);
+ static const Key *keybinding(uint32_t mods, xkb_keysym_t sym);
+@@ -2028,8 +2032,10 @@ drawbar(Monitor *m)
+ 				continue;
+ 			if (!(w = drwl_font_getwidth(m->drw, sblocks[i].text)))
+ 				continue;
+-			scm[ColFg] = sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
+-			scm[ColBg] = sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
++			scm[ColFg] = sblocks[i].fgrole ? statuscolor(sblocks[i].fgrole)
++				: sblocks[i].fg ? sblocks[i].fg : colors[SchemeNorm][ColFg];
++			scm[ColBg] = sblocks[i].bgrole ? statuscolor(sblocks[i].bgrole)
++				: sblocks[i].bg ? sblocks[i].bg : colors[SchemeNorm][ColBg];
+ 			scm[ColBorder] = colors[SchemeNorm][ColBorder];
+ 			drwl_setscheme(m->drw, scm);
+ 			if (sblocks[i].centre) {
+@@ -2531,6 +2537,114 @@ handlesig(int signo)
+ 	}
+ }
+ 
++/* Where the colours are read from, first match wins: the user's override
++ * (written by dwl-theme), then the system default. Neither existing leaves
++ * the compiled-in COL_* values alone. Each line is "name=#rrggbb". */
++static int
++colorsfile(char *buf, size_t len)
++{
++	const char *state = getenv("XDG_STATE_HOME"), *home = getenv("HOME");
++
++	if (state && *state)
++		snprintf(buf, len, "%s/dwl/colors", state);
++	else if (home && *home)
++		snprintf(buf, len, "%s/.local/state/dwl/colors", home);
++	else
++		buf[0] = '\0';
++	if (buf[0] && access(buf, R_OK) == 0)
++		return 1;
++	snprintf(buf, len, "%s", COLORS_SYSTEM);
++	return access(buf, R_OK) == 0;
++}
++
++/* Reads the colours file into colors[], sepcolors and rootcolor, then
++ * repaints what already exists: root background, client borders, bars and
++ * tray. Returns -1 when there was no file to read. */
++int
++loadcolors(void)
++{
++	struct { const char *key; uint32_t *dst[2]; } tbl[] = {
++		{ "fg",              { &colors[SchemeNorm][ColFg] } },
++		{ "surface",         { &colors[SchemeNorm][ColBg], &sepcolors[ColBg] } },
++		{ "border_inactive", { &colors[SchemeNorm][ColBorder], &sepcolors[ColBorder] } },
++		{ "muted",           { &sepcolors[ColFg] } },
++		{ "accent",          { &colors[SchemeSel][ColBg] } },
++		{ "accent_fg",       { &colors[SchemeSel][ColFg] } },
++		{ "border",          { &colors[SchemeSel][ColBorder] } },
++		{ "urgent",          { &colors[SchemeUrg][ColBorder] } },
++		{ "success",         { &successcolor } },
++	};
++	char path[PATH_MAX], line[128], key[32], hex[16];
++	unsigned int rgb;
++	size_t i;
++	FILE *f;
++	Client *c;
++	Monitor *m;
++
++	if (!colorsfile(path, sizeof(path)) || !(f = fopen(path, "r")))
++		return -1;
++	while (fgets(line, sizeof(line), f)) {
++		if (sscanf(line, " %31[a-z_] = #%15[0-9a-fA-F]", key, hex) != 2
++				|| strlen(hex) != 6)
++			continue;
++		rgb = (unsigned int)strtoul(hex, NULL, 16);
++		rgb = rgb << 8 | 0xff;
++		if (!strcmp(key, "bg")) {
++			float bg[] = COLOR(rgb);
++			memcpy(rootcolor, bg, sizeof(rootcolor));
++			continue;
++		}
++		for (i = 0; i < LENGTH(tbl); i++) {
++			if (strcmp(key, tbl[i].key))
++				continue;
++			*tbl[i].dst[0] = rgb;
++			if (tbl[i].dst[1])
++				*tbl[i].dst[1] = rgb;
++		}
++	}
++	fclose(f);
++
++	/* Before setup() has built the scene there is nothing to repaint. */
++	if (!root_bg)
++		return 0;
++	wlr_scene_rect_set_color(root_bg, rootcolor);
++	wl_list_for_each(c, &clients, link) {
++		if (client_is_unmanaged(c))
++			continue;
++		client_set_border_color(c, (float[])COLOR(colors[
++			c == focused_client ? SchemeSel : c->isurgent ? SchemeUrg : SchemeNorm][ColBorder]));
++	}
++	/* The tray holds a pointer to colors[SchemeNorm] but paints its icons
++	 * onto a canvas filled with the old background, so rebuild that. */
++	wl_list_for_each(m, &mons, link)
++		if (m->tray)
++			tray_update(m->tray);
++	drawbars();
++	return 0;
++}
++
++/* The colours a status line can name, as ^fg(accent) rather than a hex
++ * value, so they follow loadcolors. 1-based, matching setstatus's names. */
++uint32_t
++statuscolor(int role)
++{
++	switch (role) {
++	case 1: return colors[SchemeSel][ColBg];     /* accent */
++	case 2: return sepcolors[ColFg];             /* muted */
++	case 3: return colors[SchemeUrg][ColBorder]; /* alert */
++	case 4: return successcolor;                 /* good */
++	}
++	return 0;
++}
++
++int
++sigcolors(int signo, void *data)
++{
++	(void)signo; (void)data;
++	loadcolors();
++	return 0;
++}
++
+ void
+ incnmaster(const Arg *arg)
+ {
+@@ -3683,7 +3797,9 @@ setup(void)
+ 
+ 	/* Initialize the scene graph used to lay out windows */
+ 	scene = wlr_scene_create();
++	loadcolors();
+ 	root_bg = wlr_scene_rect_create(&scene->tree, 0, 0, rootcolor);
++	wl_event_loop_add_signal(event_loop, SIGUSR2, sigcolors, NULL);
+ 	for (i = 0; i < NUM_LAYERS; i++)
+ 		layers[i] = wlr_scene_tree_create(&scene->tree);
+ 	drag_icon = wlr_scene_tree_create(&scene->tree);
+@@ -3914,6 +4030,8 @@ setup(void)
+ /* Parse a status line into sblocks. Inline commands, as in dwlb:
+  *   ^fg(rrggbb[aa]) ^bg(rrggbb[aa])     colour the following text; empty
+  *                                       argument reverts to SchemeNorm
++ *   ^fg(accent|muted|alert|good)        the same, with a theme colour that
++ *                                       follows loadcolors
+  *   ^lm(cmd) ^mm(cmd) ^rm(cmd)          left/middle/right click region
+  *   ^us(cmd) ^ds(cmd)                   scroll up/down region
+  *   ^ct()                               toggle drawing the following text
+@@ -3926,11 +4044,14 @@ void
+ setstatus(const char *s)
+ {
+ 	static const char *const names[] = { "fg", "bg", "lm", "mm", "rm", "us", "ds", "ct" };
++	/* in statuscolor() order */
++	static const char *const roles[] = { "accent", "muted", "alert", "good" };
+ 	char *p = stextbuf, *end = stextbuf + sizeof(stextbuf) - 1, hex[9], *e;
+ 	const char *arg, *close;
+ 	StatusBlock *b = sblocks;
+ 	unsigned long v;
+-	size_t i, n;
++	unsigned char role;
++	size_t i, n, r;
+ 
+ 	memset(b, 0, sizeof(*b));
+ 	b->text = p;
+@@ -3961,6 +4082,12 @@ setstatus(const char *s)
+ 		}
+ 		if (i < 2) {
+ 			v = 0;
++			role = 0;
++			for (r = 0; r < LENGTH(roles); r++)
++				if (strlen(roles[r]) == n && !strncmp(arg, roles[r], n))
++					role = r + 1;
++			if (role)
++				n = 0;
+ 			if (n && *arg == '#')
+ 				arg++, n--;
+ 			if (n == 6 || n == 8) {
+@@ -3972,10 +4099,13 @@ setstatus(const char *s)
+ 				else if (n == 6)
+ 					v = v << 8 | 0xff;
+ 			}
+-			if (i == 0)
++			if (i == 0) {
+ 				b->fg = v;
+-			else
++				b->fgrole = role;
++			} else {
+ 				b->bg = v;
++				b->bgrole = role;
++			}
+ 		} else if (i == LENGTH(names) - 1) {
+ 			b->centre = !b->centre;
+ 		} else if (n && p + n < end) {

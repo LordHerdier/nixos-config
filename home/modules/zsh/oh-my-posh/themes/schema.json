@@ -1,0 +1,5196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "type": "object",
+  "title": "The Oh My Posh theme definition",
+  "description": "https://ohmyposh.dev/docs/configuration/general",
+  "definitions": {
+    "color": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/color_string"
+        },
+        {
+          "$ref": "#/definitions/palette_reference"
+        }
+      ]
+    },
+    "color_string": {
+      "type": "string",
+      "pattern": "^(#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})|^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$|black|red|green|yellow|blue|magenta|cyan|white|default|darkGray|lightRed|lightGreen|lightYellow|lightBlue|lightMagenta|lightCyan|lightWhite|transparent|parentBackground|parentForeground|background|foreground|accent)$",
+      "title": "Color string",
+      "description": "https://ohmyposh.dev/docs/configuration/colors",
+      "format": "color"
+    },
+    "palette_reference": {
+      "type": "string",
+      "pattern": "^p:.*$",
+      "title": "Palette reference",
+      "description": "https://ohmyposh.dev/docs/configuration/colors#palette"
+    },
+    "templates": {
+      "type": "array",
+      "title": "An array of templates",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/segment/properties/template"
+      }
+    },
+    "home_enabled": {
+      "type": "boolean",
+      "title": "Enable in the HOME folder",
+      "description": "Display the segment in the HOME folder",
+      "default": false
+    },
+    "fetch_version": {
+      "type": "boolean",
+      "title": "Fetch Version",
+      "description": "Fetch the version number",
+      "default": true
+    },
+    "http_timeout": {
+      "type": "integer",
+      "title": "Http request timeout",
+      "description": "Milliseconds to use for http request timeouts",
+      "default": 20
+    },
+    "expires_in": {
+      "type": "integer",
+      "title": "Expires in",
+      "description": "Access token expiration time in seconds",
+      "default": 0
+    },
+    "access_token": {
+      "type": "string",
+      "title": "Access token",
+      "description": "The initial access token",
+      "default": ""
+    },
+    "refresh_token": {
+      "type": "string",
+      "title": "Refresh token",
+      "description": "The initial refresh token",
+      "default": ""
+    },
+    "display_mode": {
+      "type": "string",
+      "title": "Display Mode",
+      "description": "Determines whether the segment is displayed always or only if a file matching the extensions are present in the current folder",
+      "enum": [
+        "always",
+        "files",
+        "environment",
+        "context"
+      ],
+      "default": "context"
+    },
+    "missing_command_text": {
+      "type": "string",
+      "title": "Missing command text",
+      "description": "The string to display when the command is not available",
+      "default": ""
+    },
+    "status_formats": {
+      "type": "object",
+      "title": "Status string formats",
+      "description": "Override the status format for a specific change. Example: {\"Added\": \"Added: %d\"}",
+      "default": {}
+    },
+    "native_fallback": {
+      "type": "boolean",
+      "title": "Native Fallback",
+      "description": "Try to use the WSL 2 native command in a shared Windows drive if the Windows executable is not found.",
+      "default": false
+    },
+    "branch_template": {
+      "type": "string",
+      "title": "Branch template",
+      "description": "the temaplate to use for the branch name, supports {{ .Branch }} for the branch name",
+      "default": ""
+    },
+    "mapped_branches": {
+      "type": "object",
+      "title": "Mapped Branches",
+      "description": "Custom glyph/text for specific branches",
+      "default": {}
+    },
+    "cache_duration": {
+      "type": "string",
+      "title": "Cache duration",
+      "description": "The duration for which the segment will be cached. This is parsed using the `time.ParseDuration` function from the Go standard library (see https://pkg.go.dev/time#ParseDuration for details).",
+      "pattern": "^(none|infinite|([0-9]+(h|m|s))+)$"
+    },
+    "language_options": {
+      "type": "object",
+      "title": "Language segment options",
+      "description": "Common options for language segments",
+      "properties": {
+        "home_enabled": {
+          "$ref": "#/definitions/home_enabled"
+        },
+        "fetch_version": {
+          "$ref": "#/definitions/fetch_version"
+        },
+        "cache_duration": {
+          "$ref": "#/definitions/cache_duration"
+        },
+        "missing_command_text": {
+          "$ref": "#/definitions/missing_command_text"
+        },
+        "display_mode": {
+          "$ref": "#/definitions/display_mode"
+        },
+        "version_url_template": {
+          "type": "string",
+          "title": "Version Url Template",
+          "description": "Template that creates the URL of the version info / release notes",
+          "default": ""
+        },
+        "tooling": {
+          "type": "array",
+          "title": "Tooling",
+          "description": "The tooling to use for fetching the version",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "title": "Extensions",
+          "description": "The extensions to look for when determining if the current directory is a project",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "folders": {
+          "type": "array",
+          "title": "Folders",
+          "description": "The folders to look for when determining if a folder is a workspace",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "filler": {
+      "type": "string",
+      "title": "Filler",
+      "description": "Right aligned filler text, will span the remaining width."
+    },
+    "aliases": {
+      "type": "object",
+      "title": "Aliases",
+      "description": "Custom value replacement for template parts",
+      "default": {}
+    },
+    "extra_prompt": {
+      "type": "object",
+      "default": {},
+      "properties": {
+        "template": {
+          "type": "string",
+          "title": "Prompt Template"
+        },
+        "foreground": {
+          "$ref": "#/definitions/color"
+        },
+        "foreground_templates": {
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
+        },
+        "background": {
+          "$ref": "#/definitions/color"
+        },
+        "background_templates": {
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "description": "https://ohmyposh.dev/docs/configuration/block",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "prompt"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "type",
+              "alignment",
+              "segments"
+            ],
+            "title": "Prompt definition, contains 1 or more segments to render"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "rprompt"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "type",
+              "segments"
+            ],
+            "title": "RPrompt definition, contains 1 or more segments to render to the right of the cursor"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "prompt"
+              },
+              "alignment": {
+                "const": "right"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "overflow": {
+                "type": "string",
+                "title": "Block overflow",
+                "description": "https://ohmyposh.dev/docs/configuration/block#overflow",
+                "enum": [
+                  "break",
+                  "hide"
+                ],
+                "default": ""
+              },
+              "filler": {
+                "$ref": "#/definitions/filler",
+                "description": "https://ohmyposh.dev/docs/configuration/block#filler"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Block type",
+          "description": "https://ohmyposh.dev/docs/configuration/block#type",
+          "enum": [
+            "prompt",
+            "rprompt"
+          ],
+          "default": "prompt"
+        },
+        "alignment": {
+          "type": "string",
+          "title": "Block alignment",
+          "description": "https://ohmyposh.dev/docs/configuration/block#alignment",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "default": "left"
+        },
+        "newline": {
+          "type": "boolean",
+          "title": "Newline",
+          "description": "https://ohmyposh.dev/docs/configuration/block#newline",
+          "default": false
+        },
+        "filler": {
+          "type": "string",
+          "title": "Filler",
+          "description": "https://ohmyposh.dev/docs/configuration/block#filler",
+          "default": ""
+        },
+        "overflow": {
+          "type": "string",
+          "title": "Overflow",
+          "description": "https://ohmyposh.dev/docs/configuration/block#overflow",
+          "default": ""
+        },
+        "leading_diamond": {
+          "type": "string",
+          "title": "Leading diamond",
+          "description": "https://ohmyposh.dev/docs/configuration/block#leading-diamond",
+          "default": ""
+        },
+        "trailing_diamond": {
+          "type": "string",
+          "title": "Trailing diamond",
+          "description": "https://ohmyposh.dev/docs/configuration/block#trailing-diamond",
+          "default": ""
+        },
+        "segments": {
+          "type": "array",
+          "title": "Segments list, prompt elements to display based on context",
+          "description": "https://ohmyposh.dev/docs/configuration/block#segments",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/segment"
+          }
+        },
+        "force": {
+          "type": "boolean",
+          "title": "Force",
+          "description": "https://ohmyposh.dev/docs/configuration/block#force",
+          "default": false
+        },
+        "index": {
+          "type": "integer",
+          "title": "Index",
+          "description": "https://ohmyposh.dev/docs/configuration/block#index"
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "title": "Segment",
+      "description": "https://ohmyposh.dev/docs/configuration/segment",
+      "default": {},
+      "required": [
+        "type",
+        "style"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Segment Type",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "enum": [
+            "angular",
+            "argocd",
+            "aurelia",
+            "aws",
+            "az",
+            "azd",
+            "azfunc",
+            "battery",
+            "bazel",
+            "brewfather",
+            "buf",
+            "bun",
+            "carbonintensity",
+            "cds",
+            "cf",
+            "cftarget",
+            "claude",
+            "clojure",
+            "cmake",
+            "copilot",
+            "connection",
+            "crystal",
+            "dart",
+            "deno",
+            "docker",
+            "dotnet",
+            "elixir",
+            "executiontime",
+            "firebase",
+            "flutter",
+            "fortran",
+            "fossil",
+            "gcp",
+            "git",
+            "gitversion",
+            "go",
+            "haskell",
+            "helm",
+            "http",
+            "ipify",
+            "java",
+            "jujutsu",
+            "julia",
+            "kotlin",
+            "kubectl",
+            "lastfm",
+            "lua",
+            "mercurial",
+            "mojo",
+            "mvn",
+            "nba",
+            "nbgv",
+            "nightscout",
+            "nim",
+            "nix-shell",
+            "node",
+            "npm",
+            "nx",
+            "ocaml",
+            "os",
+            "owm",
+            "path",
+            "perl",
+            "php",
+            "plastic",
+            "pnpm",
+            "project",
+            "pulumi",
+            "python",
+            "quasar",
+            "r",
+            "react",
+            "root",
+            "ruby",
+            "rust",
+            "sapling",
+            "session",
+            "shell",
+            "sitecore",
+            "spotify",
+            "status",
+            "strava",
+            "svelte",
+            "svn",
+            "swift",
+            "sysinfo",
+            "talosctl",
+            "tauri",
+            "terraform",
+            "text",
+            "time",
+            "todoist",
+            "ui5tooling",
+            "umbraco",
+            "unity",
+            "upgrade",
+            "v",
+            "vala",
+            "wakatime",
+            "winget",
+            "winreg",
+            "withings",
+            "xmake",
+            "yarn",
+            "ytm",
+            "zig"
+          ]
+        },
+        "style": {
+          "title": "Segment Style",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#style",
+          "anyOf": [
+            {
+              "enum": [
+                "plain",
+                "powerline",
+                "diamond",
+                "accordion"
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "foreground": {
+          "$ref": "#/definitions/color"
+        },
+        "foreground_templates": {
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
+        },
+        "background": {
+          "$ref": "#/definitions/color"
+        },
+        "background_templates": {
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
+        },
+        "template": {
+          "type": "string",
+          "title": "Template text",
+          "description": "https://ohmyposh.dev/docs/configuration/templates",
+          "default": ""
+        },
+        "templates_logic": {
+          "type": "string",
+          "title": "Templates Logic",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "enum": [
+            "first_match",
+            "join"
+          ]
+        },
+        "max_width": {
+          "type": "integer",
+          "title": "if the terminal width exceeds this value, the segment will be hidden",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "default": 0
+        },
+        "min_width": {
+          "type": "integer",
+          "title": "if the terminal width is inferior than this value, the segment will be hidden",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "default": 0
+        },
+        "options": {
+          "type": "object",
+          "title": "Segment options, used to change behavior/displaying",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#options",
+          "default": {}
+        },
+        "properties": {
+          "type": "object",
+          "title": "Segment Properties (DEPRECATED)",
+          "description": "DEPRECATED: Use 'options' instead. This field is maintained for backward compatibility with version 3 configs and will be removed in a future version. See https://ohmyposh.dev/docs/configuration/segment#options",
+          "default": {},
+          "deprecated": true,
+          "deprecationMessage": "The 'properties' field is deprecated. Please rename it to 'options' in your configuration."
+        },
+        "interactive": {
+          "type": "boolean",
+          "title": "Allow the use of interactive prompt escape sequences",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "default": false
+        },
+        "alias": {
+          "type": "string",
+          "title": "Give the segment an alias for use in templates",
+          "description": "https://ohmyposh.dev/docs/configuration/segment",
+          "default": ""
+        },
+        "include_folders": {
+          "type": "array",
+          "title": "If specified, segment will only render in these folders",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#include--exclude-folders",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude_folders": {
+          "type": "array",
+          "title": "Exclude rendering in these folders",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#include--exclude-folders",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "cache": {
+          "type": "object",
+          "title": "Cache settings",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#cache",
+          "default": {},
+          "properties": {
+            "duration": {
+              "$ref": "#/definitions/cache_duration"
+            },
+            "strategy": {
+              "type": "string",
+              "title": "Cache strategy",
+              "description": "https://ohmyposh.dev/docs/configuration/segment#strategy",
+              "default": "folder",
+              "enum": [
+                "folder",
+                "session",
+                "device"
+              ]
+            }
+          }
+        },
+        "placeholder": {
+          "type": "string",
+          "title": "Placeholder text",
+          "description": "Text to display while the segment is loading in streaming mode. See https://ohmyposh.dev/docs/experimental/streaming",
+          "default": "..."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "angular"
+              }
+            }
+          },
+          "then": {
+            "title": "Angular CLI Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/angular",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "angular.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "angular"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "argocd"
+              }
+            }
+          },
+          "then": {
+            "title": "ArgoCD Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/argocd"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "aurelia"
+              }
+            }
+          },
+          "then": {
+            "title": "Aurelia Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/aurelia",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "package.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "aurelia"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "aws"
+              }
+            }
+          },
+          "then": {
+            "title": "AWS Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/aws",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_default": {
+                    "type": "boolean",
+                    "title": "Display Default User Profile",
+                    "description": "Display the segment when default user or not",
+                    "default": true
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "az"
+              }
+            }
+          },
+          "then": {
+            "title": "Azure Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/az",
+            "properties": {
+              "options": {
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "title": "Source",
+                    "description": "https://ohmyposh.dev/docs/segments/cloud/az#options",
+                    "default": "first_match",
+                    "enum": [
+                      "cli",
+                      "pwsh"
+                    ]
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "azd"
+              }
+            }
+          },
+          "then": {
+            "title": "Azure Developer CLI Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/azd"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "azfunc"
+              }
+            }
+          },
+          "then": {
+            "title": "Azure Function Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/azfunc",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "host.json",
+                      "local.settings.json",
+                      "function.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "func"
+                    ]
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "battery"
+              }
+            }
+          },
+          "then": {
+            "title": "Battery Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/battery",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_error": {
+                    "type": "boolean",
+                    "title": "Display Error",
+                    "description": "Show the error context when failing to retrieve the battery information",
+                    "default": false
+                  },
+                  "charging_icon": {
+                    "type": "string",
+                    "title": "Charging Icon",
+                    "description": "Text/icon to display when charging",
+                    "default": ""
+                  },
+                  "discharging_icon": {
+                    "type": "string",
+                    "title": "discharging Dcon",
+                    "description": "Text/icon to display when discharging",
+                    "default": ""
+                  },
+                  "charged_icon": {
+                    "type": "string",
+                    "title": "Charged Icon",
+                    "description": "Text/icon to display when fully charged",
+                    "default": ""
+                  },
+                  "not_charging_icon": {
+                    "type": "string",
+                    "title": "Not Charging Icon",
+                    "description": "Text/icon to display when on AC power",
+                    "default": ""
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "bazel"
+              }
+            }
+          },
+          "then": {
+            "title": "Bazel Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/bazel",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.bazel",
+                      "*.bzl",
+                      "BUILD",
+                      "WORKSPACE",
+                      ".bazelrc",
+                      ".bazelversion"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      "bazel-bin",
+                      "bazel-out",
+                      "bazel-testlogs"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "bazel"
+                    ]
+                  },
+                  "icon": {
+                    "type": "string",
+                    "title": "Icon",
+                    "description": "The icon representing Bazel's logo",
+                    "default": "\ue63a"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "brewfather"
+              }
+            }
+          },
+          "then": {
+            "title": "Brewfather Batch Status",
+            "description": "https://ohmyposh.dev/docs/segments/web/brewfather",
+            "properties": {
+              "options": {
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "title": "Brewfather UserID (required)",
+                    "description": "Provided by Brewfather's Generate API Key settings option",
+                    "default": ""
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "title": "Brewfather API Key (required)",
+                    "description": "Provided by Brewfather's Generate API Key settings option",
+                    "default": ""
+                  },
+                  "batch_id": {
+                    "type": "string",
+                    "title": "ID of the batch in Brewfather (required)",
+                    "description": "At the end of the URL when viewing the batch on the Brewfather site",
+                    "default": ""
+                  },
+                  "day_icon": {
+                    "type": "string",
+                    "title": "Icon to use to indicate days",
+                    "description": "Appended to a number to indicate days, e.g. 25d",
+                    "default": "d"
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  },
+                  "doubleup_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, very high positive change",
+                    "description": "Delta between this and prior temperature reading is very high (> 4C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2191\u2191"
+                  },
+                  "singleup_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, high positive change",
+                    "description": "Delta between this and prior temperature reading is high (2C < delta < 4C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2191"
+                  },
+                  "fortyfiveup_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, positive change",
+                    "description": "Delta between this and prior temperature reading is positive (0.5C < delta < 2C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2197"
+                  },
+                  "flat_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, flat/small change",
+                    "description": "Delta between this and prior temperature and this temperature reading (< +-0.5C change), available intemplate as .TemperatureTrend",
+                    "default": "\u2192"
+                  },
+                  "fortyfivedown_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, v. negative change",
+                    "description": "Delta between this and prior temperature reading is negative (-0.5C > delta > -2C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2198"
+                  },
+                  "singledown_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, high negative change",
+                    "description": "Delta between this and prior temperature reading is large negative (-2C > delta > -4C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2193"
+                  },
+                  "doubledown_icon": {
+                    "type": "string",
+                    "title": "Temperature trend icon, very high negative change",
+                    "description": "Delta between this and prior temperature reading is very large negative (> -4C by default), available intemplate as .TemperatureTrend",
+                    "default": "\u2193\u2193"
+                  },
+                  "planning_status_icon": {
+                    "type": "string",
+                    "title": "Icon for batch in planning",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\uf8ea"
+                  },
+                  "brewing_status_icon": {
+                    "type": "string",
+                    "title": "Icon for batch being brewed",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\uf7de"
+                  },
+                  "fermenting_status_icon": {
+                    "type": "string",
+                    "title": "Icon for batch fermenting",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\uf499"
+                  },
+                  "conditioning_status_icon": {
+                    "type": "string",
+                    "title": "Icon for batch conditioning",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\ue372"
+                  },
+                  "completed_status_icon": {
+                    "type": "string",
+                    "title": "Icon for completed batch",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\uf7a5"
+                  },
+                  "archived_status_icon": {
+                    "type": "string",
+                    "title": "Icon for archived batch",
+                    "description": "Available in template as .StatusIcon",
+                    "default": "\uf187"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "buf"
+              }
+            }
+          },
+          "then": {
+            "title": "Buf Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/buf",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "buf.yaml",
+                      "buf.gen.yaml",
+                      "buf.work.yaml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "buf"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "bun"
+              }
+            }
+          },
+          "then": {
+            "title": "Bun CLI Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/bun",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "bun.lockb",
+                      "bun.lock"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "bun"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "carbonintensity"
+              }
+            }
+          },
+          "then": {
+            "title": "Carbon Intensity Segment",
+            "description": "https://ohmyposh.dev/docs/segments/web/carbonintensity",
+            "properties": {
+              "options": {
+                "properties": {
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cds"
+              }
+            }
+          },
+          "then": {
+            "title": "CDS (SAP CAP) segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/cds",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      ".cdsrc.json",
+                      ".cdsrc-private.json",
+                      "*.cds"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "cds"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cf"
+              }
+            }
+          },
+          "then": {
+            "title": "Clound Foundry CLI segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/cf",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "manifest.yml",
+                      "mta.yaml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "cf"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cftarget"
+              }
+            }
+          },
+          "then": {
+            "title": "Clound Foundry Target segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/cftarget",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode",
+                    "enum": [
+                      "always",
+                      "files"
+                    ],
+                    "default": "always"
+                  },
+                  "files": {
+                    "type": "array",
+                    "title": "Files",
+                    "description": "The files to display in the segment",
+                    "default": [
+                      "manifest.yml"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "clojure"
+              }
+            }
+          },
+          "then": {
+            "title": "Clojure Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/clojure",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "project.clj",
+                      "deps.edn",
+                      "build.boot",
+                      "bb.edn",
+                      "*.clj",
+                      "*.cljc",
+                      "*.cljs"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "clojure",
+                      "lein"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cmake"
+              }
+            }
+          },
+          "then": {
+            "title": "Cmake Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/cmake",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.cmake",
+                      "CMakeLists.txt"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "cmake"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "claude"
+              }
+            }
+          },
+          "then": {
+            "title": "Claude Code Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/claude",
+            "properties": {
+              "options": {
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "copilot"
+              }
+            }
+          },
+          "then": {
+            "title": "GitHub Copilot Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/copilot",
+            "properties": {
+              "options": {
+                "properties": {
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "connection"
+              }
+            }
+          },
+          "then": {
+            "title": "Connection Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/connection",
+            "properties": {
+              "options": {
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "title": "Connection type",
+                    "description": "The connection type to display",
+                    "enum": [
+                      "ethernet",
+                      "wifi",
+                      "cellular",
+                      "bluetooth"
+                    ],
+                    "default": "wifi|ethernet"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "crystal"
+              }
+            }
+          },
+          "then": {
+            "title": "Crystal Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/crystal",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.cr",
+                      "shard.yml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "crystal"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "dart"
+              }
+            }
+          },
+          "then": {
+            "title": "Dart Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/dart",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.dart",
+                      "pubspec.yaml",
+                      "pubspec.yml",
+                      "pubspec.lock"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      ".dart_tool"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "fvm",
+                      "dart"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "deno"
+              }
+            }
+          },
+          "then": {
+            "title": "Deno CLI Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/deno",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.js",
+                      "*.ts",
+                      "deno.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "deno"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "style": {
+                "const": "diamond"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "leading_diamond": {
+                "type": "string",
+                "title": "Leading diamond",
+                "description": "https://ohmyposh.dev/docs/configuration/segment#leading-diamond",
+                "default": ""
+              },
+              "trailing_diamond": {
+                "type": "string",
+                "title": "Trailing diamond",
+                "description": "https://ohmyposh.dev/docs/configuration/segment#trailing-diamond",
+                "default": ""
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "docker"
+              }
+            }
+          },
+          "then": {
+            "title": "Docker Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/docker",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode",
+                    "enum": [
+                      "files",
+                      "context"
+                    ]
+                  },
+                  "extensions": {
+                    "default": [
+                      "compose.yml",
+                      "compose.yaml",
+                      "docker-compose.yml",
+                      "docker-compose.yaml",
+                      "Dockerfile"
+                    ]
+                  },
+                  "fetch_context": {
+                    "type": "boolean",
+                    "title": "Fetch Context",
+                    "description": "Fetch the Docker context",
+                    "default": true
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "dotnet"
+              }
+            }
+          },
+          "then": {
+            "title": "Dotnet Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/dotnet",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.cs",
+                      "*.csx",
+                      "*.vb",
+                      "*.fs",
+                      "*.fsx",
+                      "*.sln",
+                      "*.slnf",
+                      "*.slnx",
+                      "*.csproj",
+                      "*.fsproj",
+                      "*.vbproj",
+                      "global.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "dotnet"
+                    ]
+                  },
+                  "fetch_sdk_version": {
+                    "type": "boolean",
+                    "title": "Fetch SDK Version",
+                    "description": "Fetch the .NET SDK version used in global.json",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "elixir"
+              }
+            }
+          },
+          "then": {
+            "title": "Elixir Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/elixir",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.ex",
+                      "*.exs"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "asdf",
+                      "elixir"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "executiontime"
+              }
+            }
+          },
+          "then": {
+            "title": "Displays the execution time of the previously executed command",
+            "description": "https://ohmyposh.dev/docs/segments/system/executiontime",
+            "properties": {
+              "options": {
+                "properties": {
+                  "always_enabled": {
+                    "type": "boolean",
+                    "title": "Always Enabled",
+                    "description": "Always show the duration",
+                    "default": false
+                  },
+                  "threshold": {
+                    "type": "integer",
+                    "title": "Threshold",
+                    "description": "minimum duration (milliseconds) required to enable this segment",
+                    "default": 500
+                  },
+                  "style": {
+                    "type": "string",
+                    "title": "Style",
+                    "description": "The style in which the time will be displayed",
+                    "enum": [
+                      "austin",
+                      "roundrock",
+                      "dallas",
+                      "galveston",
+                      "galvestonms",
+                      "houston",
+                      "amarillo",
+                      "round",
+                      "lucky7"
+                    ],
+                    "default": "austin"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "firebase"
+              }
+            }
+          },
+          "then": {
+            "title": "Firebase Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/firebase"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "flutter"
+              }
+            }
+          },
+          "then": {
+            "title": "Flutter Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/flutter",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.dart",
+                      "pubspec.yaml",
+                      "pubspec.yml",
+                      "pubspec.lock"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      ".dart_tool"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "fvm",
+                      "flutter"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "fortran"
+              }
+            }
+          },
+          "then": {
+            "title": "Fortran Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/fortran",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "fpm.toml",
+                      "*.f",
+                      "*.for",
+                      "*.fpp",
+                      "*.f77",
+                      "*.f90",
+                      "*.f95",
+                      "*.f03",
+                      "*.f08",
+                      "*.F",
+                      "*.FOR",
+                      "*.FPP",
+                      "*.F77",
+                      "*.F90",
+                      "*.F95",
+                      "*.F03",
+                      "*.F08"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "gfortran"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "fossil"
+              }
+            }
+          },
+          "then": {
+            "title": "Fossil Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/fossil",
+            "properties": {
+              "options": {
+                "properties": {
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gcp"
+              }
+            }
+          },
+          "then": {
+            "title": "GCP Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/gcp"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "git"
+              }
+            }
+          },
+          "then": {
+            "title": "Git Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/git",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the local changes or not",
+                    "default": false
+                  },
+                  "fetch_push_status": {
+                    "type": "boolean",
+                    "title": "Display Push Status",
+                    "description": "Display the push-remote ahead/behind information or not",
+                    "default": false
+                  },
+                  "fetch_upstream_icon": {
+                    "type": "boolean",
+                    "title": "Display Upstream Icon",
+                    "description": "Display upstream icon or not",
+                    "default": false
+                  },
+                  "fetch_bare_info": {
+                    "type": "boolean",
+                    "title": "Fetch info when in a bare repo",
+                    "description": "Fetch info when in a bare repo or not",
+                    "default": false
+                  },
+                  "fetch_user": {
+                    "type": "boolean",
+                    "title": "Fetch the user",
+                    "description": "Fetch the current configured user for the repository",
+                    "default": false
+                  },
+                  "disable_with_jj": {
+                    "type": "boolean",
+                    "title": "Disable with Jujutsu",
+                    "description": "Disable the git segment when there's a .jj directory in the parent file path",
+                    "default": false
+                  },
+                  "branch_icon": {
+                    "type": "string",
+                    "title": "Branch Icon",
+                    "description": "The icon to use in front of the git branch name",
+                    "default": "\ue0a0 "
+                  },
+                  "branch_identical_icon": {
+                    "type": "string",
+                    "title": "Branch Identical Icon",
+                    "description": "The icon to display when remote and local are identical",
+                    "default": "\u2261"
+                  },
+                  "branch_ahead_icon": {
+                    "type": "string",
+                    "title": "Branch Ahead Icon",
+                    "description": "The icon to display when the local branch is ahead of its remote",
+                    "default": "\u2191"
+                  },
+                  "branch_behind_icon": {
+                    "type": "string",
+                    "title": "Branch Behind Icon",
+                    "description": "The icon to display when the local branch is behind its remote",
+                    "default": "\u2193"
+                  },
+                  "branch_gone_icon": {
+                    "type": "string",
+                    "title": "Branch Gone Icon",
+                    "description": "The icon to display when there's no remote branch",
+                    "default": "\u2262"
+                  },
+                  "commit_icon": {
+                    "type": "string",
+                    "title": "Commit Icon",
+                    "description": "Icon/text to display before the commit context (detached HEAD)",
+                    "default": "\uf417"
+                  },
+                  "tag_icon": {
+                    "type": "string",
+                    "title": "Tag Icon",
+                    "description": "Icon/text to display before the tag context",
+                    "default": "\uf412"
+                  },
+                  "rebase_icon": {
+                    "type": "string",
+                    "title": "Rebase Icon",
+                    "description": "Icon/text to display before the context when in a rebase",
+                    "default": "\ue728"
+                  },
+                  "cherry_pick_icon": {
+                    "type": "string",
+                    "title": "Cherry-pick Icon",
+                    "description": "Icon/text to display before the context when doing a cherry-pick",
+                    "default": "\ue29b"
+                  },
+                  "revert_icon": {
+                    "type": "string",
+                    "title": "Revert Icon",
+                    "description": "Icon/text to display before the context when doing a revert",
+                    "default": "\uf0e2"
+                  },
+                  "merge_icon": {
+                    "type": "string",
+                    "title": "Merge Icon",
+                    "description": "Icon/text to display before the merge context",
+                    "default": "\ue727"
+                  },
+                  "no_commits_icon": {
+                    "type": "string",
+                    "title": "No Commits Icon",
+                    "description": "Icon/text to display when there are no commits in the repo",
+                    "default": "\uf594"
+                  },
+                  "github_icon": {
+                    "type": "string",
+                    "title": "GitHub Icon",
+                    "description": "Icon/text to display when the upstream is GitHub",
+                    "default": "\uf408"
+                  },
+                  "gitlab_icon": {
+                    "type": "string",
+                    "title": "GitLab Icon",
+                    "description": "Icon/text to display when the upstream is GitLab",
+                    "default": "\uf296"
+                  },
+                  "bitbucket_icon": {
+                    "type": "string",
+                    "title": "Bitbucket Icon",
+                    "description": "Icon/text to display when the upstream is Bitbucket",
+                    "default": "\uf171"
+                  },
+                  "azure_devops_icon": {
+                    "type": "string",
+                    "title": "Azure DevOps Icon",
+                    "description": "Icon/text to display when the upstream is Azure DevOps",
+                    "default": "\uebe8"
+                  },
+                  "codecommit_icon": {
+                    "type": "string",
+                    "title": "CodeCommit Icon",
+                    "description": "Icon/text to display when the upstream is CodeCommit",
+                    "default": "\uf270"
+                  },
+                  "codeberg_icon": {
+                    "type": "string",
+                    "title": "Codeberg Icon",
+                    "description": "Icon/text to display when the upstream is Codeberg",
+                    "default": "\uf330"
+                  },
+                  "git_icon": {
+                    "type": "string",
+                    "title": "Git Icon",
+                    "description": "Icon/text to display when the upstream is not known/mapped",
+                    "default": "\ue5fb"
+                  },
+                  "upstream_icons": {
+                    "type": "object",
+                    "title": "Status string formats",
+                    "description": "a key, value map representing the remote URL (or a part of that URL) and icon to use in case the upstream URL contains the key. These get precedence over the standard icons",
+                    "default": {}
+                  },
+                  "untracked_modes": {
+                    "type": "object",
+                    "title": "Untracked files mode",
+                    "description": "Set the untracked files mode for a repository",
+                    "default": {}
+                  },
+                  "ignore_submodules": {
+                    "type": "object",
+                    "title": "Ignore submodules",
+                    "description": "Ignore changes to submodules when looking for changes",
+                    "default": {}
+                  },
+                  "ignore_status": {
+                    "type": "array",
+                    "title": "Ignore fetching status in these repo's",
+                    "description": "Ignore fetching status for certain repo's, uses the same logic as the exclude_folders property",
+                    "default": [],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  },
+                  "mapped_branches": {
+                    "$ref": "#/definitions/mapped_branches"
+                  },
+                  "branch_template": {
+                    "$ref": "#/definitions/branch_template"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gitversion"
+              }
+            }
+          },
+          "then": {
+            "title": "Display GitVersion segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/gitversion"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "go"
+              }
+            }
+          },
+          "then": {
+            "title": "Golang Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/golang",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "parse_mod_file": {
+                    "type": "boolean",
+                    "title": "Parse go.mod file",
+                    "description": "Parse go.mod file instead of calling out to go to improve performance.",
+                    "default": false
+                  },
+                  "parse_go_work_file": {
+                    "type": "boolean",
+                    "title": "Parse go.work file",
+                    "description": "Parse go.work file instead of calling out to go to improve performance.",
+                    "default": false
+                  },
+                  "extensions": {
+                    "default": [
+                      "*.go",
+                      "go.mod",
+                      "go.work",
+                      "go.sum",
+                      "go.work.sum"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "mod",
+                      "go"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "haskell"
+              }
+            }
+          },
+          "then": {
+            "title": "Haskell Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/haskell",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "stack_ghc_mode": {
+                    "type": "string",
+                    "title": "Use Stack GHC",
+                    "description": "Get the GHC version used by Stack. Will decrease performance. Boolean indicating whether stack ghc was used available in template as .StackGhc",
+                    "enum": [
+                      "always",
+                      "package",
+                      "never"
+                    ],
+                    "default": "never"
+                  },
+                  "extensions": {
+                    "default": [
+                      "*.hs",
+                      "*.lhs",
+                      "stack.yaml",
+                      "package.yaml",
+                      "*.cabal",
+                      "cabal.project"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "ghc"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "helm"
+              }
+            }
+          },
+          "then": {
+            "title": "Helm segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/helm",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode",
+                    "enum": [
+                      "always",
+                      "files"
+                    ],
+                    "default": "always"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "http"
+              }
+            }
+          },
+          "then": {
+            "title": "HTTP segment",
+            "description": "https://ohmyposh.dev/docs/segments/web/http",
+            "properties": {
+              "options": {
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "title": "URL",
+                    "description": "The HTTP URL you want to call, supports templates",
+                    "default": ""
+                  },
+                  "method": {
+                    "type": "string",
+                    "title": "HTTP Method",
+                    "description": "The HTTP method to use",
+                    "enum": [
+                      "GET",
+                      "POST"
+                    ],
+                    "default": "GET"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ipify"
+              }
+            }
+          },
+          "then": {
+            "title": "Display your external IP Address",
+            "description": "https://ohmyposh.dev/docs/segments/web/ipify",
+            "properties": {
+              "options": {
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "title": "URL",
+                    "description": "The Ipify API URL",
+                    "default": "https://api.ipify.org"
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  },
+                  "cache_duration": {
+                    "$ref": "#/definitions/cache_duration",
+                    "default": "24h"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "java"
+              }
+            }
+          },
+          "then": {
+            "title": "Java Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/java",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "pom.xml",
+                      "build.gradle.kts",
+                      "build.sbt",
+                      ".java-version",
+                      ".deps.edn",
+                      "project.clj",
+                      "build.boot",
+                      "*.java",
+                      "*.class",
+                      "*.gradle",
+                      "*.jar",
+                      "*.clj",
+                      "*.cljc"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "java"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "jujutsu"
+              }
+            }
+          },
+          "then": {
+            "title": "Jujutsu Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/jujutsu",
+            "properties": {
+              "options": {
+                "properties": {
+                  "change_id_min_len": {
+                    "type": "integer",
+                    "title": "Change ID Minimum Length",
+                    "description": "Minimum length of the change ID to display",
+                    "default": 0
+                  },
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the changes in the working copy",
+                    "default": false
+                  },
+                  "ignore_working_copy": {
+                    "type": "boolean",
+                    "title": "Ignore Working Copy",
+                    "description": "Don't snapshot the working copy, and don't update it",
+                    "default": true
+                  },
+                  "fetch_ahead_counter": {
+                    "type": "boolean",
+                    "title": "Fetch Ahead Counter",
+                    "description": "Fetch working copy # of changes ahead of the nearest bookmark",
+                    "default": false
+                  },
+                  "ahead_icon": {
+                    "type": "string",
+                    "title": "Ahead icon",
+                    "description": "Icon to separate bookmark name and ahead counter",
+                    "default": "\u21e1"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "julia"
+              }
+            }
+          },
+          "then": {
+            "title": "Julia Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/julia",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.jl"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "julia"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "kotlin"
+              }
+            }
+          },
+          "then": {
+            "title": "Kotlin Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/kotlin",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.kt",
+                      "*.kts",
+                      "*.ktm"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "kotlin"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "kubectl"
+              }
+            }
+          },
+          "then": {
+            "title": "Kubectl Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/kubectl",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_error": {
+                    "type": "boolean",
+                    "title": "Display Error",
+                    "description": "Show the error context when failing to retrieve the kubectl information",
+                    "default": false
+                  },
+                  "parse_kubeconfig": {
+                    "type": "boolean",
+                    "title": "Parse kubeconfig",
+                    "description": "Parse kubeconfig files instead of calling out to kubectl to improve performance.",
+                    "default": true
+                  },
+                  "context_aliases": {
+                    "type": "object",
+                    "title": "Context aliases",
+                    "description": "Custom context names.",
+                    "default": {}
+                  },
+                  "cluster_aliases": {
+                    "type": "object",
+                    "title": "Cluster aliases",
+                    "description": "Custom cluster names.",
+                    "default": {}
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "lastfm"
+              }
+            }
+          },
+          "then": {
+            "title": "LastFM Segment",
+            "description": "https://ohmyposh.dev/docs/segments/music/lastfm",
+            "properties": {
+              "options": {
+                "properties": {
+                  "playing_icon": {
+                    "type": "string",
+                    "title": "Playing Icon",
+                    "description": "Text/icon to show when playing",
+                    "default": "\ue602 "
+                  },
+                  "stopped_icon": {
+                    "type": "string",
+                    "title": "Stopped Icon",
+                    "description": "Text/icon to show when stopped",
+                    "default": "\uf04d "
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "title": "API key",
+                    "description": "The API key used for the API call (Required)",
+                    "default": "."
+                  },
+                  "username": {
+                    "type": "string",
+                    "title": "username",
+                    "description": "The username used for the API call (Required)",
+                    "default": "."
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "lua"
+              }
+            }
+          },
+          "then": {
+            "title": "Lua Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/lua",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.lua",
+                      "*.rockspec"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      "lua"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "lua",
+                      "luajit"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mercurial"
+              }
+            }
+          },
+          "then": {
+            "title": "Mercurial Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/mercurial",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the local changes or not",
+                    "default": false
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mojo"
+              }
+            }
+          },
+          "then": {
+            "title": "Mojo Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/mojo",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "fetch_virtual_env": {
+                    "type": "boolean",
+                    "title": "Fetch Virtual Env",
+                    "description": "Fetch the name of the virtualenv or not",
+                    "default": true
+                  },
+                  "display_default": {
+                    "type": "boolean",
+                    "title": "Display Default",
+                    "description": "Show the name of the virtualenv when it's default",
+                    "default": true
+                  },
+                  "extensions": {
+                    "default": [
+                      "*.🔥",
+                      "*.mojo",
+                      "mojoproject.toml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "mojo"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mvn"
+              }
+            }
+          },
+          "then": {
+            "title": "Maven Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/mvn",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "pom.xml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "mvn"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nbgv"
+              }
+            }
+          },
+          "then": {
+            "title": "Nerdbank.GitVersion Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/nbgv"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nightscout"
+              }
+            }
+          },
+          "then": {
+            "title": "Display Nightscout segment",
+            "description": "https://ohmyposh.dev/docs/segments/health/nightscout",
+            "properties": {
+              "options": {
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "title": "URL",
+                    "description": "The URL to the Nightscout API",
+                    "default": ""
+                  },
+                  "http_timeout": {
+                    "type": "integer",
+                    "title": "Http request timeout",
+                    "description": "Milliseconds to use for http request timeouts",
+                    "default": 20
+                  },
+                  "headers": {
+                    "type": "object",
+                    "title": "Headers",
+                    "description": "A key, value map of Headers to send with the request",
+                    "default": {}
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nba"
+              }
+            }
+          },
+          "then": {
+            "title": "NBA Segment",
+            "description": "https://ohmyposh.dev/docs/segments/web/nba",
+            "properties": {
+              "options": {
+                "properties": {
+                  "team": {
+                    "type": "string",
+                    "title": "Team",
+                    "description": "Tri-code for the NBA team you want to get data for",
+                    "default": ""
+                  },
+                  "days_offset": {
+                    "type": "integer",
+                    "title": "Days Offset",
+                    "description": "How many days in advance you wish to see game information for",
+                    "default": 8
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nim"
+              }
+            }
+          },
+          "then": {
+            "title": "Nim Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/nim",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.nim",
+                      "*.nims"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "nim"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nix-shell"
+              }
+            }
+          },
+          "then": {
+            "title": "Nix Shell",
+            "description": "https://ohmyposh.dev/docs/segments/cli/nix-shell"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "node"
+              }
+            }
+          },
+          "then": {
+            "title": "Node Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/node",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "fetch_package_manager": {
+                    "type": "boolean",
+                    "title": "Fetch Display Package Manager",
+                    "description": "Assigns the Yarn or NPM icon to .PackageManagerIcon",
+                    "default": false
+                  },
+                  "pnpm_icon": {
+                    "type": "string",
+                    "title": "PNPM Icon",
+                    "description": "Icon/text to use for PNPM",
+                    "default": "\ue865"
+                  },
+                  "yarn_icon": {
+                    "type": "string",
+                    "title": "Yarn Icon",
+                    "description": "Icon/text to use for Yarn",
+                    "default": "\ue6a7"
+                  },
+                  "npm_icon": {
+                    "type": "string",
+                    "title": "NPM Icon",
+                    "description": "Icon/text to use for NPM",
+                    "default": "\ue71e"
+                  },
+                  "bun_icon": {
+                    "type": "string",
+                    "title": "Bun Icon",
+                    "description": "Icon/text to use for Bun",
+                    "default": "\ue76f"
+                  },
+                  "extensions": {
+                    "default": [
+                      "*.js",
+                      "*.ts",
+                      "package.json",
+                      ".nvmrc",
+                      "pnpm-workspace.yaml",
+                      ".pnpmfile.cjs",
+                      ".vue"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "node"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "npm"
+              }
+            }
+          },
+          "then": {
+            "title": "NPM Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/npm",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "package.json",
+                      "package-lock.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "npm"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "nx"
+              }
+            }
+          },
+          "then": {
+            "title": "Nx Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/nx",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "workspace.json",
+                      "nx.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "nx"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ocaml"
+              }
+            }
+          },
+          "then": {
+            "title": "OCaml Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/ocaml",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.ml",
+                      "*.mli",
+                      "dune",
+                      "dune-project",
+                      "dune-workspace"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "ocaml"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "os"
+              }
+            }
+          },
+          "then": {
+            "title": "Operating System Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/os",
+            "properties": {
+              "options": {
+                "properties": {
+                  "macos": {
+                    "type": "string",
+                    "title": "MacOS Icon",
+                    "description": "Icon/text to use for macOS",
+                    "default": "\uf179"
+                  },
+                  "linux": {
+                    "type": "string",
+                    "title": "Linux Icon",
+                    "description": "Icon/text to use for Linux",
+                    "default": "\uf17c"
+                  },
+                  "windows": {
+                    "type": "string",
+                    "title": "Windows Icon",
+                    "description": "Icon/text to use for Windows",
+                    "default": "\ue62a"
+                  },
+                  "display_distro_name": {
+                    "type": "boolean",
+                    "title": "Display Distro Name",
+                    "description": "Display the distro name or icon or not",
+                    "default": false
+                  },
+                  "alma": {
+                    "type": "string",
+                    "title": "Alma Icon",
+                    "description": "The icon to use for Alma",
+                    "default": "\uf31d"
+                  },
+                  "almalinux": {
+                    "type": "string",
+                    "title": "AlmaLinux Icon",
+                    "description": "The icon to use for AlmaLinux",
+                    "default": "\uf31d"
+                  },
+                  "almalinux9": {
+                    "type": "string",
+                    "title": "AlmaLinux9 Icon",
+                    "description": "The icon to use for AlmaLinux9",
+                    "default": "\uf31d"
+                  },
+                  "alpine": {
+                    "type": "string",
+                    "title": "Alpine Icon",
+                    "description": "The icon to use for Alpine",
+                    "default": "\uf300"
+                  },
+                  "android": {
+                    "type": "string",
+                    "title": "Android Icon",
+                    "description": "The icon to use for Android",
+                    "default": "\ue70e"
+                  },
+                  "aosc": {
+                    "type": "string",
+                    "title": "Aosc Icon",
+                    "description": "The icon to use for Aosc",
+                    "default": "\uf301"
+                  },
+                  "arch": {
+                    "type": "string",
+                    "title": "Arch Icon",
+                    "description": "The icon to use for Arch",
+                    "default": "\uf303"
+                  },
+                  "centos": {
+                    "type": "string",
+                    "title": "Centos Icon",
+                    "description": "The icon to use for Centos",
+                    "default": "\uf304"
+                  },
+                  "coreos": {
+                    "type": "string",
+                    "title": "Coreos Icon",
+                    "description": "The icon to use for Coreos",
+                    "default": "\uf305"
+                  },
+                  "debian": {
+                    "type": "string",
+                    "title": "Debian Icon",
+                    "description": "The icon to use for Debian",
+                    "default": "\uf306"
+                  },
+                  "deepin": {
+                    "type": "string",
+                    "title": "Deepin Icon",
+                    "description": "The icon to use for Deepin",
+                    "default": "\uf321"
+                  },
+                  "devuan": {
+                    "type": "string",
+                    "title": "Devuan Icon",
+                    "description": "The icon to use for Devuan",
+                    "default": "\uf307"
+                  },
+                  "elementary": {
+                    "type": "string",
+                    "title": "Elementary Icon",
+                    "description": "The icon to use for Elementary",
+                    "default": "\uf309"
+                  },
+                  "endeavouros": {
+                    "type": "string",
+                    "title": "EndeavourOS Icon",
+                    "description": "The icon to use for EndeavourOS",
+                    "default": "\uf322"
+                  },
+                  "fedora": {
+                    "type": "string",
+                    "title": "Fedora Icon",
+                    "description": "The icon to use for Fedora",
+                    "default": "\uf30a"
+                  },
+                  "freebsd": {
+                    "type": "string",
+                    "title": "FreeBSD Icon",
+                    "description": "The icon to use for FreeBSD",
+                    "default": "\udb82\udce0"
+                  },
+                  "gentoo": {
+                    "type": "string",
+                    "title": "Gentoo Icon",
+                    "description": "The icon to use for Gentoo",
+                    "default": "\uf30d"
+                  },
+                  "kali": {
+                    "type": "string",
+                    "title": "Kali Icon",
+                    "description": "The icon to use for Kali",
+                    "default": "\uf327"
+                  },
+                  "mageia": {
+                    "type": "string",
+                    "title": "Mageia Icon",
+                    "description": "The icon to use for Mageia",
+                    "default": "\uf310"
+                  },
+                  "manjaro": {
+                    "type": "string",
+                    "title": "Manjaro Icon",
+                    "description": "The icon to use for Manjaro",
+                    "default": "\uf312"
+                  },
+                  "mint": {
+                    "type": "string",
+                    "title": "Mint Icon",
+                    "description": "The icon to use for Mint",
+                    "default": "\udb82\udced"
+                  },
+                  "neon": {
+                    "type": "string",
+                    "title": "Neon Icon",
+                    "description": "The icon to use for Neon",
+                    "default": "\uf331"
+                  },
+                  "nixos": {
+                    "type": "string",
+                    "title": "Nixos Icon",
+                    "description": "The icon to use for Nixos",
+                    "default": "\uf313"
+                  },
+                  "opensuse": {
+                    "type": "string",
+                    "title": "Opensuse Icon",
+                    "description": "The icon to use for Opensuse",
+                    "default": "\uf314"
+                  },
+                  "opensuse-tumbleweed": {
+                    "type": "string",
+                    "title": "OpenSUSE Tumbleweed Icon",
+                    "description": "The icon to use for OpenSUSE Tumbleweed",
+                    "default": "\uf314"
+                  },
+                  "raspbian": {
+                    "type": "string",
+                    "title": "Raspbian Icon",
+                    "description": "The icon to use for Raspbian",
+                    "default": "\uf315"
+                  },
+                  "redhat": {
+                    "type": "string",
+                    "title": "Redhat Icon",
+                    "description": "The icon to use for Redhat",
+                    "default": "\uf316"
+                  },
+                  "rocky": {
+                    "type": "string",
+                    "title": "Rocky Icon",
+                    "description": "The icon to use for Rocky",
+                    "default": "\uf32b"
+                  },
+                  "sabayon": {
+                    "type": "string",
+                    "title": "Sabayon Icon",
+                    "description": "The icon to use for Sabayon",
+                    "default": "\uf317"
+                  },
+                  "slackware": {
+                    "type": "string",
+                    "title": "Slackware Icon",
+                    "description": "The icon to use for Slackware",
+                    "default": "\uf319"
+                  },
+                  "ubuntu": {
+                    "type": "string",
+                    "title": "Ubuntu Icon",
+                    "description": "The icon to use for Ubuntu",
+                    "default": "\uf31b"
+                  },
+                  "void": {
+                    "type": "string",
+                    "title": "Void Icon",
+                    "description": "The icon to use for Void",
+                    "default": "\uf32e"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "owm"
+              }
+            }
+          },
+          "then": {
+            "title": "Open Weather Map Segment",
+            "description": "https://ohmyposh.dev/docs/segments/web/owm",
+            "properties": {
+              "options": {
+                "properties": {
+                  "api_key": {
+                    "type": "string",
+                    "title": "API key",
+                    "description": "The API key used for the api call (Required)",
+                    "default": "."
+                  },
+                  "location": {
+                    "type": "string",
+                    "title": "location",
+                    "description": "Location to use for the API call interpreted only if valid coordinates aren't given. Formatted as <City>,<STATE>,<COUNTRY_CODE>. City name, state code and country code divided by comma. Please, refer to ISO 3166 for the state codes or country codes.",
+                    "default": "De Bilt,NL"
+                  },
+                  "units": {
+                    "type": "string",
+                    "title": "units",
+                    "description": "Units of measurement. Available values are standard (kelvin), metric (celsius), and imperial (fahrenheit). Default is standard",
+                    "default": "standard",
+                    "enum": [
+                      "standard",
+                      "metric",
+                      "imperial"
+                    ]
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "path"
+              }
+            }
+          },
+          "then": {
+            "title": "Path Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/path",
+            "properties": {
+              "options": {
+                "properties": {
+                  "folder_separator_icon": {
+                    "type": "string",
+                    "title": "Folder Separator Icon",
+                    "description": "The symbol to use as a separator between folders",
+                    "default": "/"
+                  },
+                  "folder_separator_template": {
+                    "type": "string",
+                    "title": "Folder Separator Template",
+                    "description": "the path which is split will be separated by this template",
+                    "pattern": ""
+                  },
+                  "home_icon": {
+                    "type": "string",
+                    "title": "Home Icon",
+                    "description": "The icon to display when at $HOME",
+                    "default": "~"
+                  },
+                  "folder_icon": {
+                    "type": "string",
+                    "title": "Folder Icon",
+                    "description": "The icon to use as a folder indication",
+                    "default": ".."
+                  },
+                  "windows_registry_icon": {
+                    "type": "string",
+                    "title": "Windows Registry Icon",
+                    "description": "The icon to display when in the Windows registry",
+                    "default": "\uf013"
+                  },
+                  "style": {
+                    "type": "string",
+                    "title": "The Path Style",
+                    "description": "How to display the current path",
+                    "enum": [
+                      "agnoster",
+                      "agnoster_full",
+                      "agnoster_short",
+                      "agnoster_left",
+                      "short",
+                      "full",
+                      "folder",
+                      "mixed",
+                      "letter",
+                      "unique",
+                      "powerlevel",
+                      "fish"
+                    ],
+                    "default": "agnoster"
+                  },
+                  "mapped_locations": {
+                    "type": "object",
+                    "title": "Mapped Locations",
+                    "description": "Custom glyph/text for specific paths",
+                    "default": {}
+                  },
+                  "mapped_locations_enabled": {
+                    "type": "boolean",
+                    "title": "Enable the Mapped Locations feature",
+                    "description": "Replace known locations in the path with the replacements before applying the style.",
+                    "default": true
+                  },
+                  "max_depth": {
+                    "type": "integer",
+                    "title": "Maximum Depth",
+                    "description": "Maximum path depth to display without shortening",
+                    "default": 1
+                  },
+                  "max_width": {
+                    "type": [
+                      "integer",
+                      "string"
+                    ],
+                    "title": "Maximum Width",
+                    "description": "Maximum path width to display for powerlevel style",
+                    "default": 0
+                  },
+                  "mixed_threshold": {
+                    "type": "integer",
+                    "title": "Mixed threshold",
+                    "description": "The maximum length of a path segment that will be displayed when using mixed style.",
+                    "default": 4
+                  },
+                  "hide_root_location": {
+                    "type": "boolean",
+                    "title": "Hide the root location",
+                    "description": "Hides the root location, when using agnoster_short style, if it doesn't fit in the last max_depth folders.",
+                    "default": false
+                  },
+                  "cycle": {
+                    "type": "array",
+                    "title": "Color overrides to use to cycle through and color the path per folder",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "cycle_folder_separator": {
+                    "type": "boolean",
+                    "title": "Cycle the folder_separator_icon",
+                    "description": "Colorize the folder_separator_icon as well when using a cycle.",
+                    "default": false
+                  },
+                  "folder_format": {
+                    "type": "string",
+                    "title": "The folder format",
+                    "description": "Golang string format to apply to the folder name",
+                    "pattern": "%s"
+                  },
+                  "edge_format": {
+                    "type": "string",
+                    "title": "The format to use on the start and end folder",
+                    "description": "Golang string format to apply to the start and end folder",
+                    "pattern": "%s"
+                  },
+                  "left_format": {
+                    "type": "string",
+                    "title": "The format to use on first folder of the path",
+                    "description": "Will default to whatever edge_format is set to",
+                    "pattern": "%s"
+                  },
+                  "right_format": {
+                    "type": "string",
+                    "title": "The format to use on the last folder of the path",
+                    "description": "Will default to whatever edge_format is set to",
+                    "pattern": "%s"
+                  },
+                  "gitdir_format": {
+                    "type": "string",
+                    "title": "The format to use on a git root directory",
+                    "description": "Golang string format to apply to the .git folder",
+                    "default": ""
+                  },
+                  "display_cygpath": {
+                    "type": "boolean",
+                    "title": "Display the Cygwin (Linux) style path",
+                    "description": "Display the Cygwin (Linux) style path using cygpath -u $PWD.",
+                    "default": false
+                  },
+                  "display_root": {
+                    "type": "boolean",
+                    "title": "Display the root directory (/) on Unix systems",
+                    "description": "Display the root directory (/) on Unix systems.",
+                    "default": false
+                  },
+                  "dir_length": {
+                    "type": "integer",
+                    "title": "Directory Length",
+                    "description": "The length of the directory name to display in fish style.",
+                    "default": 1
+                  },
+                  "full_length_dirs": {
+                    "type": "integer",
+                    "title": "Full Length Dirs",
+                    "description": "Indicates how many full length directory names should be displayed in fish style.",
+                    "default": 1
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "perl"
+              }
+            }
+          },
+          "then": {
+            "title": "Perl Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/perl",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      ".perl-version",
+                      "*.pl",
+                      "*.pm",
+                      "*.t"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "perl"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "php"
+              }
+            }
+          },
+          "then": {
+            "title": "PHP Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/php",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.php",
+                      "composer.json",
+                      "composer.lock",
+                      ".php-version",
+                      "blade.php"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "php"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "plastic"
+              }
+            }
+          },
+          "then": {
+            "title": "Plastic SCM Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/plastic",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the local changes or not",
+                    "default": false
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  },
+                  "branch_icon": {
+                    "type": "string",
+                    "title": "Branch Icon",
+                    "description": "The icon to use in front of the selector branch name",
+                    "default": "\ue0a0 "
+                  },
+                  "commit_icon": {
+                    "type": "string",
+                    "title": "Commit Icon",
+                    "description": "Icon/text to display before the selector changeset",
+                    "default": "\uf417"
+                  },
+                  "tag_icon": {
+                    "type": "string",
+                    "title": "Tag Icon",
+                    "description": "Icon/text to display before the seletor label",
+                    "default": "\uf412"
+                  },
+                  "branch_template": {
+                    "$ref": "#/definitions/branch_template"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  },
+                  "mapped_branches": {
+                    "$ref": "#/definitions/mapped_branches"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "pnpm"
+              }
+            }
+          },
+          "then": {
+            "title": "PNPM Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/pnpm",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "package.json",
+                      "pnpm-lock.yaml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "pnpm"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "style": {
+                "const": "powerline"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "powerline_symbol": {
+                "type": "string",
+                "title": "Powerline Symbol",
+                "description": "https://ohmyposh.dev/docs/configuration/segment#powerline-symbol",
+                "default": "\ue0b0"
+              },
+              "leading_powerline_symbol": {
+                "type": "string",
+                "title": "Leading Powerline Symbol",
+                "description": "https://ohmyposh.dev/docs/configuration/segment#powerline-symbol",
+                "default": "\ue0d7"
+              },
+              "invert_powerline": {
+                "type": "boolean",
+                "title": "Flip the Powerline symbol vertically",
+                "description": "https://ohmyposh.dev/docs/configuration/segment#invert-powerline",
+                "default": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "project"
+              }
+            }
+          },
+          "then": {
+            "title": "Project Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/project",
+            "properties": {
+              "options": {
+                "properties": {
+                  "always_enabled": {
+                    "type": "boolean",
+                    "title": "Always Enabled",
+                    "description": "Always show the segment",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "pulumi"
+              }
+            }
+          },
+          "then": {
+            "title": "Pulumi Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/pulumi",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_stack": {
+                    "type": "boolean",
+                    "title": "Fetch Stack",
+                    "description": "Fetch the current pulumi stack or not",
+                    "default": false
+                  },
+                  "fetch_about": {
+                    "type": "boolean",
+                    "title": "Fetch About",
+                    "description": "Fetch the URL and user for the current stack",
+                    "default": false
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "python"
+              }
+            }
+          },
+          "then": {
+            "title": "Python Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/python",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "fetch_virtual_env": {
+                    "type": "boolean",
+                    "title": "Fetch Virtual Env",
+                    "description": "Fetch the name of the virtualenv or not",
+                    "default": true
+                  },
+                  "display_default": {
+                    "type": "boolean",
+                    "title": "Display Default",
+                    "description": "Show the name of the virtualenv when it's default",
+                    "default": true
+                  },
+                  "extensions": {
+                    "default": [
+                      "*.py",
+                      "*.ipynb",
+                      "pyproject.toml",
+                      "venv.bak"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      ".venv",
+                      "venv",
+                      "virtualenv",
+                      "venv-win",
+                      "pyenv-win"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "pyenv",
+                      "python",
+                      "python3",
+                      "py"
+                    ]
+                  },
+                  "folder_name_fallback": {
+                    "type": "boolean",
+                    "title": "Folder Name Fallback",
+                    "description": "Replace virtual environment names in default_venv_names list with parent folder name",
+                    "default": "true"
+                  },
+                  "default_venv_names": {
+                    "type": "array",
+                    "title": "Default Venv Names",
+                    "description": "Names to replace when folder_name_fallback is true",
+                    "default": [
+                      ".venv",
+                      "venv"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "quasar"
+              }
+            }
+          },
+          "then": {
+            "title": "Quasar Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/quasar",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "fetch_dependencies": {
+                    "type": "boolean",
+                    "title": "Fetch Dependencies",
+                    "description": "Fetch the vite and @quasar/app-vite dependency information or not",
+                    "default": false
+                  },
+                  "extensions": {
+                    "default": [
+                      "quasar.config",
+                      "quasar.config.js"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "quasar"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "r"
+              }
+            }
+          },
+          "then": {
+            "title": "R Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/r",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.R",
+                      "*.Rmd",
+                      "*.Rsx",
+                      "*.Rda",
+                      "*.Rd",
+                      "*.Rproj",
+                      ".Rproj.user"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "Rscript",
+                      "R",
+                      "R.exe"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "react"
+              }
+            }
+          },
+          "then": {
+            "title": "React Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/react",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "package.json"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "react"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "root"
+              }
+            }
+          },
+          "then": {
+            "title": "Root Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/root"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ruby"
+              }
+            }
+          },
+          "then": {
+            "title": "Ruby Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/ruby",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.rb",
+                      "Rakefile",
+                      "Gemfile"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "rbenv",
+                      "rvm-prompt",
+                      "chruby",
+                      "asdf",
+                      "ruby"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "rust"
+              }
+            }
+          },
+          "then": {
+            "title": "Rust Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/rust",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.rs",
+                      "Cargo.toml",
+                      "Cargo.lock"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "rustc"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sapling"
+              }
+            }
+          },
+          "then": {
+            "title": "Sapling Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/sapling",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the local changes or not",
+                    "default": true
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "session"
+              }
+            }
+          },
+          "then": {
+            "title": "Session Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/session"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "shell"
+              }
+            }
+          },
+          "then": {
+            "title": "Shell Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/shell",
+            "properties": {
+              "options": {
+                "properties": {
+                  "mapped_shell_names": {
+                    "type": "object",
+                    "description": "Mapping of shell identifiers to the glyph/string used for that shell (e.g. bash, zsh, pwsh).",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "bash": "\udb84\udd83",
+                      "zsh": "",
+                      "pwsh": "",
+                      "shell": "$"
+                    }
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sitecore"
+              }
+            }
+          },
+          "then": {
+            "title": "Sitecore Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cloud/sitecore",
+            "properties": {
+              "options": {
+                "properties": {
+                  "display_default": {
+                    "type": "boolean",
+                    "title": "Display Default",
+                    "description": "Display the segment or not when the Sitecore environment name matches `default`",
+                    "default": true
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "spotify"
+              }
+            }
+          },
+          "then": {
+            "title": "Spotify Segment",
+            "description": "https://ohmyposh.dev/docs/segments/music/spotify",
+            "properties": {
+              "options": {
+                "properties": {
+                  "playing_icon": {
+                    "type": "string",
+                    "title": "Playing Icon",
+                    "description": "Text/icon to show when playing",
+                    "default": "\ue602 "
+                  },
+                  "paused_icon": {
+                    "type": "string",
+                    "title": "Paused Icon",
+                    "description": "Text/icon to show when paused",
+                    "default": "\uf04c "
+                  },
+                  "stopped_icon": {
+                    "type": "string",
+                    "title": "Stopped Icon",
+                    "description": "Text/icon to show when stopped",
+                    "default": "\uf04d "
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "status"
+              }
+            }
+          },
+          "then": {
+            "title": "Status Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/status",
+            "properties": {
+              "options": {
+                "properties": {
+                  "always_enabled": {
+                    "type": "boolean",
+                    "title": "Always Enabled",
+                    "description": "Always show the status",
+                    "default": false
+                  },
+                  "status_template": {
+                    "type": "string",
+                    "title": "Status Template",
+                    "description": "The template to use for the status segment",
+                    "default": "{{ .Code }}"
+                  },
+                  "status_separator": {
+                    "type": "string",
+                    "title": "Status Separator",
+                    "description": "The separator to use between the status segments",
+                    "default": "|"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "strava"
+              }
+            }
+          },
+          "then": {
+            "title": "Display training data from Strava",
+            "description": "https://ohmyposh.dev/docs/segments/health/strava",
+            "properties": {
+              "options": {
+                "properties": {
+                  "ride_icon": {
+                    "type": "string",
+                    "title": "Ride icon",
+                    "description": "Alternative icon for this activity type",
+                    "default": "\uf206"
+                  },
+                  "run_icon": {
+                    "type": "string",
+                    "title": "Run icon",
+                    "description": "Alternative icon for this activity type",
+                    "default": "\ue213"
+                  },
+                  "skiing_icon": {
+                    "type": "string",
+                    "title": "Skiing icon",
+                    "description": "Alternative icon for this activity type",
+                    "default": "\ue213"
+                  },
+                  "workout_icon": {
+                    "type": "string",
+                    "title": "Workout icon",
+                    "description": "Alternative icon for this activity type",
+                    "default": "\ue213"
+                  },
+                  "unknown_activity_icon": {
+                    "type": "string",
+                    "title": "Fallback icon",
+                    "description": "Fallback icon for other activity types",
+                    "default": "\ue213"
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  },
+                  "access_token": {
+                    "$ref": "#/definitions/access_token"
+                  },
+                  "refresh_token": {
+                    "$ref": "#/definitions/refresh_token"
+                  },
+                  "expires_in": {
+                    "$ref": "#/definitions/expires_in"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "svelte"
+              }
+            }
+          },
+          "then": {
+            "title": "Svelte Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/svelte",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "svelte.config.js"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "svelte"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "svn"
+              }
+            }
+          },
+          "then": {
+            "title": "SVN Segment",
+            "description": "https://ohmyposh.dev/docs/segments/scm/svn",
+            "properties": {
+              "options": {
+                "properties": {
+                  "fetch_status": {
+                    "type": "boolean",
+                    "title": "Display Status",
+                    "description": "Display the local changes or not",
+                    "default": false
+                  },
+                  "status_formats": {
+                    "$ref": "#/definitions/status_formats"
+                  },
+                  "native_fallback": {
+                    "$ref": "#/definitions/native_fallback"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "swift"
+              }
+            }
+          },
+          "then": {
+            "title": "Swift Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/swift",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.swift",
+                      "*.SWIFT",
+                      "Podfile"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "swift"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sysinfo"
+              }
+            }
+          },
+          "then": {
+            "title": "Get sysinfo",
+            "description": "https://ohmyposh.dev/docs/segments/system/sysinfo",
+            "properties": {
+              "options": {
+                "properties": {
+                  "precision": {
+                    "type": "integer",
+                    "title": "Precision",
+                    "description": "number of decimal places to show",
+                    "default": 2
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "talosctl"
+              }
+            }
+          },
+          "then": {
+            "title": "Talosctl Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/talosctl"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tauri"
+              }
+            }
+          },
+          "then": {
+            "title": "Tauri Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/tauri",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "tauri.conf.json"
+                    ]
+                  },
+                  "folders": {
+                    "default": [
+                      "src-tauri"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "tauri"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "terraform"
+              }
+            }
+          },
+          "then": {
+            "title": "Terraform Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/terraform",
+            "properties": {
+              "options": {
+                "properties": {
+                  "command": {
+                    "type": "string",
+                    "title": "Terraform Command",
+                    "description": "The terraform command to use",
+                    "default": "terraform"
+                  },
+                  "fetch_version": {
+                    "type": "boolean",
+                    "title": "Fetch Version",
+                    "description": "Fetch the version number",
+                    "default": false
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "text"
+              }
+            }
+          },
+          "then": {
+            "title": "Text Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/text"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "time"
+              }
+            }
+          },
+          "then": {
+            "title": "Time Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/time",
+            "properties": {
+              "options": {
+                "properties": {
+                  "time_format": {
+                    "type": "string",
+                    "title": "Time Format",
+                    "description": "Format to use, follows the golang standard: https://gobyexample.com/time-formatting-parsing",
+                    "default": "15:04:05"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "todoist"
+              }
+            }
+          },
+          "then": {
+            "title": "Todoist Segment",
+            "description": "https://ohmyposh.dev/docs/segments/web/todoist",
+            "properties": {
+              "options": {
+                "properties": {
+                  "api_key": {
+                    "type": "string",
+                    "title": "API Key",
+                    "description": "API Key (Required)",
+                    "default": "."
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ui5tooling"
+              }
+            }
+          },
+          "then": {
+            "title": "UI5 tooling CLI segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/ui5tooling",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*ui5*.y*ml"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "ui5"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "umbraco"
+              }
+            }
+          },
+          "then": {
+            "title": "Umbraco Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/umbraco"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "unity"
+              }
+            }
+          },
+          "then": {
+            "title": "Unity Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/unity",
+            "properties": {
+              "options": {
+                "properties": {
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "upgrade"
+              }
+            }
+          },
+          "then": {
+            "title": "Upgrade Segment",
+            "description": "https://ohmyposh.dev/docs/segments/system/upgrade",
+            "properties": {
+              "options": {
+                "properties": {
+                  "cache_duration": {
+                    "$ref": "#/definitions/cache_duration",
+                    "default": "168h"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "v"
+              }
+            }
+          },
+          "then": {
+            "title": "V Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/v",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.v"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "v"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "vala"
+              }
+            }
+          },
+          "then": {
+            "title": "Vala Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/vala",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.vala"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "vala"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "wakatime"
+              }
+            }
+          },
+          "then": {
+            "title": "Wakatime",
+            "description": "https://ohmyposh.dev/docs/segments/web/wakatime",
+            "properties": {
+              "options": {
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "title": "URL",
+                    "description": "The url used for the api call (Required)",
+                    "default": "."
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "winget"
+              }
+            }
+          },
+          "then": {
+            "title": "WinGet",
+            "description": "https://ohmyposh.dev/docs/segments/system/winget"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "winreg"
+              }
+            }
+          },
+          "then": {
+            "title": "Windows Registry Query",
+            "description": "https://ohmyposh.dev/docs/segments/system/winreg",
+            "properties": {
+              "options": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "title": "Registry Path",
+                    "description": "The path to the registry key (case insensitive, must use backslashes).  Ending with \\ will retrieve \"(Default)\" key in that path.",
+                    "default": ""
+                  },
+                  "fallback": {
+                    "type": "string",
+                    "title": "Fallback value",
+                    "description": "Value to display if registry value cannot be retrieved",
+                    "default": ""
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "withings"
+              }
+            }
+          },
+          "then": {
+            "title": "Display activity data from Withings",
+            "description": "https://ohmyposh.dev/docs/segments/health/withings",
+            "properties": {
+              "options": {
+                "properties": {
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  },
+                  "access_token": {
+                    "$ref": "#/definitions/access_token"
+                  },
+                  "refresh_token": {
+                    "$ref": "#/definitions/refresh_token"
+                  },
+                  "expires_in": {
+                    "$ref": "#/definitions/expires_in"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "xmake"
+              }
+            }
+          },
+          "then": {
+            "title": "XMake Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/xmake",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "xmake.lua"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "xmake"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "yarn"
+              }
+            }
+          },
+          "then": {
+            "title": "Yarn Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cli/yarn",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "package.json",
+                      "yarn.lock"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "yarn"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ytm"
+              }
+            }
+          },
+          "then": {
+            "title": "YouTube Music Desktop App Segment",
+            "description": "https://ohmyposh.dev/docs/segments/music/ytm",
+            "properties": {
+              "options": {
+                "properties": {
+                  "playing_icon": {
+                    "type": "string",
+                    "title": "Playing Icon",
+                    "description": "Text/icon to show when playing",
+                    "default": "\uf04b "
+                  },
+                  "paused_icon": {
+                    "type": "string",
+                    "title": "Paused Icon",
+                    "description": "Text/icon to show when paused",
+                    "default": "\uf04c "
+                  },
+                  "stopped_icon": {
+                    "type": "string",
+                    "title": "Stopped Icon",
+                    "description": "Text/icon to show when stopped",
+                    "default": "\uf04d "
+                  },
+                  "ad_icon": {
+                    "type": "string",
+                    "title": "Advertisement Icon",
+                    "description": "Text/icon to show when an advertisement is playing",
+                    "default": "\ueebb "
+                  },
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "zig"
+              }
+            }
+          },
+          "then": {
+            "title": "Zig Segment",
+            "description": "https://ohmyposh.dev/docs/segments/languages/zig",
+            "properties": {
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/language_options"
+                  }
+                ],
+                "properties": {
+                  "extensions": {
+                    "default": [
+                      "*.zig",
+                      "*.zon"
+                    ]
+                  },
+                  "tooling": {
+                    "default": [
+                      "zig"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "blocks"
+  ],
+  "properties": {
+    "final_space": {
+      "type": "boolean",
+      "title": "Final Space",
+      "description": "https://ohmyposh.dev/docs/configuration/general#general-settings",
+      "default": true
+    },
+    "enable_cursor_positioning": {
+      "type": "boolean",
+      "title": "Enable Cursor Positioning",
+      "description": "https://ohmyposh.dev/docs/configuration/general#general-settings",
+      "default": false
+    },
+    "shell_integration": {
+      "type": "boolean",
+      "title": "FTCS command marks for shell integration",
+      "default": false
+    },
+    "pwd": {
+      "type": "string",
+      "title": "Enable OSC99/7/51",
+      "description": "https://ohmyposh.dev/docs/configuration/general#general-settings",
+      "default": ""
+    },
+    "upgrade": {
+      "type": "object",
+      "title": "Enable Upgrade Notice",
+      "description": "https://ohmyposh.dev/docs/configuration/general#general-settings",
+      "default": {
+        "source": "cdn",
+        "auto": false,
+        "notice": false
+      },
+      "properties": {
+        "interval": {
+          "$ref": "#/definitions/cache_duration"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "cdn",
+            "github"
+          ],
+          "default": "cdn"
+        },
+        "auto": {
+          "type": "boolean",
+          "default": false
+        },
+        "notice": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "patch_pwsh_bleed": {
+      "type": "boolean",
+      "title": "Patch PowerShell Color Bleed",
+      "description": "https://ohmyposh.dev/docs/configuration/general#general-settings",
+      "default": false
+    },
+    "console_title_template": {
+      "type": "string",
+      "title": "Console Title Template",
+      "description": "https://ohmyposh.dev/docs/configuration/title#console-title-template",
+      "default": "{{ .Shell }} in {{ .Folder }}"
+    },
+    "terminal_background": {
+      "$ref": "#/definitions/color"
+    },
+    "streaming": {
+      "type": "integer",
+      "title": "Streaming Mode",
+      "description": "https://ohmyposh.dev/docs/experimental/streaming",
+      "default": 100
+    },
+    "blocks": {
+      "type": "array",
+      "title": "Block array",
+      "default": [],
+      "description": "https://ohmyposh.dev/docs/configuration/general#blocks",
+      "items": {
+        "$ref": "#/definitions/block"
+      }
+    },
+    "tooltips": {
+      "type": "array",
+      "title": "Tooltip list, prompt elements to display based on context",
+      "description": "https://ohmyposh.dev/docs/configuration/tooltips",
+      "default": [],
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/segment"
+          }
+        ],
+        "properties": {
+          "tips": {
+            "type": "array",
+            "title": "The commands for which you want the segment to show",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "tips"
+        ]
+      }
+    },
+    "transient_prompt": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Transient Prompt Setting",
+      "description": "https://ohmyposh.dev/docs/configuration/transient",
+      "anyOf": [
+        {
+          "properties": {
+            "filler": {
+              "$ref": "#/definitions/filler"
+            },
+            "newline": {
+              "type": "boolean",
+              "title": "Newline",
+              "description": "Add a newline before the prompt",
+              "default": false
+            }
+          }
+        }
+      ]
+    },
+    "valid_line": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Valid Line Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/line-error"
+    },
+    "error_line": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Error Line Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/line-error"
+    },
+    "secondary_prompt": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Secondary Prompt Setting",
+      "description": "https://ohmyposh.dev/docs/configuration/secondary-prompt"
+    },
+    "debug_prompt": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Debug Prompt Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/debug-prompt"
+    },
+    "palette": {
+      "type": "object",
+      "title": "Palette",
+      "description": "https://ohmyposh.dev/docs/configuration/colors#palette",
+      "default": {},
+      "patternProperties": {
+        ".*": {
+          "$ref": "#/definitions/color"
+        }
+      }
+    },
+    "palettes": {
+      "type": "object",
+      "title": "Palettes",
+      "description": "https://ohmyposh.dev/docs/configuration/colors#palettes",
+      "default": {},
+      "properties": {
+        "template": {
+          "type": "string",
+          "title": "Prompt Template"
+        },
+        "list": {
+          "type": "object",
+          "title": "List of palettes",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/properties/palette"
+            }
+          }
+        }
+      }
+    },
+    "cycle": {
+      "type": "array",
+      "title": "List of settings to cycle through segment by segment",
+      "description": "https://ohmyposh.dev/docs/configuration/colors#cycle",
+      "default": [],
+      "items": {
+        "properties": {
+          "foreground": {
+            "$ref": "#/definitions/color"
+          },
+          "background": {
+            "$ref": "#/definitions/color"
+          }
+        }
+      }
+    },
+    "accent_color": {
+      "title": "Accent color",
+      "$ref": "#/definitions/color"
+    },
+    "iterm_features": {
+      "type": "array",
+      "title": "The iTerm2 features to enable",
+      "items": {
+        "type": "string",
+        "enum": [
+          "prompt_mark",
+          "current_dir",
+          "remote_host"
+        ]
+      }
+    },
+    "var": {
+      "type": "object",
+      "title": "Config variables to use in templates (can be any value)",
+      "description": "https://ohmyposh.dev/docs/configuration/templates#config-variables",
+      "default": {}
+    },
+    "maps": {
+      "type": "object",
+      "title": "Custom text mappings",
+      "description": "https://ohmyposh.dev/docs/configuration/general#maps",
+      "default": {},
+      "items": {
+        "properties": {
+          "user_name": {
+            "$ref": "#/definitions/aliases"
+          },
+          "host_name": {
+            "$ref": "#/definitions/aliases"
+          },
+          "shell_name": {
+            "$ref": "#/definitions/aliases"
+          }
+        }
+      }
+    },
+    "async": {
+      "type": "boolean",
+      "title": "Async loading",
+      "default": false
+    },
+    "tooltips_action": {
+      "type": "string",
+      "title": "Tooltips action",
+      "description": "https://ohmyposh.dev/docs/configuration/tooltips#tooltips-action",
+      "enum": [
+        "replace",
+        "extend",
+        "prepend"
+      ],
+      "default": "replace"
+    },
+    "version": {
+      "type": "integer",
+      "title": "Version",
+      "description": "https://ohmyposh.dev/docs/configuration/general",
+      "default": 4
+    },
+    "extends": {
+      "type": "string",
+      "title": "Extends",
+      "description": "https://ohmyposh.dev/docs/configuration/general#extends",
+      "default": ""
+    }
+  }
+}

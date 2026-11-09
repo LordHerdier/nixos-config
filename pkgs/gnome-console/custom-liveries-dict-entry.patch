@@ -1,0 +1,36 @@
+livery-manager: unpack custom-liveries as dictionary entries
+
+custom-liveries is declared `a{sv}`, so its elements are dictionary
+entries, not tuples. g_variant_iter_next() validates the format string
+against the element type, and "(&sv)" scans as "(sv)", which is not
+"{sv}" -- so the call aborts before the first iteration:
+
+  GLib-CRITICAL: the GVariant format string '(&sv)' has a type of
+                 '(sv)' but the given value has a type of '{sv}'
+  GLib-CRITICAL: g_variant_iter_next: assertion
+                 'valid_format_string (format_string, TRUE, value)' failed
+
+The loop body therefore never runs, the custom-liveries hash table stays
+empty, and selecting a custom livery falls back to the built-in default
+with
+
+  Kgx-WARNING: settings: '<uuid>' is unknown, using default livery
+
+i.e. custom liveries are unreachable in 50.0 by any route: this is the
+only consumer of the gsettings key, and kgx_livery_import_from() (the
+keyfile path) has no callers yet. Use the dictionary-entry format.
+
+Reported against GNOME Console 50.0.
+---
+diff --git a/src/kgx-livery-manager.c b/src/kgx-livery-manager.c
+--- a/src/kgx-livery-manager.c
++++ b/src/kgx-livery-manager.c
+@@ -304,7 +304,7 @@ kgx_livery_manager_set_custom_liveries (KgxLiveryManager *self,
+ 
+   g_hash_table_remove_all (self->custom_liveries);
+ 
+-  while (g_variant_iter_next (iter, "(&sv)", &uuid, &value)) {
++  while (g_variant_iter_next (iter, "{&sv}", &uuid, &value)) {
+     g_autoptr (KgxLivery) livery = kgx_livery_deserialise (value);
+ 
+     if (g_strcmp0 (kgx_livery_get_uuid (livery), uuid) != 0) {

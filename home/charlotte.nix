@@ -1,21 +1,15 @@
 # home/charlotte.nix
 
-{ config, pkgs, dotfiles, ... }:
+{ ... }:
 
 {
-  imports = [
-    ./modules/packages.nix
-    ./modules/files.nix
-    ./modules/git.nix
-    ./modules/atuin.nix
-    ./modules/zsh
-    ./modules/tmux
-  ];
+  imports = [ ./desktop-user.nix ];
 
   home.username = "charlotte";
   home.homeDirectory = "/home/charlotte";
-  home.stateVersion = "25.05";
 
-  programs.home-manager.enable = true;
+  programs.git.settings = {
+    user.email = "charlotte@whittleman.net";
+    user.name = "Charlotte Whittleman";
+  };
 }
-

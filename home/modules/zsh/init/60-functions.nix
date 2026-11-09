@@ -12,9 +12,15 @@
       eval "sudo $last_cmd"
     }
 
+    dssh() {
+      ssh -t "$1" docker exec -it "''${2:-sh}" "''${3:-sh}"
+    }
+
+    ${builtins.readFile ../uptime.zsh}
+
     theme() {
       if [[ -z "$1" ]]; then
-        echo "Usage: omp-theme <theme>"
+        echo "Usage: theme <theme>"
         return 1
       fi
 
@@ -39,11 +45,40 @@
       echo "OMP theme switched to ''${newtheme} ($(basename "$config"))."
     }
 
+    randomtheme() {
+      local -a files names
+      
+      # (N): empty list rather than an error when nothing matches
+      files=(~/.oh-my-posh/themes/*.omp.(json|yaml)(N))
+      
+      if [[ ''${#files[@]} -eq 0 ]]; then
+        echo "No themes found in ~/.oh-my-posh/themes/"
+        return 1
+      fi
+
+      # Extract base names
+      names=()
+      for f in $files; do
+        names+=("''${f:t}")
+      done
+
+      # Strip extensions
+      names=(''${names[@]%.omp.json})
+      names=(''${names[@]%.omp.yaml})
+
+      # Select a random theme (ZSH arrays are 1-indexed)
+      local random_theme="''${names[$((RANDOM % ''${#names[@]} + 1))]}"
+      
+      theme "$random_theme"
+    }
+
     mkcd() { mkdir -p -- "$1" && cd -P -- "$1"; }
 
-    copypath() {
-      [[ -z "$1" ]] && return 1
-      realpath "$1" | clip.exe
+    t() {
+      for session in base exo homelab nixos work dev; do
+        tmux has-session -t "$session" 2>/dev/null || tmuxinator start "$session" --no-attach
+      done
+      tmux attach -t base
     }
 
     themes() {
@@ -66,6 +101,24 @@
         echo "No theme selected, nothing changed."
       fi
     }
+
+    dumpfiles() {
+      local ext
+      ext="$1"
+      if [[ -z "$ext" ]]; then
+        echo "Usage: dumpfiles <extension>"
+        return 1
+      fi
+
+      ext="''${ext#.}"
+
+      find . -type f -name "*.''${ext}" -print0 \
+        | sort -z \
+        | while IFS= read -r -d $'\0' f; do 
+            echo "==== $f ===="
+            cat -- "$f"
+            echo
+          done
+    }
   '';
 }
-

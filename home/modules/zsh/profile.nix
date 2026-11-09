@@ -18,11 +18,6 @@
       fi
     fi
 
-    # Use Windows GnuPG inside WSL
-    path+=("/mnt/c/Program Files (x86)/GnuPG/bin")
-    export PATH
     export GPG_TTY=$(tty)
-    unset GNUPGHOME
   '';
 }
-

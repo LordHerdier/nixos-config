@@ -1,0 +1,130 @@
+;; Shared keymap for every board. defcfg (input device, output) is generated
+;; by the NixOS module from kmonad.nix, not written here.
+;;
+;; defsrc covers only the keys some layer remaps; fallthrough passes the rest
+;; through untouched, which is what lets one file serve boards with
+;; different physical layouts.
+;;
+;; @@layer-key@@ is substituted per board in kmonad.nix: rctl, or ralt on the
+;; Keychron K6 (Mac-mode K6 has no right ctrl).
+
+(defsrc
+    grv   1     2     3     4     5     6
+    tab   q     w     e     r     t     y     u     i     o     p
+    caps  a     s     d     f     g     h     j     k     l     ;
+    z     x     c     v     b     n     m     ,     .     /
+    spc   @@layer-key@@
+)
+
+(defalias
+    met_a (tap-hold 200  a lmet)
+    alt_s (tap-hold 200 s lalt)
+    sft_d (tap-hold 200 d lsft)
+    ctl_f (tap-hold 200 f lctl)
+
+    nav_g (tap-hold 200 g (layer-toggle nav))
+    nav_h (tap-hold 200 h (layer-toggle nav))
+
+    ctl_j (tap-hold 200 j lctl)
+
+    sft_k (tap-hold 200 k lsft)
+    alt_l (tap-hold 200 l lalt)
+    met_; (tap-hold 200 ; lmet)
+
+    ;; Hold caps for the extend layer, tap it for a plain caps lock.
+    ;; tap-hold-next (not tap-hold) so that pressing any other key resolves
+    ;; caps as a hold immediately, instead of stalling the next keystroke for
+    ;; the full 200ms while the tap/hold decision waits on caps' release.
+    extend (tap-hold-next 200 caps (layer-toggle extend))
+
+    layer-mod (tap-hold 200 @@layer-key@@ (layer-toggle switcher))
+
+    spc_mirror (tap-hold 200 spc (layer-toggle mirror))
+
+    mir_q p
+    mir_w o
+    mir_e i
+    mir_r u
+    mir_t y
+    mir_a ;
+    mir_s l
+    mir_d k
+    mir_f j
+    mir_g h
+    mir_z /
+    mir_x .
+    mir_c ,
+    mir_v m
+    mir_b n
+    mir_grv =
+    mir_1 0
+    mir_2 9
+    mir_3 8
+    mir_4 7
+    mir_5 6
+    mir_6 5
+)
+
+(deflayer default
+    _     _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _
+    @extend @met_a @alt_s @sft_d @ctl_f  @nav_g  @nav_h  @ctl_j  @sft_k  @alt_l  @met_;
+    _     _       _       _       _       _       _       _       _       _
+    _     @layer-mod
+)
+
+;; Extend (hold caps): the nav/editing cluster under the right hand. Arrows
+;; compose with vim counts/operators (3<Down>, d<Right>), so hjkl-only TUIs
+;; need no per-app rebinding. Same inverted-T as the nav layer (up on QWERTY
+;; i, left/down/right on j/k/l); pairs run left to right (home/end,
+;; pgup/pgdn).
+;;
+;; The left hand is transparent, so the home-row mods in `default` still
+;; apply: caps + f for ctrl, + d for shift, for word-wise motions/selections.
+(deflayer extend
+    _     _       _       _       _       _       _
+    _     _       _       _       _       _       ins     home    up      end     del
+    _     _       _       _       _       _       esc     left    down    right   bspc
+    _     _       _       _       _       ret     pgup    pgdn    tab     S-tab
+    _     _
+)
+
+(deflayer nav
+    _     _       _       _       _       _       _
+    _     _       _       up      _       _       _       _       up      _       _
+    _     _       left    down    right   _       _       left    down    right   _
+    _     _       _       _       _       _       _       _       _       _
+    _     _
+)
+
+(deflayer switcher
+    _     (layer-switch default) (layer-switch nomod) (layer-switch left-hand) _ _ _
+    _     _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
+    _     _
+)
+
+(deflayer nomod
+    _     _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _
+    _     @layer-mod
+)
+
+(deflayer left-hand
+    _     _       _       _       _       _       _
+    _     _       _       _       _       _       _       _       _       _       _
+    _     @met_a  @alt_s  @sft_d  @ctl_f  @nav_g  @nav_h  @ctl_j  @sft_k  @alt_l  @met_;
+    _     _       _       _       _       _       _       _       _       _
+    @spc_mirror   @layer-mod
+)
+
+(deflayer mirror
+    @mir_grv @mir_1 @mir_2 @mir_3 @mir_4 @mir_5 @mir_6
+    bspc  @mir_q  @mir_w  @mir_e  @mir_r  @mir_t  _       _       _       _       _
+    ret   @mir_a  @mir_s  @mir_d  @mir_f  @mir_g  _       _       _       _       _
+    @mir_z @mir_x @mir_c @mir_v @mir_b  _       _       _       _       _
+    _     _
+)

@@ -3,6 +3,14 @@
 { lib, ... }:
 
 {
+  # Theme files are read-only store links, but the active theme lives in
+  # ~/.omp_current (written by the `theme` zsh function), so switching
+  # themes still works without a rebuild.
+  home.file.".oh-my-posh" = {
+    source = ../oh-my-posh;
+    recursive = true;
+  };
+
   programs.zsh.initContent = lib.mkAfter ''
     # Oh-my-posh theme selection
     if [[ -f "$HOME/.omp_current" ]]; then
@@ -29,4 +37,3 @@
     fi
   '';
 }
-

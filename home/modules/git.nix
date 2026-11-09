@@ -3,13 +3,11 @@
 {
   programs.git = {
     enable = true;
-    userName = "Charlotte Whittleman";
-    userEmail = "brennwh@siue.edu";
-    extraConfig = {
+    settings = {
       init.defaultBranch = "main";
       pull.rebase = false;
       push.autoSetupRemote = true;
+      core.hooksPath = ".githooks";
     };
   };
 }
-

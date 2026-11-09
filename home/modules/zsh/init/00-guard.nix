@@ -13,4 +13,3 @@
     export ZSH_HIGHLIGHT_MAXLENGTH=300
   '';
 }
-

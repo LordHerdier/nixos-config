@@ -1,29 +1,73 @@
-# home/modules/packages.nx
-
-{ pkgs, ... }:
+# home/modules/packages.nix
 
 {
-  home.packages = with pkgs; [
-    neovim
-    oh-my-posh
-    pass
-    sshpass
-    stow
-    zoxide
-    tmux
-    fzf
-    ripgrep
-    gnugrep
-    gnused
-    coreutils
-    procps
-    yazi
-    ffmpegthumbnailer
-    poppler_utils
-    unzip
-    jq
-    wl-clipboard
-    wslu
-  ];
-}
+  pkgs,
+  inputs,
+  ...
+}:
 
+{
+  home.packages = (
+    with pkgs;
+    [
+      (python3.withPackages (ps: with ps; [ packaging ]))
+      (ansible.overrideAttrs (old: {
+        propagatedBuildInputs = old.propagatedBuildInputs ++ [ python3Packages.paramiko ];
+      }))
+      binwalk
+      concord
+      deno # Peek nvim plugin requires this
+      bun
+      claude-code
+      coreutils
+      fastfetch
+      ffmpegthumbnailer
+      fzf
+      gcc
+      gh
+      gnugrep
+      gnupg
+      gnused
+      gron
+      gum
+      inetutils
+      inputs.forgejo-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.pluralspace-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      jq
+      lazydocker
+      lazygit
+      lazyrsync
+      mpv
+      nerd-fonts.caskaydia-cove
+      nmap
+      nodejs
+      oh-my-posh
+      opencode
+      p7zip
+      pass
+      playerctl
+      poppler-utils
+      procps
+      qemu
+      ripgrep
+      shellcheck
+      shfmt
+      sshpass
+      stow
+      stylua
+      spotify-player
+      tldr
+      tmux
+      unzip
+      wl-clipboard
+      yazi
+      yt-dlp
+      zoxide
+    ]
+  );
+  #  ++ lib.optionals isWsl (with pkgs; [
+  #    wslu
+  #    win32yank
+  #  ])
+  #  ++ lib.optionals (!isWsl) [ pkgs.wl-clipboard ];
+}

@@ -23,31 +23,49 @@
     vim = "nvim";
     "v." = "nvim .";
     "v.." = "nvim ..";
-    em = "emacs -nw";
-    emacs = "emacs -nw";
 
     # Quick commands
     y = "yazi";
     browse = "yazi";
-    nb = "newsboat && clear";
     path = "realpath";
 
     # Nix
-    nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#Charlie-Laptop";
+    n = "nix";
+    nf = "nix flake";
+    nfu = "nix flake update";
+    nd = "nix develop";
+    ns = "nix shell";
+    nix-rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname)";
     nix-update-dotfiles = "sudo nix flake lock --update-input dotfiles /etc/nixos";
+    nrb = "nh os switch /etc/nixos#$(hostname)";
 
     # Tools
     ls = "eza -gh --group-directories-first";
     la = "eza -lgha --group-directories-first";
     ll = "eza -lg --group-directories-first";
 
-    # WSL helpers
-    ts = "tailscale.exe";
-    files = "explorer.exe .";
-
     # Python venv
     venvc = "python3 -m venv venv";
     venva = "source venv/bin/activate";
+
+    # git
+    g = "git";
+    ga = "git add";
+    gad = "git add .";
+    gc = "git commit";
+    gcl = "git clone";
+    gf = "git fetch";
+    gl = "git log";
+    gcm = "git commit -m";
+    gco = "git checkout";
+    gcob = "git checkout -b";
+    gd = "git diff";
+    gds = "git diff --staged";
+    gp = "git pull";
+    gpu = "git push";
+    gs = "git status";
+    gsw = "git switch";
+    gswm = "git switch main";
 
     # Docker compose
     dc = "docker compose";
@@ -64,11 +82,9 @@
 
     # “bruh”
     npm = "/usr/bin/npm";
-    gpg = "/mnt/c/Program\\ Files\\ \\(x86\\)/GnuPG/bin/gpg.exe";
-    gpgconf = "/mnt/c/Program\\ Files\\ \\(x86\\)/GnuPG/bin/gpgconf.exe";
 
     # Workflow
     nmapc = "nmap -p 1-1000,41794,41795,41796 -Pn -T4";
+    exo64 = "sudo -E qemu-system-x86_64 -m 256M -cdrom build/exodoom.iso -drive 'file=build/exodoom_disk.img,format=raw,if=ide' -device intel-hda -device hda-output,audiodev=snd0 -audiodev pipewire,id=snd0 -machine pcspk-audiodev=snd0 -no-reboot -serial stdio -enable-kvm";
   };
 }
-

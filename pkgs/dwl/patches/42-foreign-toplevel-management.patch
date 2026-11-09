@@ -1,0 +1,175 @@
+diff --git a/dwl.c b/dwl.c
+index e5de4d3..215b2b5 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -32,6 +32,7 @@
+ #include <wlr/types/wlr_ext_image_capture_source_v1.h>
+ #include <wlr/types/wlr_ext_image_copy_capture_v1.h>
+ #include <wlr/types/wlr_ext_foreign_toplevel_list_v1.h>
++#include <wlr/types/wlr_foreign_toplevel_management_v1.h>
+ #include <wlr/types/wlr_fractional_scale_v1.h>
+ #include <wlr/types/wlr_gamma_control_v1.h>
+ #include <wlr/types/wlr_idle_inhibit_v1.h>
+@@ -143,6 +144,11 @@ struct Client {
+ 	} surface;
+ 	struct wlr_xdg_toplevel_decoration_v1 *decoration;
+ 	struct wlr_ext_foreign_toplevel_handle_v1 *foreign_toplevel_handle;
++	/* wlr-foreign-toplevel-management: lets taskbars/switchers activate us */
++	struct wlr_foreign_toplevel_handle_v1 *ftl;
++	struct wl_listener ftl_activate;
++	struct wl_listener ftl_close;
++	struct wl_listener ftl_fullscreen;
+ 	struct wlr_scene *image_capture_scene;
+ 	struct wlr_ext_image_capture_source_v1 *image_capture_source;
+ 	union {
+@@ -360,6 +366,9 @@ static void focusclient(Client *c, int lift);
+ static void focusmon(const Arg *arg);
+ static void focusstack(const Arg *arg);
+ static Client *focustop(Monitor *m);
++static void ftlactivatenotify(struct wl_listener *listener, void *data);
++static void ftlclosenotify(struct wl_listener *listener, void *data);
++static void ftlfullscreennotify(struct wl_listener *listener, void *data);
+ static void fullscreennotify(struct wl_listener *listener, void *data);
+ static void gpureset(struct wl_listener *listener, void *data);
+ static void handlesig(int signo);
+@@ -471,6 +480,7 @@ static struct wlr_virtual_pointer_manager_v1 *virtual_pointer_mgr;
+ static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr;
+ static struct wlr_output_power_manager_v1 *power_mgr;
+ static struct wlr_ext_foreign_toplevel_list_v1 *foreign_toplevel_list;
++static struct wlr_foreign_toplevel_manager_v1 *ftl_mgr;
+ static struct wlr_ext_foreign_toplevel_image_capture_source_manager_v1 *ext_foreign_toplevel_image_capture_source_manager_v1;
+ 
+ static struct wlr_pointer_constraints_v1 *pointer_constraints;
+@@ -1958,6 +1968,8 @@ focusclient(Client *c, int lift)
+ 			client_set_border_color(focused_client, (float[])COLOR(colors[SchemeNorm][ColBorder]));
+ 		if (s && s->mapped)
+ 			client_activate_surface(s, 0);
++		if (focused_client->ftl)
++			wlr_foreign_toplevel_handle_v1_set_activated(focused_client->ftl, 0);
+ 		focused_client = NULL;
+ 	}
+ 	drawbars();
+@@ -1980,8 +1992,11 @@ focusclient(Client *c, int lift)
+ 	/* Activate the new client */
+ 	client_activate_surface(client_surface(c), 1);
+ 
+-	if (!client_is_unmanaged(c))
++	if (!client_is_unmanaged(c)) {
+ 		focused_client = c;
++		if (c->ftl)
++			wlr_foreign_toplevel_handle_v1_set_activated(c->ftl, 1);
++	}
+ }
+ 
+ void
+@@ -2036,6 +2051,37 @@ focustop(Monitor *m)
+ 	return NULL;
+ }
+ 
++void
++ftlactivatenotify(struct wl_listener *listener, void *data)
++{
++	/* Go to the client rather than bring it here: switch its monitor to
++	 * its tags (view() picks the output tagmons[] maps them to) and focus. */
++	Client *c = wl_container_of(listener, c, ftl_activate);
++	if (c->swallowedby)
++		c = c->swallowedby;
++	if (locked || !c->mon)
++		return;
++	selmon = c->mon;
++	if (!VISIBLEON(c, c->mon))
++		view(&(Arg){.ui = c->tags});
++	focusclient(c, 1);
++}
++
++void
++ftlclosenotify(struct wl_listener *listener, void *data)
++{
++	Client *c = wl_container_of(listener, c, ftl_close);
++	client_send_close(c);
++}
++
++void
++ftlfullscreennotify(struct wl_listener *listener, void *data)
++{
++	Client *c = wl_container_of(listener, c, ftl_fullscreen);
++	struct wlr_foreign_toplevel_handle_v1_fullscreen_event *event = data;
++	setfullscreen(c, event->fullscreen);
++}
++
+ void
+ fullscreennotify(struct wl_listener *listener, void *data)
+ {
+@@ -2340,6 +2386,15 @@ mapnotify(struct wl_listener *listener, void *data)
+ 	c->foreign_toplevel_handle = wlr_ext_foreign_toplevel_handle_v1_create(
+ 			foreign_toplevel_list, &foreign_toplevel_state);
+ 	c->foreign_toplevel_handle->data = c;
++	c->ftl = wlr_foreign_toplevel_handle_v1_create(ftl_mgr);
++	c->ftl->data = c;
++	wlr_foreign_toplevel_handle_v1_set_app_id(c->ftl,
++			client_get_appid(c) ? client_get_appid(c) : "");
++	wlr_foreign_toplevel_handle_v1_set_title(c->ftl,
++			client_get_title(c) ? client_get_title(c) : "");
++	LISTEN(&c->ftl->events.request_activate, &c->ftl_activate, ftlactivatenotify);
++	LISTEN(&c->ftl->events.request_close, &c->ftl_close, ftlclosenotify);
++	LISTEN(&c->ftl->events.request_fullscreen, &c->ftl_fullscreen, ftlfullscreennotify);
+ 	c->image_capture_scene = wlr_scene_create();
+ 	if (c->type == XDGShell)
+ 		c->capture.image_capture_tree = wlr_scene_xdg_surface_create(&c->image_capture_scene->tree, c->surface.xdg);
+@@ -2921,6 +2976,8 @@ void
+ setfullscreen(Client *c, int fullscreen)
+ {
+ 	c->isfullscreen = fullscreen;
++	if (c->ftl)
++		wlr_foreign_toplevel_handle_v1_set_fullscreen(c->ftl, fullscreen);
+ 	if (!c->mon || !client_surface(c)->mapped)
+ 		return;
+ 	c->bw = fullscreen ? 0 : BORDERPX(c);
+@@ -2981,9 +3038,14 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 	c->prev = c->geom;
+ 
+ 	/* Scene graph sends surface leave/enter events on move and resize */
+-	if (oldmon)
++	if (oldmon) {
++		if (c->ftl)
++			wlr_foreign_toplevel_handle_v1_output_leave(c->ftl, oldmon->wlr_output);
+ 		arrange(oldmon);
++	}
+ 	if (m) {
++		if (c->ftl)
++			wlr_foreign_toplevel_handle_v1_output_enter(c->ftl, m->wlr_output);
+ 		/* Make sure window actually overlaps with the monitor */
+ 		resize(c, c->geom, 0);
+ 		c->tags = newtags ? newtags : m->tagset[m->seltags]; /* assign tags of target monitor */
+@@ -3171,6 +3233,7 @@ setup(void)
+ 	wlr_scene_node_set_enabled(&locked_bg->node, 0);
+ 
+ 	foreign_toplevel_list = wlr_ext_foreign_toplevel_list_v1_create(dpy,1);
++	ftl_mgr = wlr_foreign_toplevel_manager_v1_create(dpy);
+ 	ext_foreign_toplevel_image_capture_source_manager_v1 =
+             wlr_ext_foreign_toplevel_image_capture_source_manager_v1_create(dpy, 1);
+ 	wl_signal_add(&ext_foreign_toplevel_image_capture_source_manager_v1->events.new_request,
+@@ -3611,6 +3674,13 @@ unmapnotify(struct wl_listener *listener, void *data)
+ 		wlr_ext_foreign_toplevel_handle_v1_destroy(c->foreign_toplevel_handle);
+ 		c->foreign_toplevel_handle = NULL;
+ 	}
++	if (c->ftl) {
++		wl_list_remove(&c->ftl_activate.link);
++		wl_list_remove(&c->ftl_close.link);
++		wl_list_remove(&c->ftl_fullscreen.link);
++		wlr_foreign_toplevel_handle_v1_destroy(c->ftl);
++		c->ftl = NULL;
++	}
+ #ifdef XWAYLAND
+ 	if (c->type != XDGShell && c->capture.image_capture_scene_surface) {
+ 		wlr_scene_node_destroy(&c->capture.image_capture_scene_surface->buffer->node);
+@@ -3797,6 +3867,9 @@ updatetitle(struct wl_listener *listener, void *data)
+ 		wlr_ext_foreign_toplevel_handle_v1_update_state(c->foreign_toplevel_handle,
+ 				&foreign_toplevel_state);
+ 	}
++	if (c->ftl)
++		wlr_foreign_toplevel_handle_v1_set_title(c->ftl,
++				client_get_title(c) ? client_get_title(c) : "");
+ }
+ 
+ void

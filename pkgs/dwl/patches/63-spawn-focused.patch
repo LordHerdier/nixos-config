@@ -1,0 +1,41 @@
+diff --git a/dwl.c b/dwl.c
+--- a/dwl.c
++++ b/dwl.c
+@@ -451,6 +451,7 @@
+ static void setup(void);
+ static void setstatus(const char *s);
+ static void spawn(const Arg *arg);
++static void spawnfocused(const Arg *arg);
+ static void spawnstatuscmd(const StatusBlock *b, int cmd);
+ static void startdrag(struct wl_listener *listener, void *data);
+ static void swallow(Client *c, Client *toswallow);
+@@ -3954,6 +3955,29 @@
+ }
+ 
+ void
++spawnfocused(const Arg *arg)
++{
++	/* spawn with DWL_FOCUS_GEOM="x,y wxh" (slurp's format, in layout
++	 * coordinates, borders included) set to the focused client's box */
++	Client *c = selmon ? focustop(selmon) : NULL;
++	char geom[64];
++
++	if (fork() == 0) {
++		if (c) {
++			snprintf(geom, sizeof(geom), "%d,%d %dx%d",
++					c->geom.x, c->geom.y, c->geom.width, c->geom.height);
++			setenv("DWL_FOCUS_GEOM", geom, 1);
++		}
++		close(STDIN_FILENO);
++		open("/dev/null", O_RDWR);
++		dup2(STDERR_FILENO, STDOUT_FILENO);
++		setsid();
++		execvp(((char **)arg->v)[0], (char **)arg->v);
++		die("dwl: execvp %s failed:", ((char **)arg->v)[0]);
++	}
++}
++
++void
+ startdrag(struct wl_listener *listener, void *data)
+ {
+ 	struct wlr_drag *drag = data;
