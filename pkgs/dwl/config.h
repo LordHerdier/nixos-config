@@ -372,6 +372,10 @@ static const Key keys[] = {
 	{ MODKEY|CTRL,               XKB_KEY_backslash,   togglegaps,       {0} },
 	{ MODKEY|CTRL|SHIFT,         XKB_KEY_bar,         defaultgaps,      {0} },
 	{ MODKEY|CTRL,               XKB_KEY_Return,      zoom,             {0} },
+	/* Rotate this tag's tiled windows (87-rotate-clients): Alt+E sends the
+	 * master to the bottom of the stack, Alt+U pulls the bottom one up */
+	{ MODKEY|ALT,                XKB_KEY_e,           rotate_clients,   {.i = +1} },
+	{ MODKEY|ALT,                XKB_KEY_u,           rotate_clients,   {.i = -1} },
 	/* Alt+Tab-style: hold Super, Tab steps through windows in recently used
 	 * order, releasing Super keeps the one shown, Escape goes back */
 	{ MODKEY,                    XKB_KEY_Tab,         mrucycle,         {.i = +1} },

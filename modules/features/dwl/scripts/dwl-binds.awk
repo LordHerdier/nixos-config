@@ -37,6 +37,7 @@ function describe(fn, arg,    c) {
 	if (fn in gapfns && match(arg, /\.i *= *([-+]?[0-9]+)/, c)) return gapfns[fn] " " c[1] "px"
 	if (fn == "togglegaps") return "gaps on/off"
 	if (fn == "defaultgaps") return "reset gaps"
+	if (fn == "rotate_clients") return (arg ~ /-/) ? "rotate windows up" : "rotate windows down"
 	sub(/^\{ */, "", arg); sub(/\}? *$/, "", arg)
 	sub(/^\.[a-z]+ *= */, "", arg)
 	return (arg == "0" || arg == "") ? fn : fn " " arg

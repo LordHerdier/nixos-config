@@ -1,0 +1,57 @@
+rotate-clients (https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/rotate-clients),
+refreshed to apply on top of 03..84; the config.def.h hunk is dropped (binds
+live in ./config.h).
+
+rotate_clients ({.i = +1} / {.i = -1}) rotates the tiled, non-fullscreen
+clients visible on the selected monitor: +1 sends the master to the end of
+the stack, -1 brings the last client up to master. Focus stays on the same
+window.
+
+diff --git a/dwl.c b/dwl.c
+index 9726343..5ec560f 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -530,6 +530,7 @@ static void xytonode(double x, double y, struct wlr_surface **psurface,
+ 		Client **pc, LayerSurface **pl, double *nx, double *ny);
+ static void shiftview(const Arg *arg);
+ static void zoom(const Arg *arg);
++static void rotate_clients(const Arg *arg);
+ 
+ /* variables */
+ static pid_t child_pid = -1;
+@@ -5367,6 +5368,35 @@ zoom(const Arg *arg)
+ 	arrange(selmon);
+ }
+ 
++void
++rotate_clients(const Arg *arg)
++{
++	Monitor *m = selmon;
++	Client *c, *first = NULL, *last = NULL;
++	struct wl_list *after, *elem;
++
++	if (!m || arg->i == 0)
++		return;
++
++	wl_list_for_each(c, &clients, link) {
++		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen) {
++			if (!first)
++				first = c;
++			last = c;
++		}
++	}
++	if (first == last)
++		return;
++
++	/* +1 moves the first tiled client (master) to the end, -1 the last to
++	 * the front; clients on other tags keep their place in the list */
++	after = arg->i > 0 ? &last->link : first->link.prev;
++	elem = arg->i > 0 ? &first->link : &last->link;
++	wl_list_remove(elem);
++	wl_list_insert(after, elem);
++	arrange(m);
++}
++
+ #ifdef XWAYLAND
+ void
+ activatex11(struct wl_listener *listener, void *data)

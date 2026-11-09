@@ -90,6 +90,7 @@ Applied in filename order; the number prefix is the order.
 | `78-xkb-layout-signal.patch`           | local                                                               | `SIGUSR1` steps the xkb layout forward (the same as `switchxkblayout {.i = +1}`), so the bar's `kb` click region can reach it from a shell via `dwl-xkb-switch`. |
 | `81-bar-status-hover.patch`            | local                                                               | `^hv(text)` status region: while the pointer is over the block it is drawn (and hit-tested) as `text`, e.g. slstatus shows `net +` and the SSID on hover. `motionnotify` redraws the bars when the hovered block changes                                                                                                                                                                                                                                                                                                                                           |
 | `84-vanitygaps.patch`                  | dwl-patches `vanitygaps` (main, refreshed for this stack)           | Inner and outer gaps per monitor (`gappih`/`gappiv`/`gappoh`/`gappov`, `smartgaps`, `monoclegaps`), all bound to `]`/`[` and `\` (see Keybinds below). Both upstream commits squashed; the `togglegaps`/`enablegaps` declaration hunks were placed by hand |
+| `87-rotate-clients.patch`             | dwl-patches `rotate-clients` (0.7, refreshed for this stack)        | `rotate_clients` rotates the tiled, non-fullscreen windows on the selected monitor's tags (`{.i = +1}` sends the master to the end of the stack, `-1` pulls the last window up to master); focus stays on the same window. Bound to `Super+Alt+E`/`Super+Alt+U` |
 
 `06-bar.patch` is a `diff -ruN` regenerated from a working tree rather than a
 verbatim wiki patch; it also changes `rootcolor` to black and drops
@@ -135,7 +136,8 @@ Based on `config.def.h` with patch hunks merged in by hand. Notable settings:
   `Super+Ctrl+Shift` outer, `Super+Ctrl+Alt` inner, `Super+Alt`(`+Shift`)
   between stacked windows (columns), `Super`(`+Shift`) top/bottom (left/right)
   edges; `Super+Ctrl+\` toggles them and `Super+Ctrl+Shift+\` resets them,
-  `84-vanitygaps`). Wallpaper cycling is
+  `84-vanitygaps`). `Super+Alt+E`/`Super+Alt+U` rotate the current
+  tag's tiled windows down/up the stack (`87-rotate-clients`). Wallpaper cycling is
   `Super+Alt+1/2/3` (`dwl-wallpaper next|prev|rand`); `Super+Alt+4` opens
   `dwl-wallpaper-pick`, an fzf menu in a `MODAL` popup that previews each
   wallpaper live as you move through it (Enter keeps, Esc reverts).
