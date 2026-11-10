@@ -6,9 +6,12 @@
     ../profiles/desktop-hyprland.nix
     ../modules/easyeffects.nix
     ../modules/easyeffects-presets.nix
+    ../modules/gtk-theme.nix
   ];
 
   my.theme.default = lib.mkForce "halloween";
+
+  my.gtk-theme.enable = true;
 
   my.easyeffects.enable = true;
   my.easyeffects.presets.enable = true;
