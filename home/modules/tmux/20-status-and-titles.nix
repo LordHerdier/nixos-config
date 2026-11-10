@@ -32,7 +32,7 @@ in
     # *left* edge when it doesn't fit, so now-playing is eaten first.
     set -g status-left "#[fg=#{@tm_surface},bg=#{@tm_attention},bold] ❐ #S #[default]${vimbridge}#[default]"
     set -g status-left-length 200
-    set -g status-right " #[range=user|nowplaying,fg=#{@tm_magenta}]#(~/.config/tmux/scripts/now-playing.sh)#[norange,default] #{?client_prefix,⌨ ,}#{?mouse,↗ ,}#{?synchronize-panes,⚏ ,}| #{session_dots} | ${vimbridgeR}#[default]"
+    set -g status-right " #[range=user|nowplaying,fg=#{@tm_magenta}]#(~/.config/tmux/scripts/now-playing.sh)#[norange,default] #{?client_prefix,⌨ ,}#{?mouse,↗ ,}#{?synchronize-panes,⚏ ,}| #[fg=#{@session-dots-color}]#(~/.config/tmux/scripts/session-dots.sh '#S')#[default] | ${vimbridgeR}#[default]"
     set -g status-right-length 200
 
     set -g set-titles on

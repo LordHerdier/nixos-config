@@ -58,6 +58,18 @@ in
     '';
   };
 
+  # Replaces the tmux-session-dots plugin: its script has a /bin/bash
+  # shebang, which does not exist on NixOS, so #() silently rendered empty.
+  home.file.".config/tmux/scripts/session-dots.sh" = {
+    executable = true;
+    text = ''
+      #!${pkgs.bash}/bin/bash
+      # Current session as ●, the others as ○.
+      ${config.programs.tmux.package}/bin/tmux list-sessions \
+        -F "#{?#{==:#{session_name},$1},●,○}" 2>/dev/null | ${pkgs.coreutils}/bin/tr -d '\n'
+    '';
+  };
+
   home.file.".config/tmux/scripts/now-playing.sh" = {
     executable = true;
     text = ''

@@ -1,22 +1,7 @@
 # home/modules/tmux/default.nix
 
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
-let
-  tmux-session-dots = pkgs.tmuxPlugins.mkTmuxPlugin {
-    pluginName = "tmux-session-dots";
-    version = "unstable=2026-02-14";
-
-    rtpFilePath = "session-dots.tmux";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "jtmcginty";
-      repo = "tmux-session-dots";
-      rev = "992a6c76e42bdd1b1a6f082216a13c94ebaffc34";
-      sha256 = "lI5aOGHubu2kWGPaOvUkjcwUgRnaW//YA3PAazqZcjg=";
-    };
-  };
-in
 {
   imports = [
     ./00-core.nix
@@ -37,12 +22,6 @@ in
     plugins = with pkgs.tmuxPlugins; [
       resurrect
       continuum
-      tmux-session-dots
     ];
-
-    # Force-run the tmux-session-dots plugin
-    extraConfig = lib.mkAfter ''
-      run-shell "${tmux-session-dots}/share/tmux-plugins/tmux-session-dots/session-dots.tmux"
-    '';
   };
 }
