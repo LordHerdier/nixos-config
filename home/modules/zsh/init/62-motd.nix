@@ -31,8 +31,12 @@
       # Short lock-style snooze so other panes don't ask while this prompt is open
       print -r -- $(( EPOCHSECONDS + 30 )) > "$_motd_snooze"
 
-      local reply
-      read -k 1 "reply?Good morning! Show today's MOTD? [y/N/s=snooze 5m] "
+      local reply greeting hour=$(strftime %H)
+      if (( 10#$hour < 12 )); then greeting="Good morning"
+      elif (( 10#$hour < 18 )); then greeting="Good afternoon"
+      else greeting="Good evening"
+      fi
+      read -k 1 "reply?$greeting! Show today's MOTD? [y/N/s=snooze 5m] "
       print
       case $reply in
         [yY])
