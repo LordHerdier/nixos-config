@@ -20,6 +20,7 @@
     ./modules/spotify-player.nix
     ./modules/wiremix.nix
     ./modules/youtube-tui
+    ./modules/yazi.nix
     ./modules/case-insensitive-dirs.nix
     ./modules/zen-browser
   ];
