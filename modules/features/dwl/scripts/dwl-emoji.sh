@@ -1,6 +1,6 @@
 # dwl-emoji
 #
-# Emoji picker in a centred st-wl popup (Super+. in pkgs/dwl/config.h),
+# Emoji picker in a centred kitty popup (Super+. in pkgs/dwl/config.h),
 # standing in for Noctalia's "/emo" launcher. DWL_EMOJI_LIST is the
 # "emoji<TAB>name" file scripts.nix builds from Unicode's emoji-test.txt.
 # Enter copies the emoji to the clipboard; the last 30 picks are listed first.

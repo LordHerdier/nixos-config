@@ -1,7 +1,7 @@
 # dwl-wallpaper-pick
 #
-# fzf menu over the dwl-wallpaper images in a centred st-wl popup
-# (Super+Alt+4), with icat-mini thumbnails. The highlighted entry is applied
+# fzf menu over the dwl-wallpaper images in a centred kitty popup
+# (Super+Alt+4), with kitty icat thumbnails. The highlighted entry is applied
 # once the cursor rests on it a moment (each change starts a fresh swaybg,
 # so holding an arrow key would pile them up). Enter keeps it, Esc restores
 # the wallpaper from when the menu opened.
@@ -52,7 +52,7 @@ sel=$(
     --delimiter / --with-nth -1 \
     --layout reverse --prompt 'wallpaper> ' \
     --preview-window right,65%,border-left \
-    --preview 'icat-mini --max-cols "$FZF_PREVIEW_COLUMNS" --max-rows "$FZF_PREVIEW_LINES" {}' \
+    --preview 'kitty icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0" {}' \
     --bind "load:pos($pos)" \
     --bind "focus:execute-silent($0 --apply-later $pending {})"
 ) || true

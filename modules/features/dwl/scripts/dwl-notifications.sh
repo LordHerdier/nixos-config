@@ -1,6 +1,6 @@
 # dwl-notifications
 #
-# Notification centre in a centred st-wl popup (Super+W), standing in for
+# Notification centre in a centred kitty popup (Super+W), standing in for
 # Noctalia's control-center panel: fzf over mako's open notifications
 # (marked ●) and history, full text in the preview. Enter runs an open one's
 # default action, Ctrl+D deletes, Ctrl+X clears all (as the bar bell's

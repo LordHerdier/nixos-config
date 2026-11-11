@@ -1,6 +1,6 @@
 # dwl-windows
 #
-# fzf window switcher in a centred st-wl popup (Super+Alt+Tab), standing in
+# fzf window switcher in a centred kitty popup (Super+Alt+Tab), standing in
 # for Noctalia's. Enter goes to the window (dwl views its tags and focuses
 # it, 42-foreign-toplevel-management.patch); Ctrl+D closes it.
 #

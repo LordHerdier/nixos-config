@@ -1,11 +1,11 @@
 # dwl-modal NAME
 #
-# Toggles a control popup: an st-wl with app_id "modal", which config.h's
+# Toggles a control popup: a kitty with app_id "modal", which config.h's
 # "modal" rule floats and centres. NAME picks its size (cells) and command
 # from the table below, shared by config.h's MODAL() binds and the bar's
 # click regions. If that popup is already open it is closed instead.
 #
-# The open popup is found by its command line; the trailing " -g" stops one
+# The open popup is found by its command line; the trailing " -o" stops one
 # name matching another that starts with it. Names are used as a regex, so
 # keep them to plain words.
 
@@ -34,8 +34,12 @@ cols=$1
 rows=$2
 shift 2
 
-if pkill -u "$(id -u)" -f -- "-c modal -T $name -g"; then
+if pkill -u "$(id -u)" -f -- "--class modal --title $name -o"; then
   exit 0
 fi
 
-exec st-wl -c modal -T "$name" -g "${cols}x${rows}" "$@"
+exec kitty --class modal --title "$name" \
+  -o remember_window_size=no \
+  -o initial_window_width="${cols}c" \
+  -o initial_window_height="${rows}c" \
+  "$@"

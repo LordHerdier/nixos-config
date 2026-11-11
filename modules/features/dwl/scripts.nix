@@ -10,7 +10,6 @@
   lib,
   pkgs,
   dwl,
-  st,
   themes,
 }:
 
@@ -72,9 +71,9 @@ let
     clipboard.deps = with pkgs; [
       cliphist
       fzf
+      kitty
       util-linux
       wl-clipboard
-      st
     ];
 
     # mako as a runtime input rather than on PATH; see startup.sh.
@@ -95,10 +94,10 @@ let
       env.DWL_EMOJI_LIST = emojiList;
     };
 
-    modal.deps = [
-      pkgs.coreutils
-      pkgs.procps
-      st
+    modal.deps = with pkgs; [
+      coreutils
+      kitty
+      procps
     ];
 
     # theme-set, which the appearance page calls, is not here: it comes from
@@ -226,8 +225,8 @@ let
     wallpaper-pick.deps = with pkgs; [
       coreutils
       fzf
+      kitty
       scripts.wallpaper
-      st
     ];
 
     # wlrctl activates windows through dwl's 42-foreign-toplevel-management.patch.

@@ -1,6 +1,6 @@
 # dwl-settings [network | --toggle-wifi | --toggle-bluetooth]
 #
-# Settings menu in a centred st-wl popup (Super+/), standing in for
+# Settings menu in a centred kitty popup (Super+/), standing in for
 # Noctalia's control centre: one row per page with a live summary; Escape
 # goes back a level, then closes. Each page is a file in ./settings that
 # scripts.nix concatenates ahead of this one (after common.sh, the shared

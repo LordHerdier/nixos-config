@@ -2,10 +2,10 @@
 #
 # dwl as a selectable login session ("dwl" in tuigreet's F3 list). The
 # compositor, its patches and config.h are pkgs/dwl; the bar's status line
-# is pkgs/slstatus. Needs the desktop-hyprland profile for the wofi that
-# config.h launches; st-wl, its terminal, is built here.
+# is pkgs/slstatus. Needs the desktop-hyprland profile for the kitty / wofi
+# that config.h launches.
 #
-# Colours (bar, borders, mako, slstatus, st-wl) follow charlotte's
+# Colours (bar, borders, mako, slstatus) follow charlotte's
 # `my.theme.default`, like her kitty/wofi/nvim. dwl reads them at runtime,
 # so a change needs no restart, and `dwl-theme` switches palettes live.
 #
@@ -60,42 +60,11 @@ let
 
   slstatus = pkgs.slstatus;
 
-  # st-wl's compiled-in colours (pkgs/st-wl) are the my.theme palette as
-  # built; they are only the fallback for when the st-colors fragment
-  # (below) is missing. Live windows and new ones follow `theme-set`.
-  st = pkgs.st-wl.override {
-    colours = {
-      inherit (t.palette)
-        bg
-        fg
-        black
-        red
-        green
-        yellow
-        blue
-        magenta
-        cyan
-        white
-        brightBlack
-        brightRed
-        brightGreen
-        brightYellow
-        brightBlue
-        brightMagenta
-        brightCyan
-        brightWhite
-        ;
-      cursor = t.roles.cursor;
-      cursorRev = t.palette.brightBlack;
-    };
-  };
-
   scripts = import ./scripts.nix {
     inherit
       lib
       pkgs
       dwl
-      st
       themes
       ;
   };
@@ -168,49 +137,6 @@ in
     wal = true;
   };
 
-  # st-wl reads this at startup and on SIGUSR1 (pkgs/st-wl/patches/
-  # 20-theme-colours.patch): "INDEX #rrggbb" per line, 0-15 the ANSI colours
-  # and 256-259 cursor, reverse cursor, default background, default foreground.
-  home-manager.users.charlotte.my.theme.fragments.st-colors = {
-    file = "st-colors";
-    wal = true;
-    render =
-      t:
-      let
-        p = t.palette;
-        ansi = [
-          p.black
-          p.red
-          p.green
-          p.yellow
-          p.blue
-          p.magenta
-          p.cyan
-          p.white
-          p.brightBlack
-          p.brightRed
-          p.brightGreen
-          p.brightYellow
-          p.brightBlue
-          p.brightMagenta
-          p.brightCyan
-          p.brightWhite
-        ];
-        line = i: c: "${toString i} ${c}\n";
-      in
-      lib.concatStrings (
-        lib.imap0 line ansi
-        ++ [
-          (line 256 t.roles.cursor)
-          (line 257 p.brightBlack)
-          (line 258 p.bg)
-          (line 259 p.fg)
-        ]
-      );
-    reload = "pkill -USR1 -x st-wl";
-    runtimeInputs = [ pkgs.procps ];
-  };
-
   home-manager.users.charlotte.my.theme.fragments.mako = {
     file = "mako";
     wal = true;
@@ -246,8 +172,6 @@ in
   environment.systemPackages = lib.attrValues scripts ++ [
     dwl
     session
-    # The terminal config.h launches (pkgs/st-wl), coloured from `my.theme`.
-    st
     # Audio mixer popup (Super+A / bar status click in pkgs/dwl/config.h).
     pkgs.wiremix
     # Brightness and media keys in pkgs/dwl/config.h.
