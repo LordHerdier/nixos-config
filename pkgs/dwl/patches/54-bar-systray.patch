@@ -706,7 +706,7 @@ new file mode 100644
 index 0000000..1b97866
 --- /dev/null
 +++ b/systray/icon.c
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,153 @@
 +#include "icon.h"
 +
 +#include <fcft/fcft.h>
@@ -773,6 +773,10 @@ index 0000000..1b97866
 +	uint8_t *buf_orig = NULL;
 +
 +	n_pixels = size / 4;
++
++	/* The buffer must hold width*height pixels or pixman reads past it. */
++	if (width <= 0 || height <= 0 || (size_t)width * height > (size_t)n_pixels)
++		return NULL;
 +
 +	icon = calloc(1, sizeof(Icon));
 +	buf_orig = malloc(size);
@@ -2134,7 +2138,7 @@ new file mode 100644
 index 0000000..7f9b1b0
 --- /dev/null
 +++ b/systray/tray.c
-@@ -0,0 +1,238 @@
+@@ -0,0 +1,244 @@
 +#include "tray.h"
 +
 +#include "icon.h"
@@ -2174,7 +2178,13 @@ index 0000000..7f9b1b0
 +
 +	dest = pixman_image_create_bits(PIXMAN_a8r8g8b8, width, height, NULL,
 +	                                0);
++	if (!dest)
++		return NULL;
 +	src = pixman_image_create_solid_fill(&bgcolor_pix);
++	if (!src) {
++		pixman_image_unref(dest);
++		return NULL;
++	}
 +
 +	pixman_image_composite32(PIXMAN_OP_SRC, src, NULL, dest, 0, 0, 0, 0, 0,
 +	                         0, width, height);
