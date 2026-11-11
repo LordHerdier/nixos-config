@@ -129,6 +129,7 @@ let
         procps
         util-linux
         wireplumber
+        wl-mirror
         wlr-randr
         scripts.airpods
         scripts.bar-refresh
