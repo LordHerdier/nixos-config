@@ -6,6 +6,7 @@
       "nix-command"
       "flakes"
     ];
+    trusted-users = [ "charlotte" ];
     warn-dirty = false;
     download-buffer-size = 524288000; # 500 MiB
   };
