@@ -4,13 +4,12 @@ inputs: final: prev: {
   # dwl with our config.h and patch stack -- see pkgs/dwl.
   # `prev` is passed explicitly because callPackage
   # would otherwise hand the override itself back in.
-  # The screen shader (72-screen-shader.patch) is hyprCRT's, the same
-  # one the Hyprland session uses.
+  # The screen shader (72-screen-shader.patch) is pkgs/dwl/crt.frag, a
+  # copy of the hyprCRT one the Hyprland session uses, plus the
+  # dwl-damage line that lets dwl redraw only what changed.
   dwl = final.callPackage ../pkgs/dwl {
     inherit (prev) dwl;
-    screenShader = "${
-      inputs.hyprCRT-shader.packages.${final.stdenv.hostPlatform.system}.default
-    }/share/hyprCRT/crt.frag";
+    screenShader = "${../pkgs/dwl/crt.frag}";
   };
   dwl-clangd = final.callPackage ../pkgs/dwl/clangd.nix { };
 

@@ -12,7 +12,7 @@ index 617e1ca..f8b3d1c 100644
  LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
  
 diff --git a/dwl.c b/dwl.c
-index a0df0f4..42635ef 100644
+index e1733cb..1afcae4 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -1,6 +1,7 @@
@@ -33,7 +33,7 @@ index a0df0f4..42635ef 100644
  #include <wlr/render/swapchain.h>
  #include <wlr/render/wlr_renderer.h>
  #include <wlr/types/wlr_alpha_modifier_v1.h>
-@@ -291,6 +295,13 @@ struct Monitor {
+@@ -292,6 +296,15 @@ struct Monitor {
  	Drwl *drw;
  	Buffer *pool[2];
  	int lrpad;
@@ -44,22 +44,26 @@ index a0df0f4..42635ef 100644
 +	uint64_t shader_point;
 +	int shader_locked; /* holds the software-cursor and scan-out locks */
 +	int shader_dirty; /* redraw the whole output next frame */
++	/* what each of the output's own buffers is missing, in output pixels */
++	struct wlr_damage_ring shader_ring;
  };
  
  typedef struct {
-@@ -450,6 +461,11 @@ static void setpsel(struct wl_listener *listener, void *data);
+@@ -451,6 +464,13 @@ static void setpsel(struct wl_listener *listener, void *data);
  static void setsel(struct wl_listener *listener, void *data);
  static void setup(void);
  static void setstatus(const char *s);
 +static int shaderapply(Monitor *m, struct wlr_output_state *state);
 +static GLuint shadercompile(GLenum type, const char *src);
++static void shaderdamage(pixman_region32_t *dst, const pixman_region32_t *src,
++		int w, int h);
 +static void shaderfree(Monitor *m);
 +static void shaderload(void);
 +static void shaderset(int on);
  static void spawn(const Arg *arg);
  static void spawnfocused(const Arg *arg);
  static void spawnstatuscmd(const StatusBlock *b, int cmd);
-@@ -465,6 +481,7 @@ static void tile(Monitor *m);
+@@ -466,6 +486,7 @@ static void tile(Monitor *m);
  static void togglebar(const Arg *arg);
  static void togglefloating(const Arg *arg);
  static void togglefullscreen(const Arg *arg);
@@ -67,7 +71,7 @@ index a0df0f4..42635ef 100644
  static void toggleswallow(const Arg *arg);
  static void toggleautoswallow(const Arg *arg);
  static void toggletag(const Arg *arg);
-@@ -512,6 +529,11 @@ static struct wlr_scene_tree *drag_icon;
+@@ -513,6 +534,14 @@ static struct wlr_scene_tree *drag_icon;
  static const int layermap[] = { LyrBg, LyrBottom, LyrTop, LyrOverlay };
  static struct wlr_renderer *drw;
  static struct wlr_allocator *alloc;
@@ -76,18 +80,30 @@ index a0df0f4..42635ef 100644
 +static int shader_on, shader_reload;
 +static GLuint shader_prog;
 +static GLint shader_tex, shader_size;
++/* from the shader's dwl-damage line; a negative margin redraws whole outputs */
++static float shader_curve;
++static int shader_margin = -1;
  static struct wlr_compositor *compositor;
  static struct wlr_session *session;
  
-@@ -1233,6 +1255,7 @@ cleanupmon(struct wl_listener *listener, void *data)
+@@ -1240,6 +1269,8 @@ cleanupmon(struct wl_listener *listener, void *data)
  	m->wlr_output->data = NULL;
  	wlr_output_layout_remove(output_layout, m->wlr_output);
  	wlr_scene_output_destroy(m->scene_output);
 +	shaderfree(m);
++	wlr_damage_ring_finish(&m->shader_ring);
  
  	closemon(m);
  	wlr_scene_node_destroy(&m->fullscreen_bg->node);
-@@ -2467,6 +2490,19 @@ gpureset(struct wl_listener *listener, void *data)
+@@ -1566,6 +1597,7 @@ createmon(struct wl_listener *listener, void *data)
+ 
+ 	m = wlr_output->data = ecalloc(1, sizeof(*m));
+ 	m->wlr_output = wlr_output;
++	wlr_damage_ring_init(&m->shader_ring);
+ 
+ 	for (i = 0; i < LENGTH(m->layers); i++)
+ 		wl_list_init(&m->layers[i]);
+@@ -2476,6 +2508,19 @@ gpureset(struct wl_listener *listener, void *data)
  		wlr_output_init_render(m->wlr_output, alloc, drw);
  	}
  
@@ -107,7 +123,7 @@ index a0df0f4..42635ef 100644
  	wlr_allocator_destroy(old_alloc);
  	wlr_renderer_destroy(old_drw);
  }
-@@ -3263,13 +3299,53 @@ rendermon(struct wl_listener *listener, void *data)
+@@ -3272,13 +3317,57 @@ rendermon(struct wl_listener *listener, void *data)
  	/* This function is called every time an output is ready to display a frame,
  	 * generally at the output's refresh rate (e.g. 60Hz). */
  	Monitor *m = wl_container_of(listener, m, frame);
@@ -140,6 +156,10 @@ index a0df0f4..42635ef 100644
  	}
 +	dirty = m->shader_dirty;
 +	m->shader_dirty = 0;
++	/* The output's buffers hold frames from before the toggle (or the
++	 * reload, or the GPU reset) that the ring knows nothing about */
++	if (dirty)
++		wlr_damage_ring_add_whole(&m->shader_ring);
 +
 +	wlr_output_state_init(&state);
 +	if (shader_on) {
@@ -163,7 +183,7 @@ index a0df0f4..42635ef 100644
  	clock_gettime(CLOCK_MONOTONIC, &now);
  	wlr_scene_output_send_frame_done(m->scene_output, &now);
  }
-@@ -3916,6 +3992,258 @@ setstatus(const char *s)
+@@ -3925,6 +4014,349 @@ setstatus(const char *s)
  	nsblocks = b - sblocks + 1;
  }
  
@@ -171,19 +191,24 @@ index a0df0f4..42635ef 100644
 +shaderapply(Monitor *m, struct wlr_output_state *state)
 +{
 +	/* Render the scene into a buffer of our own, then draw that onto the
-+	 * output's buffer through the shader. The scene still only redraws
-+	 * what changed in its buffer, but the shader pass always covers the
-+	 * whole output: it samples away from each pixel (the curve, the
-+	 * neighbourhood taps), so a partial redraw would leave stale edges */
-+	static const GLfloat quad[] = { 0, 0, 1, 0, 0, 1, 1, 1 };
++	 * output's buffer through the shader. The scene only redraws what
++	 * changed in its buffer. The shader samples away from each pixel (the
++	 * curve, the neighbourhood taps), so its pass redraws the output
++	 * pixels that can see a change (shaderdamage()), or all of them if
++	 * the shader doesn't say how far it reaches. The output has several
++	 * buffers in rotation, and shader_ring tracks what each one missed */
++	enum { MAXQUADS = 32 };
++	GLfloat v[MAXQUADS * 12];
 +	struct wlr_output *o = m->wlr_output;
 +	struct wlr_scene_output_state_options opts = {0};
 +	struct wlr_gles2_texture_attribs attribs;
 +	struct wlr_render_pass *pass;
 +	struct wlr_texture *tex;
 +	struct wlr_buffer *buf;
-+	pixman_region32_t whole;
-+	int sync, ok = 0;
++	const pixman_box32_t *r;
++	pixman_region32_t frame, redraw;
++	GLfloat x1, y1, x2, y2;
++	int i, n, sync, ok = 0;
 +
 +	if (m->shader_swapchain && (m->shader_swapchain->width != o->width
 +			|| m->shader_swapchain->height != o->height)) {
@@ -210,6 +235,8 @@ index a0df0f4..42635ef 100644
 +	if (!wlr_output_configure_primary_swapchain(o, state, &o->swapchain)
 +			|| !(buf = wlr_swapchain_acquire(o->swapchain)))
 +		return 0;
++	pixman_region32_init(&frame);
++	pixman_region32_init(&redraw);
 +	if (!(tex = wlr_texture_from_buffer(drw, state->buffer)))
 +		goto unlock;
 +
@@ -235,10 +262,39 @@ index a0df0f4..42635ef 100644
 +		wlr_log(WLR_ERROR, "screen shader: %s's buffer isn't a 2D texture", o->name);
 +		shaderset(0);
 +	}
++
++	/* After shaderload(), which sets shader_margin. frame is what changed
++	 * on screen since the last commit, which is what KMS is told; redraw
++	 * adds whatever this particular buffer missed while others were up */
++	if (shader_prog && shader_on && shader_margin >= 0
++			&& (state->committed & WLR_OUTPUT_STATE_DAMAGE))
++		shaderdamage(&frame, &state->damage, buf->width, buf->height);
++	else
++		pixman_region32_union_rect(&frame, &frame, 0, 0,
++				(unsigned)buf->width, (unsigned)buf->height);
++	wlr_damage_ring_add(&m->shader_ring, &frame);
++	wlr_damage_ring_rotate_buffer(&m->shader_ring, buf, &redraw);
++
 +	if (shader_prog && shader_on) {
++		/* One quad per rect, in [0, 1] across the buffer: the vertex
++		 * shader passes pos on as v_texcoord, so a smaller quad samples
++		 * the same texels the full-screen one would there */
++		r = pixman_region32_rectangles(&redraw, &n);
++		if (n > MAXQUADS) {
++			r = pixman_region32_extents(&redraw);
++			n = 1;
++		}
++		for (i = 0; i < n; i++) {
++			x1 = (GLfloat)r[i].x1 / (GLfloat)buf->width;
++			y1 = (GLfloat)r[i].y1 / (GLfloat)buf->height;
++			x2 = (GLfloat)r[i].x2 / (GLfloat)buf->width;
++			y2 = (GLfloat)r[i].y2 / (GLfloat)buf->height;
++			memcpy(&v[i * 12], (GLfloat[]){ x1, y1, x2, y1, x1, y2,
++					x2, y1, x2, y2, x1, y2 }, 12 * sizeof(GLfloat));
++		}
 +		/* begin_buffer_pass has bound buf and set the viewport; wlroots
 +		 * sets the rest of its GL state per draw, but expects no buffer
-+		 * bound to GL_ARRAY_BUFFER, so the quad stays a client array */
++		 * bound to GL_ARRAY_BUFFER, so the quads stay a client array */
 +		glUseProgram(shader_prog);
 +		glDisable(GL_BLEND);
 +		glActiveTexture(GL_TEXTURE0);
@@ -249,27 +305,29 @@ index a0df0f4..42635ef 100644
 +		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 +		glUniform1i(shader_tex, 0);
 +		glUniform2f(shader_size, (GLfloat)buf->width, (GLfloat)buf->height);
-+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, quad);
++		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, v);
 +		glEnableVertexAttribArray(0);
-+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
++		glDrawArrays(GL_TRIANGLES, 0, n * 6);
 +		glDisableVertexAttribArray(0);
 +		glBindTexture(GL_TEXTURE_2D, 0);
 +		glUseProgram(0);
 +	} else {
 +		/* It failed to load or can't sample this buffer, and has turned
-+		 * itself off: show this one frame unfiltered, not nothing */
++		 * itself off: show this one frame unfiltered, not nothing. frame
++		 * was the whole buffer, so redraw is too */
 +		wlr_render_pass_add_texture(pass, &(struct wlr_render_texture_options){
 +			.texture = tex,
 +			.blend_mode = WLR_RENDER_BLEND_MODE_NONE,
 +		});
 +	}
-+	if (!wlr_render_pass_submit(pass))
++	if (!wlr_render_pass_submit(pass)) {
++		/* The ring has already counted buf as up to date */
++		wlr_damage_ring_add_whole(&m->shader_ring);
 +		goto destroy;
++	}
 +
 +	wlr_output_state_set_buffer(state, buf);
-+	pixman_region32_init_rect(&whole, 0, 0, buf->width, buf->height);
-+	wlr_output_state_set_damage(state, &whole);
-+	pixman_region32_fini(&whole);
++	wlr_output_state_set_damage(state, &frame);
 +	if (sync)
 +		wlr_output_state_set_wait_timeline(state, m->shader_timeline, ++m->shader_point);
 +	ok = 1;
@@ -277,8 +335,42 @@ index a0df0f4..42635ef 100644
 +destroy:
 +	wlr_texture_destroy(tex);
 +unlock:
++	pixman_region32_fini(&frame);
++	pixman_region32_fini(&redraw);
 +	wlr_buffer_unlock(buf);
 +	return ok;
++}
++
++void
++shaderdamage(pixman_region32_t *dst, const pixman_region32_t *src, int w, int h)
++{
++	/* Map the scene's damage to the output pixels whose shading can see
++	 * it, for a barrel-distortion shader like crt.frag's: an output point
++	 * q (in [-1, 1] about the centre) shows the scene at
++	 *   s = q * (1 + curve² * q_other²),
++	 * so on each axis q lies between s / (1 + curve²) and s. A damaged
++	 * rect therefore reaches the bounding box of itself and its copy
++	 * shrunk toward the centre. The margin, in scene pixels, widens it by
++	 * however far the shader's taps reach from s; the extra output pixel
++	 * on each side covers rounding */
++	const pixman_box32_t *r;
++	double k = 1.0 + (double)shader_curve * shader_curve, a, b;
++	int i, n, x1, y1, x2, y2;
++
++	r = pixman_region32_rectangles(src, &n);
++	for (i = 0; i < n; i++) {
++		a = (r[i].x1 - shader_margin) * 2.0 / w - 1;
++		b = (r[i].x2 + shader_margin) * 2.0 / w - 1;
++		x1 = (int)floor((MIN(a, a / k) + 1) * w / 2) - 1;
++		x2 = (int)ceil((MAX(b, b / k) + 1) * w / 2) + 1;
++		a = (r[i].y1 - shader_margin) * 2.0 / h - 1;
++		b = (r[i].y2 + shader_margin) * 2.0 / h - 1;
++		y1 = (int)floor((MIN(a, a / k) + 1) * h / 2) - 1;
++		y2 = (int)ceil((MAX(b, b / k) + 1) * h / 2) + 1;
++		pixman_region32_union_rect(dst, dst, x1, y1,
++				(unsigned)(x2 - x1), (unsigned)(y2 - y1));
++	}
++	pixman_region32_intersect_rect(dst, dst, 0, 0, (unsigned)w, (unsigned)h);
 +}
 +
 +GLuint
@@ -333,7 +425,7 @@ index a0df0f4..42635ef 100644
 +		"	v_texcoord = pos;\n"
 +		"	gl_Position = vec4(pos * 2.0 - 1.0, 0.0, 1.0);\n"
 +		"}\n";
-+	char vsrc[512], log[1024], *src = NULL, *ver;
++	char vsrc[512], log[1024], *src = NULL, *ver, *dmg;
 +	GLuint vs = 0, fs = 0, prog;
 +	size_t verlen;
 +	long len;
@@ -341,6 +433,7 @@ index a0df0f4..42635ef 100644
 +	FILE *f;
 +
 +	shader_reload = 0;
++	shader_margin = -1;
 +	if (shader_prog)
 +		glDeleteProgram(shader_prog);
 +	shader_prog = 0;
@@ -391,6 +484,24 @@ index a0df0f4..42635ef 100644
 +	shader_tex = glGetUniformLocation(prog, "tex");
 +	shader_size = glGetUniformLocation(prog, "fullSize");
 +
++	/* Partial redraws (shaderdamage()) need the shader's barrel curve and
++	 * how many pixels its taps reach from the sample point, from a line
++	 * like `// dwl-damage: curve=0.14 margin=4`. Without one, or with a
++	 * negative margin, every frame redraws the whole output, which is
++	 * the only safe guess for an arbitrary shader */
++	if ((dmg = strstr(src, "dwl-damage:"))
++			&& sscanf(dmg, "dwl-damage: curve=%f margin=%d",
++				&shader_curve, &shader_margin) != 2) {
++		wlr_log(WLR_ERROR, "screen shader: can't parse %.*s",
++				(int)strcspn(dmg, "\r\n"), dmg);
++		shader_margin = -1;
++	}
++	if (shader_margin >= 0)
++		wlr_log(WLR_INFO, "screen shader: partial redraws, curve %g, margin %d",
++				(double)shader_curve, shader_margin);
++	else
++		wlr_log(WLR_INFO, "screen shader: redrawing whole outputs");
++
 +out:
 +	glDeleteShader(vs);
 +	glDeleteShader(fs);
@@ -422,7 +533,7 @@ index a0df0f4..42635ef 100644
  void
  spawnstatuscmd(const StatusBlock *b, int cmd)
  {
-@@ -4190,6 +4518,12 @@ togglefullscreen(const Arg *arg)
+@@ -4199,6 +4631,12 @@ togglefullscreen(const Arg *arg)
  		setfullscreen(sel, !sel->isfullscreen);
  }
  
@@ -435,3 +546,54 @@ index a0df0f4..42635ef 100644
  void
  toggleswallow(const Arg *arg)
  {
+diff --git a/dwl.c.orig b/dwl.c.orig
+index 286f34b..e1733cb 100644
+--- a/dwl.c.orig
++++ b/dwl.c.orig
+@@ -95,13 +95,14 @@
+ #define LISTEN(E, L, H)         wl_signal_add((E), ((L)->notify = (H), (L)))
+ #define LISTEN_STATIC(E, H)     do { struct wl_listener *_l = ecalloc(1, sizeof(*_l)); _l->notify = (H); wl_signal_add((E), _l); } while (0)
+ #define BORDERPX(C)             (borderpx + ((C)->swallowing ? (int)ceilf(swallowborder * (C)->swallowing->bw) : 0))
++#define LAUNCHER_SYMBOL         "^"
+ #define TEXTW(mon, text)        (drwl_font_getwidth(mon->drw, text) + mon->lrpad)
+ 
+ /* enums */
+ enum { SchemeNorm, SchemeSel, SchemeUrg }; /* color schemes */
+ enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
+ enum { XDGShell, LayerShell, X11 }; /* client types */
+-enum { ClkTagBar, ClkLtSymbol, ClkStatus, ClkTitle, ClkClient, ClkRoot, ClkTray }; /* clicks */
++enum { ClkTagBar, ClkLtSymbol, ClkStatus, ClkTitle, ClkClient, ClkRoot, ClkTray, ClkLauncher }; /* clicks */
+ enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrTop, LyrFS, LyrUnmanaged, LyrOverlay,
+ 	LyrIMPopup, LyrBlock, NUM_LAYERS }; /* scene layers */
+ enum { AxisUp, AxisRight, AxisDown, AxisLeft };
+@@ -1027,6 +1028,11 @@ buttonpress(struct wl_listener *listener, void *data)
+ 				occ |= c->tags == TAGMASK ? 0 : c->tags;
+ 			}
+ 			c = NULL; /* loop leaves c pointing at the list head; focus code below reuses it */
++			x = TEXTW(selmon, LAUNCHER_SYMBOL);
++			if (cx < x) {
++				click = ClkLauncher;
++				goto launcher_done;
++			}
+ 			do {
+ 				if (!(occ & 1 << i || selmon->tagset[selmon->seltags] & 1 << i))
+ 					continue;
+@@ -1052,6 +1058,7 @@ buttonpress(struct wl_listener *listener, void *data)
+ 			} else
+ 				click = ClkTitle;
+ 		}
++launcher_done:
+ 
+ 		/* Change focus if the button was _pressed_ over a client
+ 		   or a layer surface with on-demand keyboard interactivity */
+@@ -2026,7 +2033,9 @@ drawbar(Monitor *m)
+ 		if (c->isurgent)
+ 			urg |= c->tags;
+ 	}
+-	x = 0;
++	w = TEXTW(m, LAUNCHER_SYMBOL);
++	drwl_setscheme(m->drw, colors[SchemeNorm]);
++	x = drwl_text(m->drw, 0, 0, w, m->b.height, m->lrpad / 2, LAUNCHER_SYMBOL, 0);
+ 	c = focustop(m);
+ 	for (i = 0; i < LENGTH(tags); i++) {
+ 		if(!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))

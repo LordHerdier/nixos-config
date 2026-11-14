@@ -19,8 +19,11 @@
 #
 # SCREEN SHADER. `screenShader` is the fragment shader 72-screen-shader.patch
 # runs over each output (Super+Shift+G), passed the same way; null keeps
-# config.h's fallback. The overlay points it at hyprCRT's crt.frag. dwl
-# rereads the file each time the shader is turned on.
+# config.h's fallback. The overlay points it at ./crt.frag, hyprCRT's shader
+# plus a `dwl-damage:` line giving its curve and tap reach, which lets dwl
+# redraw only the pixels that can see a change; a shader without that line
+# gets whole-output redraws. dwl rereads the file each time the shader is
+# turned on.
 
 {
   lib,
