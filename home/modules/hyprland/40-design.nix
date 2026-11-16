@@ -153,7 +153,7 @@ in
         shadow = {
           enabled = true;
           range = 24;
-          render_power = 5;
+          render_power = 4;
           color = "rgba(0,0,0,0.7)";
         };
         blur = {
