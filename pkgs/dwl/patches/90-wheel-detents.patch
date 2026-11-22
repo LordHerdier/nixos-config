@@ -1,0 +1,61 @@
+--- a/dwl.c
++++ b/dwl.c
+@@ -909,6 +909,12 @@
+ 	double cx;
+ 	int tw;
+ 	StatusBlock *sb;
++	double delta = event->delta;
++	int32_t discrete = event->delta_discrete;
++	static int32_t wheelacc[2];
++	static uint32_t wheeltime[2];
++	int o = event->orientation == WL_POINTER_AXIS_VERTICAL_SCROLL;
++	int32_t steps;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+@@ -945,10 +951,32 @@
+ 		return;
+ 	}
+ 
++	/* Hi-res wheels (e.g. the MX Master 3S over Bluetooth) report each notch
++	 * as several partial steps, and clients that act on every event move
++	 * before the wheel reaches its detent. Sum the partial steps and pass on
++	 * only whole detents (96+ of 120 units), dropping a remainder left over from an
++	 * earlier, abandoned turn. */
++	if (event->source == WL_POINTER_AXIS_SOURCE_WHEEL && discrete) {
++		if (event->time_msec - wheeltime[o] > 250 || (wheelacc[o] ^ discrete) < 0)
++			wheelacc[o] = 0;
++		wheeltime[o] = event->time_msec;
++		wheelacc[o] += discrete;
++		/* A detent counts from 96 units: real notches total 100-130, so
++		 * demanding the full 120 misses some. */
++		steps = (abs(wheelacc[o]) + 24) / 120;
++		if (!steps)
++			return;
++		if (wheelacc[o] < 0)
++			steps = -steps;
++		wheelacc[o] -= steps * 120;
++		discrete = steps * 120;
++		delta = steps * 15.0;
++	}
++
+ 	if (event->orientation == WL_POINTER_AXIS_VERTICAL_SCROLL)
+-		adir = event->delta > 0 ? AxisDown : AxisUp;
++		adir = delta > 0 ? AxisDown : AxisUp;
+ 	else
+-		adir = event->delta > 0 ? AxisRight : AxisLeft;
++		adir = delta > 0 ? AxisRight : AxisLeft;
+ 	for (a = axes; a < END(axes); a++) {
+ 		if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func) {
+ 			a->func(&a->arg);
+@@ -958,8 +986,8 @@
+ 
+ 	/* Notify the client with pointer focus of the axis event. */
+ 	wlr_seat_pointer_notify_axis(seat,
+-			event->time_msec, event->orientation, event->delta,
+-			event->delta_discrete, event->source, event->relative_direction);
++			event->time_msec, event->orientation, delta,
++			discrete, event->source, event->relative_direction);
+ }
+ 
+ bool
