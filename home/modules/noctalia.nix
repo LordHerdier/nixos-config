@@ -166,8 +166,10 @@ in
           "wipe"
           "zoom"
         ];
+        # Off: dwl-wallpaper owns the wallpaper and pushes it to noctalia
+        # (for the lock screen); rotation here would override it.
         automation = {
-          enabled = true;
+          enabled = false;
           interval_seconds = 1800;
           order = "random";
           recursive = true;

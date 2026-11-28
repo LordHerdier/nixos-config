@@ -81,7 +81,7 @@
       }
 
       image {
-          path = .face.icon
+          path = ~/.face
           size = 200
           position = 0, 75
           halign = center

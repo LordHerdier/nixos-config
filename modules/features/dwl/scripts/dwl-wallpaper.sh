@@ -8,6 +8,9 @@
 # While `theme-set wal` is active a new wallpaper also re-derives the pywal
 # colours (theme-set is a Home Manager package, found on PATH); `restore`
 # doesn't, as wal already holds that image.
+#
+# Every pick is also pushed to noctalia (`noctalia msg wallpaper-set`) so its
+# lock screen matches, and symlinked at ~/.current.wall for hyprlock.
 
 dir="${DWL_WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/dwl-wallpaper"
@@ -71,6 +74,9 @@ esac
 mkdir -p "$(dirname "$state")"
 printf '%s\n' "$pick" >"$state"
 
+# hyprlock's background reads ~/.current.wall (hyprland/hyprlock.nix).
+ln -sfn "$pick" "$HOME/.current.wall"
+
 # Start the new swaybg before stopping the old ones, so the background never
 # flashes. nixpkgs' swaybg is a wrapper (process ".swaybg-wrapped"), so
 # match the command line rather than `pgrep -x swaybg`.
@@ -78,6 +84,13 @@ mapfile -t old < <(pgrep -u "$(id -u)" -f '(^|/)\.?swaybg(-wrapped)? -m fill' ||
 setsid swaybg -m fill -i "$pick" >/dev/null 2>&1 &
 sleep 0.3
 [ "${#old[@]}" -gt 0 ] && kill "${old[@]}" 2>/dev/null || true
+
+# Mirror it into noctalia, which draws its lock screen over its own wallpaper
+# state (no file to symlink). Needs noctalia's automation off, or it rotates
+# the image away again. Skipped if noctalia isn't running.
+if command -v noctalia >/dev/null; then
+  noctalia msg wallpaper-set "$pick" >/dev/null 2>&1 || true
+fi
 
 if [ "${1:-}" != restore ] && [ -e "${XDG_STATE_HOME:-$HOME/.local/state}/theme/wal" ] \
   && command -v theme-set >/dev/null; then
