@@ -27,6 +27,9 @@
     noctalia.url = "github:noctalia-dev/noctalia";
     noctalia.inputs.nixpkgs.follows = "nixpkgs";
 
+    luciole.url = "github:noctalia-dev/luciole";
+    luciole.inputs.nixpkgs.follows = "nixpkgs";
+
     easyeffects-presets.url = "github:Soab42/easyeffects-presets";
     easyeffects-presets.flake = false;
 

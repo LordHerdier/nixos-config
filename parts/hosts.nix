@@ -3,6 +3,7 @@ let
   inherit (inputs)
     dotfiles
     home-manager
+    luciole
     nixos-hardware
     nixos-wsl
     nixpkgs
@@ -118,6 +119,8 @@ in
         nixos-hardware.nixosModules.framework-amd-ai-300-series
         qylock.nixosModules.default
         ../modules/features/qylock.nix
+        luciole.nixosModules.default
+        ../modules/features/luciole.nix
         ../modules/features/dwl
       ];
       extraHomeUsers = {

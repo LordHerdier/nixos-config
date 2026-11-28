@@ -291,6 +291,26 @@
         "type": "github"
       }
     },
+    "luciole": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795801582,
+        "narHash": "sha256-I89k8HiKFeJacJlXMSOJ3qrxQ3Zrk1Yu1kBKFTvWtO8=",
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "rev": "c91150b41dab0eac403800e8d005946d8f1fd68c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "type": "github"
+      }
+    },
     "mnw": {
       "locked": {
         "lastModified": 1784154424,
@@ -471,6 +491,7 @@
         "hacky-tts": "hacky-tts",
         "home-manager": "home-manager",
         "hyprCRT-shader": "hyprCRT-shader",
+        "luciole": "luciole",
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
